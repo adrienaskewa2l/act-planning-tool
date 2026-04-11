@@ -1,0 +1,707 @@
+
+// ── CONSTANTS ──
+const PX_PER_MIN = 1.6;
+const OVERLAP_OFFSET_PX = 20;
+const START_H = 7;
+const END_H = 23;
+const TOTAL_MINS = (END_H - START_H) * 60;
+
+const DEFAULT_TYPES = {
+  LOUANGE:      { label: 'Louange', color: '#C39BD3' },
+  PREDICATION:  { label: 'Prédication', color: '#82E0AA' },
+  REPAS:        { label: 'Repas', color: '#FAD7A0' },
+  LOGISTIQUE:   { label: 'Logistique', color: '#AED6F1' },
+  REPETITION:   { label: 'Répétition', color: '#D7BDE2' },
+  REUNION:      { label: 'Réunion / Brief', color: '#D5F5E3' },
+  BOOST:        { label: 'Boost', color: '#F1948A' },
+  STE_CENE:     { label: 'Ste Cène', color: '#BB8FCE' },
+  PRIERE:       { label: 'Prière', color: '#7FB3D3' },
+  INTERCESSION: { label: 'Intercession', color: '#D6EAF8' },
+  FUNDRAISING:  { label: 'Levée de fonds', color: '#F9E79F' },
+  TED_PITCH:    { label: 'Pitch / TED', color: '#A9DFBF' },
+  ANNONCES:     { label: 'Annonces', color: '#A9DFBF' },
+  TECHNIQUE:    { label: 'Technique', color: '#D5D8DC' }
+};
+
+let schedule = null;
+let hiddenTypes = new Set();
+
+// ── TIME UTILITIES ──
+function timeToY(t) {
+  const [h, m] = t.split(':').map(Number);
+  return ((h - START_H) * 60 + m) * PX_PER_MIN;
+}
+function timeToMinutes(t) {
+  const [h, m] = String(t || '00:00').split(':').map(Number);
+  return h * 60 + m;
+}
+function yToTime(y) {
+  const totalMin = Math.round(y / PX_PER_MIN / 5) * 5;
+  const clamped = Math.max(0, Math.min(totalMin, TOTAL_MINS - 15));
+  const h = START_H + Math.floor(clamped / 60);
+  const m = clamped % 60;
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+}
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escAttr(str) {
+  return esc(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function genId() { return 'e_' + Math.random().toString(36).slice(2,9); }
+
+function ensureScheduleShape() {
+  schedule.attendance = schedule.attendance || {};
+  ['vendredi', 'samedi', 'dimanche'].forEach(key => {
+    if (schedule.attendance[key] === undefined) schedule.attendance[key] = '';
+  });
+  schedule.types = schedule.types || {};
+  Object.entries(DEFAULT_TYPES).forEach(([key, config]) => {
+    if (!schedule.types[key]) schedule.types[key] = { ...config };
+  });
+  forEachEvent(ev => {
+    if (ev.type && !schedule.types[ev.type]) {
+      schedule.types[ev.type] = {
+        label: ev.type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase()),
+        color: ev.color || '#A9DFBF'
+      };
+    }
+  });
+}
+
+function forEachEvent(callback) {
+  (schedule.days || []).forEach(day => {
+    (day.sessions || []).forEach(session => {
+      (session.events || []).forEach(ev => callback(ev, day, session));
+    });
+  });
+}
+
+function typeEntries() {
+  return Object.entries(schedule.types || {}).sort((a, b) => {
+    return (a[1].label || a[0]).localeCompare(b[1].label || b[0]);
+  });
+}
+
+function typeLabel(type) {
+  return (schedule.types && schedule.types[type] && schedule.types[type].label) || type || 'Type';
+}
+
+function typeColor(type) {
+  return (schedule.types && schedule.types[type] && schedule.types[type].color) || '#A9DFBF';
+}
+
+function applyTypeConfigToEvents(type) {
+  const color = typeColor(type);
+  forEachEvent(ev => {
+    if (ev.type === type) ev.color = color;
+  });
+}
+
+// ── LOAD + RENDER ──
+async function loadSchedule() {
+  try {
+    const r = await fetch('/api/schedule');
+    schedule = await r.json();
+    ensureScheduleShape();
+    renderAll();
+  } catch (err) {
+    document.getElementById('days-row').innerHTML = '<div style="padding:24px;color:#b00020;font-weight:600">Erreur de chargement du planning. Rechargez la page ou relancez l\'outil.</div>';
+    console.error(err);
+  }
+}
+
+function renderAll() {
+  renderTimeAxis();
+  renderLegend();
+  renderDays();
+}
+
+function renderTimeAxis() {
+  const ax = document.getElementById('time-axis');
+  ax.style.height = TOTAL_MINS * PX_PER_MIN + 'px';
+  ax.innerHTML = '';
+  for (let h = START_H; h <= END_H; h++) {
+    const y = (h - START_H) * 60 * PX_PER_MIN;
+    const lbl = document.createElement('div');
+    lbl.className = 'hour-label';
+    lbl.style.top = y + 'px';
+    lbl.textContent = String(h).padStart(2,'0') + ':00';
+    ax.appendChild(lbl);
+  }
+}
+
+function renderLegend() {
+  const leg = document.getElementById('legend');
+  leg.innerHTML = '<h3>Types d\'événements</h3><button class="legend-add" onclick="openTypeModal()">+ Ajouter un type</button>';
+  typeEntries().forEach(([k, config]) => {
+    const label = config.label || k;
+    const item = document.createElement('div');
+    item.className = 'legend-item' + (hiddenTypes.has(k) ? ' hidden-type' : '');
+    item.dataset.type = k;
+    item.innerHTML = `
+      <div class="legend-dot" style="background:${config.color || '#A9DFBF'}"></div>
+      <span class="legend-label">${esc(label)}</span>
+      <button class="legend-edit" title="Modifier ce type" onclick="event.stopPropagation(); openTypeModal('${escAttr(k)}')">&#9998;</button>
+    `;
+    item.addEventListener('click', () => {
+      if (hiddenTypes.has(k)) hiddenTypes.delete(k);
+      else hiddenTypes.add(k);
+      renderAll();
+    });
+    leg.appendChild(item);
+  });
+}
+
+function renderDays() {
+  const row = document.getElementById('days-row');
+  row.innerHTML = '';
+  const timelineH = TOTAL_MINS * PX_PER_MIN;
+
+  for (const day of schedule.days) {
+    const overlapLevels = computeOverlapLevels(day);
+    const col = document.createElement('div');
+    col.className = 'day-col';
+    col.dataset.dayId = day.id;
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.className = 'day-header';
+    hdr.innerHTML = `<span>${day.name}</span><button class="add-btn" title="Ajouter un événement" onclick="openAddModal('${day.id}')">+</button>`;
+    col.appendChild(hdr);
+
+    // Events area
+    const area = document.createElement('div');
+    area.className = 'events-area';
+    area.style.height = timelineH + 'px';
+    area.dataset.dayId = day.id;
+
+    // Half-hour lines
+    for (let m = 30; m < TOTAL_MINS; m += 60) {
+      const line = document.createElement('div');
+      line.className = 'half-line';
+      line.style.top = m * PX_PER_MIN + 'px';
+      area.appendChild(line);
+    }
+
+    // Click on empty area → add event
+    area.addEventListener('click', function(e) {
+      if (e.target === area) {
+        const rect = area.getBoundingClientRect();
+        const y = e.clientY - rect.top + area.parentElement.parentElement.scrollTop;
+        openAddModal(day.id, null, yToTime(y));
+      }
+    });
+
+    // Sessions + events
+    let prevSessionStart = -1;
+    for (const session of day.sessions) {
+      if (session.events.length === 0) continue;
+      const firstTime = session.events[0].time;
+      const sepY = timeToY(firstTime) - 18;
+      if (sepY > prevSessionStart) {
+        const sep = document.createElement('div');
+        sep.className = 'session-sep';
+        sep.style.top = Math.max(0, sepY) + 'px';
+        sep.innerHTML = `<div class="session-sep-line"></div><div class="session-sep-label">${esc(session.name)}</div><div class="session-sep-line"></div>`;
+        area.appendChild(sep);
+        prevSessionStart = sepY;
+      }
+
+      for (const ev of session.events) {
+        if (!ev.time) continue;
+        const block = createEventBlock(ev, day.id, session.id, overlapLevels[ev.id] || 0);
+        area.appendChild(block);
+      }
+    }
+
+    col.appendChild(area);
+    row.appendChild(col);
+  }
+
+  // Update grid wrapper height
+  document.querySelector('.time-axis').style.height = timelineH + 'px';
+}
+
+function computeOverlapLevels(day) {
+  const allEvents = [];
+  for (const session of day.sessions || []) {
+    for (const ev of session.events || []) {
+      if (!ev.time) continue;
+      const start = timeToMinutes(ev.time);
+      const end = start + (parseInt(ev.duration, 10) || 0);
+      allEvents.push({ id: ev.id, start, end });
+    }
+  }
+
+  allEvents.sort((a, b) => {
+    if (a.start !== b.start) return a.start - b.start;
+    return b.end - a.end;
+  });
+
+  const activeEndsByLevel = [];
+  const levelsById = {};
+
+  for (const ev of allEvents) {
+    let level = 0;
+    while (activeEndsByLevel[level] !== undefined && activeEndsByLevel[level] > ev.start) {
+      level += 1;
+    }
+    levelsById[ev.id] = level;
+    activeEndsByLevel[level] = ev.end;
+  }
+
+  return levelsById;
+}
+
+function createEventBlock(ev, dayId, sessionId, overlapLevel) {
+  const top = timeToY(ev.time);
+  const h = Math.max(ev.duration * PX_PER_MIN, 22);
+  const left = 4 + (overlapLevel * OVERLAP_OFFSET_PX);
+  const div = document.createElement('div');
+  div.className = 'event-block' + (hiddenTypes.has(ev.type) ? ' hidden-type' : '');
+  div.dataset.evId = ev.id;
+  div.dataset.type = ev.type;
+  const bgColor = ev.color || typeColor(ev.type);
+  div.style.cssText = `top:${top}px;height:${h}px;left:${left}px;right:4px;background:${bgColor};z-index:${3 + overlapLevel}`;
+  div.style.borderLeftColor = darken(bgColor, 40);
+
+  const teamsHtml = (ev.teams||[]).length
+    ? `<div class="ev-teams">${esc((ev.teams||[]).join(', '))}</div>` : '';
+  div.innerHTML = `
+    <div class="ev-time">${esc(ev.time)}${ev.duration >= 15 ? ' <span style="opacity:.55">(${ev.duration}min)</span>' : ''}</div>
+    <div class="ev-title">${esc(ev.title)}</div>
+    ${teamsHtml}
+    <div class="resize-handle"></div>
+  `;
+
+  div.addEventListener('click', e => { if (!e._resized) openEditModal(ev, dayId, sessionId); });
+
+  div.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('resize-handle') || e.button !== 0) return;
+    const startY = e.clientY;
+    const startTime = ev.time;
+    let moved = false;
+    const onMove = me => {
+      const delta = me.clientY - startY;
+      if (Math.abs(delta) < 4) return;
+      moved = true;
+      me.preventDefault();
+      ev.time = yToTime(timeToY(startTime) + delta);
+      div.style.top = timeToY(ev.time) + 'px';
+      const timeEl = div.querySelector('.ev-time');
+      if (timeEl) {
+        timeEl.innerHTML = `${esc(ev.time)}${ev.duration >= 15 ? ' <span style="opacity:.55">(' + ev.duration + 'min)</span>' : ''}`;
+      }
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      if (moved) {
+        const day = schedule.days.find(d => d.id === dayId);
+        const session = day ? day.sessions.find(s => s.id === sessionId) : null;
+        if (session) session.events.sort((a, b) => a.time.localeCompare(b.time));
+        div._resized = true;
+        setTimeout(() => { if (div) delete div._resized; }, 200);
+        renderDays();
+      }
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  // Resize
+  div.querySelector('.resize-handle').addEventListener('mousedown', e => {
+    e.stopPropagation(); e.preventDefault();
+    const startY = e.clientY;
+    const startDur = ev.duration;
+    const onMove = me => {
+      const delta = me.clientY - startY;
+      ev.duration = Math.max(5, Math.round((startDur + delta / PX_PER_MIN) / 5) * 5);
+      div.style.height = Math.max(ev.duration * PX_PER_MIN, 22) + 'px';
+      const durEl = div.querySelector('.ev-time');
+      if (durEl) durEl.innerHTML = `${esc(ev.time)} <span style="opacity:.55">(${ev.duration}min)</span>`;
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      e.target.parentElement._resized = true;
+      setTimeout(() => { if(e.target.parentElement) delete e.target.parentElement._resized; }, 200);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  return div;
+}
+
+function darken(hex, amt) {
+  let r = parseInt(hex.slice(1,3),16) - amt;
+  let g = parseInt(hex.slice(3,5),16) - amt;
+  let b = parseInt(hex.slice(5,7),16) - amt;
+  r = Math.max(0,r); g = Math.max(0,g); b = Math.max(0,b);
+  return '#' + [r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+// ── MODAL ──
+let _editEv = null, _editDay = null, _editSession = null;
+
+function buildSessionSelect(dayId, currentSession) {
+  const sel = document.getElementById('f-session-sel');
+  sel.innerHTML = '';
+  const day = schedule.days.find(d => d.id === dayId);
+  if (!day) return;
+  day.sessions.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id; opt.textContent = s.name;
+    if (s.id === currentSession) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function buildTypeSelect(currentType) {
+  const sel = document.getElementById('f-type');
+  sel.innerHTML = '';
+  typeEntries().forEach(([key, config]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = config.label || key;
+    if (key === currentType) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function buildColorPresets() {
+  const container = document.getElementById('color-presets');
+  container.innerHTML = '';
+  typeEntries().forEach(([type, config]) => {
+    const color = config.color || '#A9DFBF';
+    const dot = document.createElement('div');
+    dot.className = 'color-preset';
+    dot.style.background = color;
+    dot.title = config.label || type;
+    dot.dataset.color = color;
+    dot.addEventListener('click', () => {
+      document.getElementById('f-color').value = color;
+      document.querySelectorAll('.color-preset').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+    });
+    container.appendChild(dot);
+  });
+}
+
+function openEditModal(ev, dayId, sessionId) {
+  _editEv = ev; _editDay = dayId; _editSession = sessionId;
+  buildTypeSelect(ev.type || 'ANNONCES');
+  document.getElementById('modal-h2').textContent = 'Modifier l\'événement';
+  document.getElementById('f-id').value = ev.id;
+  document.getElementById('f-day').value = dayId;
+  document.getElementById('f-time').value = ev.time;
+  document.getElementById('f-duration').value = ev.duration;
+  document.getElementById('f-title').value = ev.title;
+  document.getElementById('f-type').value = ev.type || 'ANNONCES';
+  document.getElementById('f-color').value = ev.color || typeColor(ev.type);
+  document.getElementById('f-teams').value = (ev.teams||[]).join(', ');
+  document.getElementById('f-details').value = ev.details || '';
+  buildSessionSelect(dayId, sessionId);
+  buildColorPresets();
+  document.getElementById('btn-delete').style.display = 'inline-flex';
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function openAddModal(dayId, sessionId, time) {
+  _editEv = null; _editDay = dayId; _editSession = sessionId;
+  buildTypeSelect('ANNONCES');
+  document.getElementById('modal-h2').textContent = 'Ajouter un événement';
+  document.getElementById('f-id').value = '';
+  document.getElementById('f-day').value = dayId;
+  document.getElementById('f-time').value = time || '09:00';
+  document.getElementById('f-duration').value = 30;
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-type').value = 'ANNONCES';
+  document.getElementById('f-color').value = typeColor('ANNONCES');
+  document.getElementById('f-teams').value = '';
+  document.getElementById('f-details').value = '';
+  // default to first session if none given
+  const day = schedule.days.find(d => d.id === dayId);
+  buildSessionSelect(dayId, sessionId || (day && day.sessions[0] && day.sessions[0].id));
+  buildColorPresets();
+  document.getElementById('btn-delete').style.display = 'none';
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+  _editEv = null;
+}
+
+function onTypeChange() {
+  const type = document.getElementById('f-type').value;
+  const color = typeColor(type);
+  if (color) {
+    document.getElementById('f-color').value = color;
+    document.querySelectorAll('.color-preset').forEach(d => {
+      d.classList.toggle('active', d.dataset.color === color);
+    });
+  }
+}
+
+function adjustDur(delta) {
+  const inp = document.getElementById('f-duration');
+  inp.value = Math.max(5, (parseInt(inp.value)||30) + delta);
+}
+
+function saveEvent() {
+  const id = document.getElementById('f-id').value || genId();
+  const dayId = document.getElementById('f-day').value;
+  const sessionId = document.getElementById('f-session-sel').value;
+  const teams = document.getElementById('f-teams').value
+    .split(',').map(t => t.trim()).filter(t => t);
+
+  const ev = {
+    id,
+    time: document.getElementById('f-time').value,
+    duration: parseInt(document.getElementById('f-duration').value) || 30,
+    title: document.getElementById('f-title').value,
+    type: document.getElementById('f-type').value,
+    color: document.getElementById('f-color').value,
+    teams,
+    details: document.getElementById('f-details').value
+  };
+
+  const day = schedule.days.find(d => d.id === dayId);
+  if (!day) return;
+
+  // Remove from old session if session changed
+  if (_editEv && _editSession && _editSession !== sessionId) {
+    const oldSession = day.sessions.find(s => s.id === _editSession);
+    if (oldSession) oldSession.events = oldSession.events.filter(e => e.id !== id);
+  }
+
+  const session = day.sessions.find(s => s.id === sessionId);
+  if (!session) return;
+
+  const idx = session.events.findIndex(e => e.id === id);
+  if (idx >= 0) session.events[idx] = ev;
+  else session.events.push(ev);
+
+  // Sort by time
+  session.events.sort((a, b) => a.time.localeCompare(b.time));
+
+  closeModal();
+  renderDays();
+  showToast('Événement enregistré');
+}
+
+function deleteEvent() {
+  if (!_editEv) return;
+  if (!confirm('Supprimer cet événement ?')) return;
+  const day = schedule.days.find(d => d.id === _editDay);
+  if (day) {
+    day.sessions.forEach(s => {
+      s.events = s.events.filter(e => e.id !== _editEv.id);
+    });
+  }
+  closeModal();
+  renderDays();
+  showToast('Événement supprimé');
+}
+
+// ── TYPE MODAL ──
+function typeKeyFromLabel(label) {
+  return String(label || 'TYPE')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toUpperCase() || 'TYPE';
+}
+
+function uniqueTypeKey(baseKey) {
+  let key = baseKey;
+  let i = 2;
+  while (schedule.types[key]) {
+    key = `${baseKey}_${i}`;
+    i += 1;
+  }
+  return key;
+}
+
+function openTypeModal(typeKey) {
+  const isEdit = Boolean(typeKey);
+  const config = isEdit ? schedule.types[typeKey] : null;
+  document.getElementById('type-modal-h2').textContent = isEdit ? 'Modifier un type' : 'Ajouter un type';
+  document.getElementById('t-original-key').value = typeKey || '';
+  document.getElementById('t-label').value = config ? (config.label || typeKey) : '';
+  document.getElementById('t-key').value = typeKey || '';
+  document.getElementById('t-key').readOnly = isEdit;
+  document.getElementById('type-key-row').style.display = isEdit ? 'none' : 'block';
+  document.getElementById('t-color').value = config ? (config.color || '#A9DFBF') : '#A9DFBF';
+  document.getElementById('modal-type').classList.remove('hidden');
+}
+
+function closeTypeModal() {
+  document.getElementById('modal-type').classList.add('hidden');
+}
+
+function saveType() {
+  const originalKey = document.getElementById('t-original-key').value;
+  const label = document.getElementById('t-label').value.trim();
+  const color = document.getElementById('t-color').value || '#A9DFBF';
+  if (!label) {
+    showToast('Donnez un nom au type');
+    return;
+  }
+
+  const key = originalKey || uniqueTypeKey(typeKeyFromLabel(document.getElementById('t-key').value.trim() || label));
+  schedule.types[key] = { label, color };
+  applyTypeConfigToEvents(key);
+
+  closeTypeModal();
+  buildTypeSelect(document.getElementById('f-type').value);
+  buildColorPresets();
+  renderAll();
+  showToast('Type mis à jour');
+}
+
+// ── SESSION MODAL ──
+function openAddSessionModal() {
+  const sel = document.getElementById('fs-day');
+  sel.innerHTML = '';
+  schedule.days.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id; opt.textContent = d.name;
+    sel.appendChild(opt);
+  });
+  renderExistingSessions(sel.value);
+  sel.onchange = () => renderExistingSessions(sel.value);
+  document.getElementById('fs-name').value = '';
+  document.getElementById('modal-session').classList.remove('hidden');
+}
+
+function renderExistingSessions(dayId) {
+  const day = schedule.days.find(d => d.id === dayId);
+  const container = document.getElementById('fs-existing');
+  container.innerHTML = '';
+  if (!day) return;
+  day.sessions.forEach(s => {
+    const tag = document.createElement('span');
+    tag.className = 'session-tag';
+    tag.innerHTML = `${esc(s.name)} <span class="del-tag" title="Supprimer" onclick="deleteSession('${dayId}','${s.id}')">&#10005;</span>`;
+    container.appendChild(tag);
+  });
+}
+
+function addSession() {
+  const dayId = document.getElementById('fs-day').value;
+  const name = document.getElementById('fs-name').value.trim();
+  if (!name) return;
+  const day = schedule.days.find(d => d.id === dayId);
+  if (!day) return;
+  day.sessions.push({ id: 'sess_' + genId(), name, events: [] });
+  document.getElementById('fs-name').value = '';
+  renderExistingSessions(dayId);
+  showToast('Session ajoutée');
+}
+
+function deleteSession(dayId, sessionId) {
+  const day = schedule.days.find(d => d.id === dayId);
+  if (!day) return;
+  const sess = day.sessions.find(s => s.id === sessionId);
+  if (sess && sess.events.length > 0) {
+    if (!confirm(`Supprimer la session "${sess.name}" et ses ${sess.events.length} événement(s) ?`)) return;
+  }
+  day.sessions = day.sessions.filter(s => s.id !== sessionId);
+  renderExistingSessions(dayId);
+  renderDays();
+}
+
+function closeSessionModal() {
+  document.getElementById('modal-session').classList.add('hidden');
+  renderDays();
+}
+
+function openMetaModal() {
+  ensureScheduleShape();
+  document.getElementById('m-event').value = schedule.event || '';
+  document.getElementById('m-lieu').value = schedule.lieu || '';
+  document.getElementById('m-installation').value = schedule.installation_dates || '';
+  document.getElementById('m-conference').value = schedule.conference_dates || '';
+  document.getElementById('m-dresscode').value = schedule.dresscode || '';
+  document.getElementById('m-att-vendredi').value = schedule.attendance.vendredi || '';
+  document.getElementById('m-att-samedi').value = schedule.attendance.samedi || '';
+  document.getElementById('m-att-dimanche').value = schedule.attendance.dimanche || '';
+  document.getElementById('modal-meta').classList.remove('hidden');
+}
+
+function closeMetaModal() {
+  document.getElementById('modal-meta').classList.add('hidden');
+}
+
+function saveMeta() {
+  ensureScheduleShape();
+  schedule.event = document.getElementById('m-event').value.trim();
+  schedule.lieu = document.getElementById('m-lieu').value.trim();
+  schedule.installation_dates = document.getElementById('m-installation').value.trim();
+  schedule.conference_dates = document.getElementById('m-conference').value.trim();
+  schedule.dresscode = document.getElementById('m-dresscode').value.trim();
+  schedule.attendance.vendredi = document.getElementById('m-att-vendredi').value.trim();
+  schedule.attendance.samedi = document.getElementById('m-att-samedi').value.trim();
+  schedule.attendance.dimanche = document.getElementById('m-att-dimanche').value.trim();
+  closeMetaModal();
+  showToast('Infos générales enregistrées');
+}
+
+// ── SAVE / GENERATE ──
+async function saveSchedule() {
+  const r = await fetch('/api/schedule', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(schedule)
+  });
+  if (r.ok) showToast('&#128190; Planning sauvegardé !');
+}
+
+async function generateDocx() {
+  showToast('&#9201; Génération du Running Sheet...');
+  const r = await fetch('/api/generate-docx', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(schedule)
+  });
+  if (r.ok) {
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Running_Sheet_ACT_2026.docx';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    showToast('&#128196; Running Sheet téléchargé !');
+  } else {
+    showToast('Erreur lors de la génération');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+document.getElementById('modal-session').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-session')) closeSessionModal();
+});
+document.getElementById('modal-type').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-type')) closeTypeModal();
+});
+document.getElementById('modal-meta').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-meta')) closeMetaModal();
+});
+
+// Start
+loadSchedule();

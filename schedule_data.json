@@ -1,0 +1,935 @@
+{
+  "attendance": {
+    "dimanche": "",
+    "samedi": "",
+    "vendredi": ""
+  },
+  "conference_dates": "Vendredi 15 – Dimanche 17 mai 2026",
+  "days": [
+    {
+      "date": "2026-05-14",
+      "id": "jeudi",
+      "name": "JEUDI 14 MAI",
+      "sessions": [
+        {
+          "events": [
+            {
+              "color": "#AED6F1",
+              "details": "Arrivée à St Joseph pour chargement du matériel",
+              "duration": 60,
+              "id": "j001",
+              "teams": [
+                "Team Logistique"
+              ],
+              "time": "07:00",
+              "title": "Arrivée St Joseph – Chargement matériel",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#AED6F1",
+              "details": "Départ à E140. Adrien part en avance.",
+              "duration": 15,
+              "id": "j002",
+              "teams": [
+                "Team Logistique"
+              ],
+              "time": "08:00",
+              "title": "Départ vers E140",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#FAD7A0",
+              "details": "Installation café/buffet (en route vers E140)",
+              "duration": 15,
+              "id": "j003",
+              "teams": [
+                "Team Hospitalité"
+              ],
+              "time": "08:15",
+              "title": "Installation café/buffet",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#AED6F1",
+              "details": "Arrivée à E140. Café/Buffet prêt sur place. Arrivée des responsables.",
+              "duration": 30,
+              "id": "j004",
+              "teams": [
+                "Team Hospitalité",
+                "Team Logistique"
+              ],
+              "time": "08:30",
+              "title": "Arrivée E140 – Café/Buffet prêt",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#D5F5E3",
+              "details": "Briefing organisation + lancement. Installation des équipes (Logistique, Kids, Bébés, Ménage). Préparation snacking (ados + jeunes). Communication RS stories. Installation des stands (Bible School, Festival, Librairie).",
+              "duration": 210,
+              "id": "j005",
+              "teams": [
+                "Team Coordo",
+                "Team Logistique",
+                "Team Kids",
+                "Team Bébés",
+                "Team Snacking",
+                "Team Communication",
+                "Team Médias",
+                "Team Bible School",
+                "Team Festival",
+                "Team Librairie"
+              ],
+              "time": "09:00",
+              "title": "Brief organisation + Installations multiples",
+              "type": "REUNION"
+            },
+            {
+              "color": "#FAD7A0",
+              "details": "Repas tirés des sacs",
+              "duration": 60,
+              "id": "j006",
+              "teams": [],
+              "time": "12:30",
+              "title": "Repas tirés des sacs",
+              "type": "REPAS"
+            },
+            {
+              "color": "#AED6F1",
+              "details": "Derniers ajustements installation",
+              "duration": 30,
+              "id": "j007",
+              "teams": [
+                "Toutes les teams"
+              ],
+              "time": "13:30",
+              "title": "Derniers ajustements installation",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#D7BDE2",
+              "details": "Arrivée et installation des musiciens (disposition...)",
+              "duration": 90,
+              "id": "j008",
+              "teams": [
+                "Team Louange",
+                "Team Son"
+              ],
+              "time": "14:00",
+              "title": "Arrivée louange + technique + installation",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#D7BDE2",
+              "details": "Balances et répétitions",
+              "duration": 150,
+              "id": "j009",
+              "teams": [
+                "Team Louange",
+                "Team Son"
+              ],
+              "time": "15:30",
+              "title": "Balances et répétitions",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#AED6F1",
+              "details": "Fin de journée d'installation. Départ de tout le monde.",
+              "duration": 15,
+              "id": "j010",
+              "teams": [
+                "Toutes les teams"
+              ],
+              "time": "18:00",
+              "title": "Fin de journée – Départ",
+              "type": "LOGISTIQUE"
+            }
+          ],
+          "id": "jeudi_install",
+          "name": "Installation"
+        }
+      ]
+    },
+    {
+      "date": "2026-05-15",
+      "id": "vendredi",
+      "name": "VENDREDI 15 MAI",
+      "sessions": [
+        {
+          "events": [
+            {
+              "color": "#AED6F1",
+              "details": "Arrivée à E140 – Toutes les teams, toute la Dream Team ACT",
+              "duration": 30,
+              "id": "v001",
+              "teams": [
+                "Toutes les teams",
+                "Toute la Dream Team ACT"
+              ],
+              "time": "08:30",
+              "title": "Arrivée à E140",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#D5F5E3",
+              "details": "Briefing organisation + lancement",
+              "duration": 30,
+              "id": "v002",
+              "teams": [
+                "Team Coordo"
+              ],
+              "time": "09:00",
+              "title": "Briefing organisation + lancement",
+              "type": "REUNION"
+            },
+            {
+              "color": "#D7BDE2",
+              "details": "Répétitions de louange. Dernières préparations du snacking. Ajustements techniques, sécurité.",
+              "duration": 150,
+              "id": "v003",
+              "teams": [
+                "Team Louange",
+                "Team Son",
+                "Team Snacking",
+                "Team Médias Capture",
+                "Team Médias Projection",
+                "Team Sécurité",
+                "Team Parking",
+                "Team Kids",
+                "Team Bébés",
+                "Team Hospitalité",
+                "Fil Rouge"
+              ],
+              "time": "09:30",
+              "title": "Répétitions + Préparations multiples",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#FAD7A0",
+              "details": "Ménage – Team E140. Repas tirés des sacs OU snacking déjà opérationnel – Team Snacking ?",
+              "duration": 90,
+              "id": "v004",
+              "teams": [
+                "Team E140",
+                "Team Snacking"
+              ],
+              "time": "12:00",
+              "title": "Ménage + Repas",
+              "type": "REPAS"
+            },
+            {
+              "color": "#F1948A",
+              "details": "Méga-Boost pour toute la Dream Team ACT – Team Boost, mot d'Adrien, mot du Fil Rouge, mot de Matt ?",
+              "duration": 30,
+              "id": "v005",
+              "teams": [
+                "Team Boost"
+              ],
+              "time": "13:30",
+              "title": "Méga-Boost – Toute la Dream Team",
+              "type": "BOOST"
+            },
+            {
+              "color": "#D7BDE2",
+              "details": "Répétitions de louange",
+              "duration": 30,
+              "id": "v006",
+              "teams": [
+                "Team Louange",
+                "Team Son"
+              ],
+              "time": "14:00",
+              "title": "Répétitions de louange",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#AED6F1",
+              "details": "Accueil opérationnel : entrée dans le hall, stands ouverts (Snacking, Librairie, Festival, Bible School). Portes de la salle principale fermées. Scan des billets. Orateurs principaux → Green Room.",
+              "duration": 75,
+              "id": "v007",
+              "teams": [
+                "Team Accueil",
+                "Team Snacking",
+                "Team Festival",
+                "Team Bible School",
+                "Team Librairie",
+                "Team Hospitalité"
+              ],
+              "time": "14:30",
+              "title": "Accueil opérationnel",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "id": "e_hz7fyv8",
+              "time": "20:00",
+              "duration": 150,
+              "title": "Célébration 2",
+              "type": "CELEBRATION",
+              "color": "#d357fe",
+              "teams": [],
+              "details": ""
+            }
+          ],
+          "id": "ven_prep",
+          "name": "Préparation"
+        },
+        {
+          "events": [
+            {
+              "id": "v010",
+              "time": "15:45",
+              "duration": 15,
+              "title": "Boost + Point Fil Rouge",
+              "type": "BOOST",
+              "color": "#f1948a",
+              "teams": [
+                "Team Boost"
+              ],
+              "details": "Boost"
+            },
+            {
+              "color": "#D6EAF8",
+              "details": "Intercession – Josias, Team Prière, équipiers volontaires (hors service). Ouverture des portes de la salle principale – Team Accueil.",
+              "duration": 25,
+              "id": "v012",
+              "teams": [
+                "Team Prière",
+                "Team Accueil"
+              ],
+              "time": "16:00",
+              "title": "Intercession + Ouverture des portes",
+              "type": "INTERCESSION"
+            },
+            {
+              "id": "v013",
+              "time": "16:25",
+              "duration": 5,
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TECHNIQUE",
+              "color": "#d5d8dc",
+              "teams": [
+                "Team Médias Projection"
+              ],
+              "details": "Lancement vidéo pre-roll + countdown – Team Médias Projection"
+            },
+            {
+              "id": "e_1wtkb8s",
+              "time": "16:30",
+              "duration": 90,
+              "title": "Célébration d'ouverture",
+              "type": "CELEBRATION",
+              "color": "#d357fe",
+              "teams": [],
+              "details": ""
+            },
+            {
+              "color": "#A9DFBF",
+              "details": "Mot d'accueil – MC",
+              "duration": 25,
+              "id": "v015",
+              "teams": [
+                "MC"
+              ],
+              "time": "16:35",
+              "title": "Mot d'accueil – MC",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#A9DFBF",
+              "details": "Introduction Johannes, Annonces importantes pour le WE",
+              "duration": 30,
+              "id": "v016",
+              "teams": [
+                "Johannes"
+              ],
+              "time": "17:00",
+              "title": "Introduction Johannes + Annonces WE",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Louange",
+              "duration": 30,
+              "id": "v017",
+              "teams": [
+                "Team Louange"
+              ],
+              "time": "17:30",
+              "title": "Louange",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#fad7a0",
+              "details": "Repas",
+              "duration": 120,
+              "id": "v018",
+              "teams": [
+                "Team Snacking"
+              ],
+              "time": "18:00",
+              "title": "Repas",
+              "type": "REPAS"
+            },
+            {
+              "color": "#F1948A",
+              "details": "Boost + point fil rouge",
+              "duration": 15,
+              "id": "v019",
+              "teams": [
+                "Team Boost",
+                "Fil Rouge"
+              ],
+              "time": "19:15",
+              "title": "Boost + point fil rouge",
+              "type": "BOOST"
+            },
+            {
+              "color": "#d6eaf8",
+              "details": "",
+              "duration": 30,
+              "id": "v020",
+              "teams": [
+                "Team Prières"
+              ],
+              "time": "19:30",
+              "title": "Intercession",
+              "type": "INTERCESSION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Louange",
+              "duration": 45,
+              "id": "v021",
+              "teams": [
+                "Team Louange"
+              ],
+              "time": "20:00",
+              "title": "Louange",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#82E0AA",
+              "details": "Prédication Dennis",
+              "duration": 45,
+              "id": "v022",
+              "teams": [
+                "Dennis"
+              ],
+              "time": "20:45",
+              "title": "Prédication Dennis",
+              "type": "PREDICATION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Louange, ministère…",
+              "duration": 30,
+              "id": "v023",
+              "teams": [
+                "Team Louange"
+              ],
+              "time": "21:30",
+              "title": "Louange + ministère",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#F9E79F",
+              "details": "Levée de fonds : 10K pour ACT et BS",
+              "duration": 30,
+              "id": "v024",
+              "teams": [],
+              "time": "22:00",
+              "title": "Levée de fonds – 10K pour ACT et BS",
+              "type": "FUNDRAISING"
+            }
+          ],
+          "id": "ven_ouverture",
+          "name": "Célébration d'ouverture"
+        }
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "id": "samedi",
+      "name": "SAMEDI 16 MAI",
+      "sessions": [
+        {
+          "events": [
+            {
+              "color": "#AED6F1",
+              "details": "Arrivée Dream Team",
+              "duration": 15,
+              "id": "s001",
+              "teams": [
+                "Toute la Dream Team"
+              ],
+              "time": "08:30",
+              "title": "Arrivée Dream Team",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#F1948A",
+              "details": "Boost + point fil rouge",
+              "duration": 45,
+              "id": "s002",
+              "teams": [
+                "Team Boost",
+                "Fil Rouge"
+              ],
+              "time": "08:45",
+              "title": "Boost + point fil rouge",
+              "type": "BOOST"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Louange",
+              "duration": 30,
+              "id": "s003",
+              "teams": [
+                "Team Louange"
+              ],
+              "time": "09:30",
+              "title": "Louange",
+              "type": "LOUANGE"
+            },
+            {
+              "id": "e_al89wl5",
+              "time": "09:30",
+              "duration": 150,
+              "title": "Célébration 3",
+              "type": "CELEBRATION",
+              "color": "#d357fe",
+              "teams": [],
+              "details": ""
+            },
+            {
+              "id": "s004",
+              "time": "10:00",
+              "duration": 60,
+              "title": "Prédication Dennis",
+              "type": "PREDICATION",
+              "color": "#82e0aa",
+              "teams": [
+                "Dennis"
+              ],
+              "details": "Prédication Dennis"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Louange, ministère…",
+              "duration": 60,
+              "id": "s007",
+              "teams": [
+                "Team Louange"
+              ],
+              "time": "11:00",
+              "title": "Louange + ministère",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#FAD7A0",
+              "details": "Repas",
+              "duration": 150,
+              "id": "s008",
+              "teams": [],
+              "time": "12:00",
+              "title": "Repas",
+              "type": "REPAS"
+            },
+            {
+              "color": "#00c148",
+              "details": "BS Kilgoris (Alicia), Stockholm (Christopher ou Whitney), Lyon (Gaetana) + DEMANDER SUPPORTS et annoncer inscriptions",
+              "duration": 15,
+              "id": "e_ls1t3gh",
+              "teams": [],
+              "time": "16:45",
+              "title": "Intervention 2B : Présentation SOS Bible Schools",
+              "type": "TED_PITCH"
+            },
+            {
+              "id": "e_k76q88b",
+              "time": "20:00",
+              "duration": 150,
+              "title": "Célébration 4",
+              "type": "CELEBRATION",
+              "color": "#d357fe",
+              "teams": [],
+              "details": ""
+            }
+          ],
+          "id": "sam_matin",
+          "name": "Matinée"
+        },
+        {
+          "events": [
+            {
+              "color": "#00c148",
+              "details": "Présentation de : \nSOS Yverdon : Pasteurs Majo et Babs\nSOS Strasbourg : Pasteurs Luc et Mathilde\nSOS Buford : Pasteur Fernando \n\nEn format interview (interviewer à trouver) : préparer également supports vidéos, photos...",
+              "duration": 60,
+              "id": "s010",
+              "teams": [],
+              "time": "14:30",
+              "title": "Intervention 1 : Présentation nouvelles églises SOS",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#d5d8dc",
+              "details": "",
+              "duration": 30,
+              "id": "s014",
+              "teams": [],
+              "time": "15:30",
+              "title": "PAUSE",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#00c148",
+              "details": "Retours festivals SOS : Fior explique comment ça fonctionne, vidéos harvest report, 1 témoignage à trouver pour Lyon (demander à Sarah), Strasbourg, Stockholm, Bienne, Fribourg ",
+              "duration": 45,
+              "id": "s016",
+              "teams": [],
+              "time": "16:00",
+              "title": "Intervention 2A : Retours festivals SOS",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#d5d8dc",
+              "details": "",
+              "duration": 30,
+              "id": "s019",
+              "teams": [],
+              "time": "17:00",
+              "title": "PAUSE",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#00c148",
+              "details": "Podcast live spécial avec Philippe Deas (contacter Jacob + Johannes) - SOUS RESERVE DE VALIDATION DE JOHANNES OU Johannes et Maria",
+              "duration": 60,
+              "id": "s020",
+              "teams": [],
+              "time": "17:30",
+              "title": "Intervention 3 : Podcast Live Johannes (À CONFIRMER)",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#fad7a0",
+              "details": "Repas",
+              "duration": 90,
+              "id": "s021",
+              "teams": [],
+              "time": "18:30",
+              "title": "Repas",
+              "type": "REPAS"
+            }
+          ],
+          "id": "sam_apresmidi",
+          "name": "Après-midi"
+        },
+        {
+          "events": [
+            {
+              "color": "#F1948A",
+              "details": "Boost + point fil rouge",
+              "duration": 15,
+              "id": "s030",
+              "teams": [
+                "Team Boost",
+                "Fil Rouge"
+              ],
+              "time": "19:15",
+              "title": "Boost + point fil rouge",
+              "type": "BOOST"
+            },
+            {
+              "color": "#d6eaf8",
+              "details": "",
+              "duration": 30,
+              "id": "s031",
+              "teams": [
+                "Team Prières"
+              ],
+              "time": "19:30",
+              "title": "Intercession",
+              "type": "INTERCESSION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Louange Résistance",
+              "duration": 30,
+              "id": "s032",
+              "teams": [
+                "Team Louange"
+              ],
+              "time": "20:00",
+              "title": "Louange Résistance",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#82E0AA",
+              "details": "Prédication Johannes",
+              "duration": 60,
+              "id": "s033",
+              "teams": [
+                "Johannes"
+              ],
+              "time": "20:30",
+              "title": "Prédication Johannes",
+              "type": "PREDICATION"
+            },
+            {
+              "color": "#7FB3D3",
+              "details": "Temps de prière conduit par Johannes",
+              "duration": 30,
+              "id": "s034",
+              "teams": [
+                "Johannes"
+              ],
+              "time": "21:30",
+              "title": "Temps de prière",
+              "type": "PRIERE"
+            },
+            {
+              "color": "#7FB3D3",
+              "details": "Ministère…",
+              "duration": 15,
+              "id": "s035",
+              "teams": [],
+              "time": "22:00",
+              "title": "Ministère",
+              "type": "PRIERE"
+            },
+            {
+              "color": "#F9E79F",
+              "details": "Levée de fonds : 10K pour ACT et BS",
+              "duration": 15,
+              "id": "s036",
+              "teams": [],
+              "time": "22:15",
+              "title": "Levée de fonds – 10K pour ACT et BS",
+              "type": "FUNDRAISING"
+            }
+          ],
+          "id": "sam_soiree",
+          "name": "Soirée"
+        }
+      ]
+    },
+    {
+      "date": "2026-05-17",
+      "id": "dimanche",
+      "name": "DIMANCHE 17 MAI",
+      "sessions": [
+        {
+          "events": [
+            {
+              "id": "d001",
+              "time": "08:30",
+              "duration": 30,
+              "title": "Arrivée Dream Team",
+              "type": "LOGISTIQUE",
+              "color": "#aed6f1",
+              "teams": [
+                "Toute la Dream Team"
+              ],
+              "details": "Arrivée Dream Team"
+            },
+            {
+              "color": "#F1948A",
+              "details": "Boost + point fil rouge (attention Ste Cène)",
+              "duration": 15,
+              "id": "d002",
+              "teams": [
+                "Team Boost",
+                "Fil Rouge"
+              ],
+              "time": "09:15",
+              "title": "Boost + point fil rouge (attention Ste Cène)",
+              "type": "BOOST"
+            },
+            {
+              "color": "#D6EAF8",
+              "details": "Intercession / Ouverture des portes",
+              "duration": 30,
+              "id": "d003",
+              "teams": [
+                "Team Prière",
+                "Team Accueil"
+              ],
+              "time": "09:30",
+              "title": "Intercession + Ouverture des portes",
+              "type": "INTERCESSION"
+            },
+            {
+              "id": "d004",
+              "time": "10:00",
+              "duration": 30,
+              "title": "Louange",
+              "type": "LOUANGE",
+              "color": "#d9cafe",
+              "teams": [
+                "Team Louange"
+              ],
+              "details": "Louange"
+            },
+            {
+              "id": "e_0meyblu",
+              "time": "10:00",
+              "duration": 165,
+              "title": "Célébration 5",
+              "type": "CELEBRATION",
+              "color": "#d357fe",
+              "teams": [],
+              "details": ""
+            },
+            {
+              "color": "#BB8FCE",
+              "details": "Ste Cène conduite par Johannes",
+              "duration": 15,
+              "id": "d005",
+              "teams": [
+                "Johannes"
+              ],
+              "time": "10:30",
+              "title": "Ste Cène",
+              "type": "STE_CENE"
+            },
+            {
+              "color": "#7FB3D3",
+              "details": "Temps de prière (Johannes)",
+              "duration": 15,
+              "id": "d006",
+              "teams": [
+                "Johannes"
+              ],
+              "time": "10:45",
+              "title": "Temps de prière",
+              "type": "PRIERE"
+            },
+            {
+              "color": "#82E0AA",
+              "details": "Prédication Dennis (option Mamadou si présent)",
+              "duration": 60,
+              "id": "d007",
+              "teams": [
+                "Dennis"
+              ],
+              "time": "11:00",
+              "title": "Prédication Dennis",
+              "type": "PREDICATION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Louange, ministère",
+              "duration": 15,
+              "id": "d008",
+              "teams": [
+                "Team Louange"
+              ],
+              "time": "12:00",
+              "title": "Louange + ministère",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#F9E79F",
+              "details": "Levée de fonds : 10K pour ACT et BS",
+              "duration": 15,
+              "id": "d009",
+              "teams": [],
+              "time": "12:15",
+              "title": "Levée de fonds – 10K pour ACT et BS",
+              "type": "FUNDRAISING"
+            },
+            {
+              "color": "#A9DFBF",
+              "details": "Clôture conférence, annonces",
+              "duration": 15,
+              "id": "d010",
+              "teams": [],
+              "time": "12:30",
+              "title": "Clôture conférence + annonces",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#FAD7A0",
+              "details": "Repas",
+              "duration": 75,
+              "id": "d011",
+              "teams": [],
+              "time": "12:45",
+              "title": "Repas",
+              "type": "REPAS"
+            }
+          ],
+          "id": "dim_matin",
+          "name": "Matinée – Clôture"
+        }
+      ]
+    }
+  ],
+  "dresscode": "Bracelet bleu pour la Dream Team",
+  "event": "ACT Conference 2026",
+  "installation_dates": "Jeudi 14 mai 2026",
+  "lieu": "Espace 140, Rillieux la Pape",
+  "types": {
+    "ANNONCES": {
+      "color": "#A9DFBF",
+      "label": "Annonces"
+    },
+    "BOOST": {
+      "color": "#F1948A",
+      "label": "Boost"
+    },
+    "FUNDRAISING": {
+      "color": "#F9E79F",
+      "label": "Levée de fonds"
+    },
+    "INTERCESSION": {
+      "color": "#D6EAF8",
+      "label": "Intercession"
+    },
+    "LOGISTIQUE": {
+      "color": "#AED6F1",
+      "label": "Logistique"
+    },
+    "LOUANGE": {
+      "label": "Louange",
+      "color": "#d9cafe"
+    },
+    "PREDICATION": {
+      "color": "#82E0AA",
+      "label": "Prédication"
+    },
+    "PRIERE": {
+      "color": "#7FB3D3",
+      "label": "Prière"
+    },
+    "REPAS": {
+      "color": "#FAD7A0",
+      "label": "Repas"
+    },
+    "REPETITION": {
+      "color": "#D7BDE2",
+      "label": "Répétition"
+    },
+    "REUNION": {
+      "color": "#D5F5E3",
+      "label": "Réunion / Brief"
+    },
+    "STE_CENE": {
+      "color": "#BB8FCE",
+      "label": "Ste Cène"
+    },
+    "TECHNIQUE": {
+      "color": "#D5D8DC",
+      "label": "Technique"
+    },
+    "TED_PITCH": {
+      "label": "Interventions",
+      "color": "#00c148"
+    },
+    "CELEBRATION": {
+      "label": "Célébration",
+      "color": "#d357fe"
+    }
+  },
+  "version": "1.0"
+}
