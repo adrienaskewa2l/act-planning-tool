@@ -546,6 +546,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .btn:hover { opacity: .85; }
   .btn-save { background: #fff; color: var(--green); }
   .btn-docx { background: #4CAF50; color: white; }
+  .btn-sync { background: #F9E79F; color: #174032; }
   .btn-add  { background: rgba(255,255,255,.18); color: white; border: 1px solid rgba(255,255,255,.4); }
   .toast {
     position: fixed; bottom: 20px; right: 20px; background: #333; color: white;
@@ -763,6 +764,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <h1>ACT Conference 2026 &mdash; Planning Interactif</h1>
   <button class="btn btn-add" onclick="openMetaModal()">Infos</button>
   <button class="btn btn-add" onclick="openAddSessionModal()">+ Session</button>
+  <button class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
   <button class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
   <button class="btn btn-docx" onclick="generateDocx()">&#128196; Running Sheet</button>
 </header>
@@ -963,7 +965,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   </div>
 </div>
 
-<script src="/app.js?v=5"></script>
+<script src="/app.js?v=6"></script>
 </body>
 </html>
 """
@@ -982,6 +984,8 @@ def app_js():
 
 @app.route("/api/schedule", methods=["GET"])
 def get_schedule():
+    # Endpoint de synchronisation: Render et localhost exposent le même JSON.
+    # La version locale l'utilise pour récupérer la source de vérité hébergée.
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, encoding="utf-8") as f:
             return jsonify(normalize_schedule(json.load(f)))
@@ -1214,7 +1218,4 @@ if __name__ == "__main__":
     print(f"  ==========================================")
     print(f"  Démarrage du serveur...")
     print(f"  Ouvrez votre navigateur sur: {url}\n")
-    import os
-
-port = int(os.environ.get("PORT", 5000))
-app.run(host="0.0.0.0", port=port)
+    app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)

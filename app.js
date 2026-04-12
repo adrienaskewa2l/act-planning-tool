@@ -6,6 +6,10 @@ const START_H = 7;
 const END_H = 23;
 const TOTAL_MINS = (END_H - START_H) * 60;
 
+// Renseignez ici l'URL JSON de la version Render, puis gardez /api/schedule.
+// Exemple: const RENDER_SCHEDULE_URL = 'https://mon-app.onrender.com/api/schedule';
+const RENDER_SCHEDULE_URL = 'https://act-planning-tool.onrender.com/api/schedule';
+
 const DEFAULT_TYPES = {
   LOUANGE:      { label: 'Louange', color: '#C39BD3' },
   PREDICATION:  { label: 'Prédication', color: '#82E0AA' },
@@ -109,6 +113,15 @@ async function loadSchedule() {
     document.getElementById('days-row').innerHTML = '<div style="padding:24px;color:#b00020;font-weight:600">Erreur de chargement du planning. Rechargez la page ou relancez l\'outil.</div>';
     console.error(err);
   }
+}
+
+async function persistLocalSchedule() {
+  const r = await fetch('/api/schedule', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(schedule)
+  });
+  if (!r.ok) throw new Error('Sauvegarde locale impossible');
 }
 
 function renderAll() {
@@ -653,12 +666,39 @@ function saveMeta() {
 
 // ── SAVE / GENERATE ──
 async function saveSchedule() {
-  const r = await fetch('/api/schedule', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(schedule)
-  });
-  if (r.ok) showToast('&#128190; Planning sauvegardé !');
+  try {
+    await persistLocalSchedule();
+    showToast('&#128190; Planning sauvegardé !');
+  } catch (err) {
+    console.error(err);
+    showToast('Erreur lors de la sauvegarde locale');
+  }
+}
+
+async function syncFromOnline() {
+  if (!RENDER_SCHEDULE_URL || RENDER_SCHEDULE_URL.includes('MON-URL-RENDER')) {
+    showToast('Configurez RENDER_SCHEDULE_URL dans app.js');
+    return;
+  }
+
+  showToast('Synchronisation depuis la version en ligne...');
+  try {
+    const r = await fetch(RENDER_SCHEDULE_URL, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`Render a répondu ${r.status}`);
+
+    const onlineSchedule = await r.json();
+    schedule = onlineSchedule;
+    ensureScheduleShape();
+    renderAll();
+
+    // La sauvegarde locale rend les données synchronisées disponibles pour l'export Word
+    // et les conserve si l'application est rechargée avant l'export.
+    await persistLocalSchedule();
+    showToast('Planning synchronisé depuis la version en ligne');
+  } catch (err) {
+    console.error(err);
+    showToast('Erreur de synchronisation depuis la version en ligne');
+  }
 }
 
 async function generateDocx() {
