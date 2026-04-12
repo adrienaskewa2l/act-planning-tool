@@ -12,6 +12,7 @@
       "name": "JEUDI 14 MAI",
       "sessions": [
         {
+          "end_time": "",
           "events": [
             {
               "color": "#AED6F1",
@@ -145,7 +146,8 @@
             }
           ],
           "id": "jeudi_install",
-          "name": "Installation"
+          "name": "Installation",
+          "start_time": ""
         }
       ]
     },
@@ -155,6 +157,7 @@
       "name": "VENDREDI 15 MAI",
       "sessions": [
         {
+          "end_time": "",
           "events": [
             {
               "color": "#AED6F1",
@@ -229,9 +232,9 @@
               "type": "BOOST"
             },
             {
-              "color": "#D7BDE2",
+              "color": "#d7bde2",
               "details": "Répétitions de louange",
-              "duration": 30,
+              "duration": 120,
               "id": "v006",
               "teams": [
                 "Team Louange",
@@ -270,9 +273,11 @@
             }
           ],
           "id": "ven_prep",
-          "name": "Préparation"
+          "name": "Préparation",
+          "start_time": ""
         },
         {
+          "end_time": "",
           "events": [
             {
               "color": "#f1948a",
@@ -442,7 +447,8 @@
             }
           ],
           "id": "ven_ouverture",
-          "name": "Célébration d'ouverture"
+          "name": "Célébration d'ouverture",
+          "start_time": ""
         }
       ]
     },
@@ -452,6 +458,7 @@
       "name": "SAMEDI 16 MAI",
       "sessions": [
         {
+          "end_time": "",
           "events": [
             {
               "color": "#AED6F1",
@@ -556,9 +563,11 @@
             }
           ],
           "id": "sam_matin",
-          "name": "Matinée"
+          "name": "Matinée",
+          "start_time": ""
         },
         {
+          "end_time": "",
           "events": [
             {
               "color": "#00c148",
@@ -622,9 +631,11 @@
             }
           ],
           "id": "sam_apresmidi",
-          "name": "Après-midi"
+          "name": "Après-midi",
+          "start_time": ""
         },
         {
+          "end_time": "",
           "events": [
             {
               "color": "#F1948A",
@@ -709,7 +720,8 @@
             }
           ],
           "id": "sam_soiree",
-          "name": "Soirée"
+          "name": "Soirée",
+          "start_time": ""
         }
       ]
     },
@@ -719,6 +731,7 @@
       "name": "DIMANCHE 17 MAI",
       "sessions": [
         {
+          "end_time": "",
           "events": [
             {
               "color": "#aed6f1",
@@ -860,7 +873,8 @@
             }
           ],
           "id": "dim_matin",
-          "name": "Matinée – Clôture"
+          "name": "Matinée – Clôture",
+          "start_time": ""
         }
       ]
     }

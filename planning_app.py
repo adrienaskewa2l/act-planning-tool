@@ -534,6 +534,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     --header-h: 64px;
     --axis-w: 54px;
     --col-w: 230px;
+    --day-header-h: 42px;
+    --day-header-gap: 8px;
     --px-per-min: 1.6;
     --start-h: 7;
     --end-h: 23;
@@ -630,7 +632,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     width: var(--axis-w);
     flex-shrink: 0;
     position: relative;
-    margin-top: 42px;
+    margin-top: calc(var(--day-header-h) + var(--day-header-gap));
   }
   .hour-label {
     position: absolute; right: 8px;
@@ -651,13 +653,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     position: relative;
   }
   .day-header {
-    height: 42px;
+    height: var(--day-header-h);
     background: var(--green);
     color: white;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 8px;
     font-size: 12px; font-weight: 700;
-    position: sticky; top: var(--header-h); z-index: 10;
+    position: relative;
+    z-index: 10;
   }
   .day-header .add-btn {
     background: rgba(255,255,255,.2); border: none; color: white;
@@ -669,6 +672,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
   .events-area {
     position: relative;
+    margin-top: var(--day-header-gap);
     background: repeating-linear-gradient(
       to bottom,
       transparent,
@@ -791,6 +795,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       --header-h: 116px;
       --axis-w: 46px;
       --col-w: 174px;
+      --day-header-h: 38px;
+      --day-header-gap: 8px;
       --px-per-min: 1.35;
     }
     .toolbar {
