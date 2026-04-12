@@ -789,6 +789,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .session-tag .del-tag:hover { color: #e53935; }
   .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .helper-text { font-size: 11px; color: #777; margin-top: 4px; line-height: 1.4; }
+  body.read-only [data-admin-only] { display: none !important; }
+  body.read-only .resize-handle { display: none; }
 
   @media (max-width: 760px) {
     :root {
@@ -867,11 +869,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <header class="toolbar">
   <span class="logo">&#128197;</span>
   <h1>ACT Conference 2026 &mdash; Planning Interactif</h1>
-  <button class="btn btn-add" onclick="openMetaModal()">Infos</button>
-  <button class="btn btn-add" onclick="openAddSessionModal()">+ Session</button>
-  <button class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
-  <button class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
-  <button class="btn btn-docx" onclick="generateDocx()">&#128196; Running Sheet</button>
+  <button data-admin-only class="btn btn-add" onclick="openMetaModal()">Infos</button>
+  <button data-admin-only class="btn btn-add" onclick="openAddSessionModal()">+ Session</button>
+  <button data-admin-only class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
+  <button data-admin-only class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
+  <button data-admin-only class="btn btn-docx" onclick="generateDocx()">&#128196; Running Sheet</button>
 </header>
 
 <!-- LEGEND -->
@@ -1083,7 +1085,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   </div>
 </div>
 
-<script src="/app.js?v=7"></script>
+<script>window.READ_ONLY = __READ_ONLY__;</script>
+<script src="/app.js?v=8"></script>
 </body>
 </html>
 """
@@ -1093,7 +1096,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 # ─────────────────────────────────────────────────────────────────
 @app.route("/")
 def index():
-    return Response(HTML_TEMPLATE, mimetype="text/html; charset=utf-8")
+    # Page publique Render: consultation seulement.
+    html = HTML_TEMPLATE.replace("__READ_ONLY__", "true")
+    return Response(html, mimetype="text/html; charset=utf-8")
+
+@app.route("/admin")
+def admin():
+    # Page d'édition complète. Non protégée volontairement pour garder la solution légère.
+    html = HTML_TEMPLATE.replace("__READ_ONLY__", "false")
+    return Response(html, mimetype="text/html; charset=utf-8")
 
 @app.route("/app.js")
 def app_js():

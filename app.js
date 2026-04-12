@@ -9,6 +9,7 @@ const TOTAL_MINS = (END_H - START_H) * 60;
 // Renseignez ici l'URL JSON de la version Render, puis gardez /api/schedule.
 // Exemple: const RENDER_SCHEDULE_URL = 'https://mon-app.onrender.com/api/schedule';
 const RENDER_SCHEDULE_URL = 'https://act-planning-tool.onrender.com/api/schedule';
+const READ_ONLY = typeof window !== 'undefined' && Boolean(window.READ_ONLY);
 
 const DEFAULT_TYPES = {
   LOUANGE:      { label: 'Louange', color: '#C39BD3' },
@@ -108,6 +109,11 @@ function applyTypeConfigToEvents(type) {
   });
 }
 
+function applyReadOnlyMode() {
+  if (!READ_ONLY) return;
+  document.body.classList.add('read-only');
+}
+
 // ── LOAD + RENDER ──
 async function loadSchedule() {
   try {
@@ -131,6 +137,7 @@ async function persistLocalSchedule() {
 }
 
 function renderAll() {
+  applyReadOnlyMode();
   renderTimeAxis();
   renderLegend();
   renderDays();
@@ -152,7 +159,9 @@ function renderTimeAxis() {
 
 function renderLegend() {
   const leg = document.getElementById('legend');
-  leg.innerHTML = '<h3>Types d\'événements</h3><button class="legend-add" onclick="openTypeModal()">+ Ajouter un type</button>';
+  leg.innerHTML = READ_ONLY
+    ? '<h3>Types d\'événements</h3>'
+    : '<h3>Types d\'événements</h3><button class="legend-add" onclick="openTypeModal()">+ Ajouter un type</button>';
   typeEntries().forEach(([k, config]) => {
     const label = config.label || k;
     const item = document.createElement('div');
@@ -161,7 +170,7 @@ function renderLegend() {
     item.innerHTML = `
       <div class="legend-dot" style="background:${config.color || '#A9DFBF'}"></div>
       <span class="legend-label">${esc(label)}</span>
-      <button class="legend-edit" title="Modifier ce type" onclick="event.stopPropagation(); openTypeModal('${escAttr(k)}')">&#9998;</button>
+      ${READ_ONLY ? '' : `<button class="legend-edit" title="Modifier ce type" onclick="event.stopPropagation(); openTypeModal('${escAttr(k)}')">&#9998;</button>`}
     `;
     item.addEventListener('click', () => {
       if (hiddenTypes.has(k)) hiddenTypes.delete(k);
@@ -192,7 +201,9 @@ function renderDays() {
     // Header
     const hdr = document.createElement('div');
     hdr.className = 'day-header';
-    hdr.innerHTML = `<span>${day.name}</span><button class="add-btn" title="Ajouter un événement" onclick="openAddModal('${day.id}')">+</button>`;
+    hdr.innerHTML = READ_ONLY
+      ? `<span>${day.name}</span>`
+      : `<span>${day.name}</span><button class="add-btn" title="Ajouter un événement" onclick="openAddModal('${day.id}')">+</button>`;
     col.appendChild(hdr);
 
     // Events area
@@ -211,6 +222,7 @@ function renderDays() {
 
     // Click on empty area → add event
     area.addEventListener('click', function(e) {
+      if (READ_ONLY) return;
       if (e.target === area) {
         const rect = area.getBoundingClientRect();
         const y = e.clientY - rect.top + area.parentElement.parentElement.scrollTop;
@@ -302,7 +314,12 @@ function createEventBlock(ev, dayId, sessionId, overlapLevel) {
     <div class="resize-handle"></div>
   `;
 
-  div.addEventListener('click', e => { if (!e._resized) openEditModal(ev, dayId, sessionId); });
+  div.addEventListener('click', e => {
+    if (READ_ONLY) return;
+    if (!e._resized) openEditModal(ev, dayId, sessionId);
+  });
+
+  if (READ_ONLY) return div;
 
   div.addEventListener('mousedown', e => {
     if (e.target.classList.contains('resize-handle') || e.button !== 0) return;
