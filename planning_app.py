@@ -610,13 +610,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .main {
     margin-top: var(--header-h);
     margin-left: 160px;
+    width: calc(100vw - 160px);
     overflow-x: auto;
     padding-bottom: 40px;
+    transition: margin-left .2s ease, width .2s ease;
   }
+  body.legend-collapsed .main { width: 100vw; }
 
   /* ── GRID ── */
   .grid-wrapper {
     display: flex;
+    width: 100%;
     min-width: calc(var(--axis-w) + var(--col-w) * 4);
     position: relative;
   }
@@ -638,10 +642,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .days-row {
     display: flex;
     flex: 1;
+    min-width: 0;
   }
   .day-col {
-    width: var(--col-w);
-    flex-shrink: 0;
+    flex: 1 1 var(--col-w);
+    min-width: 180px;
     border-left: 1px solid #d0d0d0;
     position: relative;
   }
@@ -780,6 +785,74 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .session-tag .del-tag:hover { color: #e53935; }
   .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .helper-text { font-size: 11px; color: #777; margin-top: 4px; line-height: 1.4; }
+
+  @media (max-width: 760px) {
+    :root {
+      --header-h: 116px;
+      --axis-w: 46px;
+      --col-w: 174px;
+      --px-per-min: 1.35;
+    }
+    .toolbar {
+      height: auto;
+      min-height: var(--header-h);
+      flex-wrap: wrap;
+      align-content: center;
+      gap: 8px;
+      padding: 10px 12px;
+    }
+    .toolbar h1 {
+      flex: 1 0 calc(100% - 44px);
+      font-size: 14px;
+    }
+    .btn {
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+    .legend {
+      width: min(82vw, 260px);
+      transform: translateX(-100%);
+    }
+    body:not(.legend-collapsed) .legend { transform: translateX(0); }
+    body:not(.legend-collapsed) .legend-toggle { left: calc(min(82vw, 260px) + 10px); }
+    body.legend-collapsed .legend { transform: translateX(-100%); }
+    .main,
+    body.legend-collapsed .main {
+      margin-left: 0;
+      width: 100vw;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .grid-wrapper {
+      width: max-content;
+      min-width: calc(var(--axis-w) + var(--col-w) * 4);
+    }
+    .days-row {
+      flex: 0 0 auto;
+    }
+    .day-col {
+      flex: 0 0 var(--col-w);
+      min-width: var(--col-w);
+    }
+    .day-header {
+      font-size: 11px;
+      padding: 0 6px;
+    }
+    .event-block {
+      padding: 4px 5px 10px 5px;
+    }
+    .ev-title { font-size: 10.5px; }
+    .ev-teams { font-size: 8.5px; }
+    .modal-card {
+      width: min(94vw, 520px);
+      padding: 18px;
+    }
+    .form-row-2,
+    .meta-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
 </style>
 </head>
 <body class="legend-collapsed">
