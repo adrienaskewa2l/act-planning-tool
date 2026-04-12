@@ -8,8 +8,10 @@ Puis ouvrez: http://localhost:5001
 
 import os, json, io
 from flask import Flask, jsonify, request, send_file, Response
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "schedule_data.json")
 JS_FILE = os.path.join(BASE_DIR, "app.js")
