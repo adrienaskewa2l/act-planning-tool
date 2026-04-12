@@ -259,14 +259,14 @@
               "type": "LOGISTIQUE"
             },
             {
-              "id": "e_hz7fyv8",
-              "time": "20:00",
-              "duration": 150,
-              "title": "Célébration 2",
-              "type": "CELEBRATION",
               "color": "#d357fe",
+              "details": "",
+              "duration": 150,
+              "id": "e_hz7fyv8",
               "teams": [],
-              "details": ""
+              "time": "20:00",
+              "title": "Célébration 2",
+              "type": "CELEBRATION"
             }
           ],
           "id": "ven_prep",
@@ -275,16 +275,16 @@
         {
           "events": [
             {
-              "id": "v010",
-              "time": "15:45",
-              "duration": 15,
-              "title": "Boost + Point Fil Rouge",
-              "type": "BOOST",
               "color": "#f1948a",
+              "details": "Boost",
+              "duration": 15,
+              "id": "v010",
               "teams": [
                 "Team Boost"
               ],
-              "details": "Boost"
+              "time": "15:45",
+              "title": "Boost + Point Fil Rouge",
+              "type": "BOOST"
             },
             {
               "color": "#D6EAF8",
@@ -300,26 +300,26 @@
               "type": "INTERCESSION"
             },
             {
-              "id": "v013",
-              "time": "16:25",
-              "duration": 5,
-              "title": "Lancement vidéo pre-roll + countdown",
-              "type": "TECHNIQUE",
               "color": "#d5d8dc",
+              "details": "Lancement vidéo pre-roll + countdown – Team Médias Projection",
+              "duration": 5,
+              "id": "v013",
               "teams": [
                 "Team Médias Projection"
               ],
-              "details": "Lancement vidéo pre-roll + countdown – Team Médias Projection"
+              "time": "16:25",
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TECHNIQUE"
             },
             {
-              "id": "e_1wtkb8s",
-              "time": "16:30",
-              "duration": 90,
-              "title": "Célébration d'ouverture",
-              "type": "CELEBRATION",
               "color": "#d357fe",
+              "details": "",
+              "duration": 90,
+              "id": "e_1wtkb8s",
               "teams": [],
-              "details": ""
+              "time": "16:30",
+              "title": "Célébration d'ouverture",
+              "type": "CELEBRATION"
             },
             {
               "color": "#A9DFBF",
@@ -491,26 +491,26 @@
               "type": "LOUANGE"
             },
             {
-              "id": "e_al89wl5",
-              "time": "09:30",
-              "duration": 150,
-              "title": "Célébration 3",
-              "type": "CELEBRATION",
               "color": "#d357fe",
+              "details": "",
+              "duration": 150,
+              "id": "e_al89wl5",
               "teams": [],
-              "details": ""
+              "time": "09:30",
+              "title": "Célébration 3",
+              "type": "CELEBRATION"
             },
             {
-              "id": "s004",
-              "time": "10:00",
-              "duration": 60,
-              "title": "Prédication Dennis",
-              "type": "PREDICATION",
               "color": "#82e0aa",
+              "details": "Prédication Dennis",
+              "duration": 60,
+              "id": "s004",
               "teams": [
                 "Dennis"
               ],
-              "details": "Prédication Dennis"
+              "time": "10:00",
+              "title": "Prédication Dennis",
+              "type": "PREDICATION"
             },
             {
               "color": "#d9cafe",
@@ -545,14 +545,14 @@
               "type": "TED_PITCH"
             },
             {
-              "id": "e_k76q88b",
-              "time": "20:00",
-              "duration": 150,
-              "title": "Célébration 4",
-              "type": "CELEBRATION",
               "color": "#d357fe",
+              "details": "",
+              "duration": 150,
+              "id": "e_k76q88b",
               "teams": [],
-              "details": ""
+              "time": "20:00",
+              "title": "Célébration 4",
+              "type": "CELEBRATION"
             }
           ],
           "id": "sam_matin",
@@ -721,16 +721,16 @@
         {
           "events": [
             {
-              "id": "d001",
-              "time": "08:30",
-              "duration": 30,
-              "title": "Arrivée Dream Team",
-              "type": "LOGISTIQUE",
               "color": "#aed6f1",
+              "details": "Arrivée Dream Team",
+              "duration": 30,
+              "id": "d001",
               "teams": [
                 "Toute la Dream Team"
               ],
-              "details": "Arrivée Dream Team"
+              "time": "08:30",
+              "title": "Arrivée Dream Team",
+              "type": "LOGISTIQUE"
             },
             {
               "color": "#F1948A",
@@ -759,26 +759,26 @@
               "type": "INTERCESSION"
             },
             {
-              "id": "d004",
-              "time": "10:00",
-              "duration": 30,
-              "title": "Louange",
-              "type": "LOUANGE",
               "color": "#d9cafe",
+              "details": "Louange",
+              "duration": 30,
+              "id": "d004",
               "teams": [
                 "Team Louange"
               ],
-              "details": "Louange"
+              "time": "10:00",
+              "title": "Louange",
+              "type": "LOUANGE"
             },
             {
-              "id": "e_0meyblu",
-              "time": "10:00",
-              "duration": 165,
-              "title": "Célébration 5",
-              "type": "CELEBRATION",
               "color": "#d357fe",
+              "details": "",
+              "duration": 165,
+              "id": "e_0meyblu",
               "teams": [],
-              "details": ""
+              "time": "10:00",
+              "title": "Célébration 5",
+              "type": "CELEBRATION"
             },
             {
               "color": "#BB8FCE",
@@ -878,6 +878,10 @@
       "color": "#F1948A",
       "label": "Boost"
     },
+    "CELEBRATION": {
+      "color": "#d357fe",
+      "label": "Célébration"
+    },
     "FUNDRAISING": {
       "color": "#F9E79F",
       "label": "Levée de fonds"
@@ -891,8 +895,8 @@
       "label": "Logistique"
     },
     "LOUANGE": {
-      "label": "Louange",
-      "color": "#d9cafe"
+      "color": "#d9cafe",
+      "label": "Louange"
     },
     "PREDICATION": {
       "color": "#82E0AA",
@@ -923,12 +927,8 @@
       "label": "Technique"
     },
     "TED_PITCH": {
-      "label": "Interventions",
-      "color": "#00c148"
-    },
-    "CELEBRATION": {
-      "label": "Célébration",
-      "color": "#d357fe"
+      "color": "#00c148",
+      "label": "Interventions"
     }
   },
   "version": "1.0"

@@ -71,6 +71,12 @@ function ensureScheduleShape() {
       };
     }
   });
+  (schedule.days || []).forEach(day => {
+    (day.sessions || []).forEach(session => {
+      session.start_time = session.start_time || '';
+      session.end_time = session.end_time || '';
+    });
+  });
 }
 
 function forEachEvent(callback) {
@@ -166,6 +172,12 @@ function renderLegend() {
   });
 }
 
+function toggleLegend() {
+  document.body.classList.toggle('legend-collapsed');
+  const btn = document.getElementById('legend-toggle');
+  btn.textContent = document.body.classList.contains('legend-collapsed') ? 'Types' : 'Masquer';
+}
+
 function renderDays() {
   const row = document.getElementById('days-row');
   row.innerHTML = '';
@@ -209,19 +221,21 @@ function renderDays() {
     // Sessions + events
     let prevSessionStart = -1;
     for (const session of day.sessions) {
-      if (session.events.length === 0) continue;
-      const firstTime = session.events[0].time;
-      const sepY = timeToY(firstTime) - 18;
+      const sessionEvents = session.events || [];
+      const sessionStart = session.start_time || (sessionEvents[0] && sessionEvents[0].time);
+      if (!sessionStart) continue;
+      const sepY = timeToY(sessionStart) - 18;
       if (sepY > prevSessionStart) {
         const sep = document.createElement('div');
         sep.className = 'session-sep';
         sep.style.top = Math.max(0, sepY) + 'px';
-        sep.innerHTML = `<div class="session-sep-line"></div><div class="session-sep-label">${esc(session.name)}</div><div class="session-sep-line"></div>`;
+        const timeLabel = session.end_time ? ` ${sessionStart}-${session.end_time}` : ` ${sessionStart}`;
+        sep.innerHTML = `<div class="session-sep-line"></div><div class="session-sep-label">${esc(session.name)}${esc(timeLabel)}</div><div class="session-sep-line"></div>`;
         area.appendChild(sep);
         prevSessionStart = sepY;
       }
 
-      for (const ev of session.events) {
+      for (const ev of sessionEvents) {
         if (!ev.time) continue;
         const block = createEventBlock(ev, day.id, session.id, overlapLevels[ev.id] || 0);
         area.appendChild(block);
@@ -586,8 +600,11 @@ function openAddSessionModal() {
     sel.appendChild(opt);
   });
   renderExistingSessions(sel.value);
-  sel.onchange = () => renderExistingSessions(sel.value);
-  document.getElementById('fs-name').value = '';
+  sel.onchange = () => {
+    resetSessionForm();
+    renderExistingSessions(sel.value);
+  };
+  resetSessionForm();
   document.getElementById('modal-session').classList.remove('hidden');
 }
 
@@ -599,21 +616,65 @@ function renderExistingSessions(dayId) {
   day.sessions.forEach(s => {
     const tag = document.createElement('span');
     tag.className = 'session-tag';
-    tag.innerHTML = `${esc(s.name)} <span class="del-tag" title="Supprimer" onclick="deleteSession('${dayId}','${s.id}')">&#10005;</span>`;
+    const range = s.start_time ? ` (${s.start_time}${s.end_time ? ' - ' + s.end_time : ''})` : '';
+    tag.innerHTML = `
+      ${esc(s.name)}${esc(range)}
+      <button class="edit-tag" title="Modifier" onclick="editSession('${escAttr(dayId)}','${escAttr(s.id)}')">&#9998;</button>
+      <button class="del-tag" title="Supprimer" onclick="deleteSession('${escAttr(dayId)}','${escAttr(s.id)}')">&#10005;</button>
+    `;
     container.appendChild(tag);
   });
 }
 
-function addSession() {
+function resetSessionForm() {
+  document.getElementById('fs-edit-id').value = '';
+  document.getElementById('fs-name').value = '';
+  document.getElementById('fs-start').value = '';
+  document.getElementById('fs-end').value = '';
+}
+
+function editSession(dayId, sessionId) {
+  const day = schedule.days.find(d => d.id === dayId);
+  if (!day) return;
+  const session = day.sessions.find(s => s.id === sessionId);
+  if (!session) return;
+  document.getElementById('fs-day').value = dayId;
+  document.getElementById('fs-edit-id').value = session.id;
+  document.getElementById('fs-name').value = session.name || '';
+  document.getElementById('fs-start').value = session.start_time || '';
+  document.getElementById('fs-end').value = session.end_time || '';
+}
+
+function saveSession() {
   const dayId = document.getElementById('fs-day').value;
+  const sessionId = document.getElementById('fs-edit-id').value;
   const name = document.getElementById('fs-name').value.trim();
   if (!name) return;
   const day = schedule.days.find(d => d.id === dayId);
   if (!day) return;
-  day.sessions.push({ id: 'sess_' + genId(), name, events: [] });
-  document.getElementById('fs-name').value = '';
+  const payload = {
+    name,
+    start_time: document.getElementById('fs-start').value,
+    end_time: document.getElementById('fs-end').value
+  };
+
+  if (sessionId) {
+    const session = day.sessions.find(s => s.id === sessionId);
+    if (!session) return;
+    Object.assign(session, payload);
+  } else {
+    day.sessions.push({ id: 'sess_' + genId(), ...payload, events: [] });
+  }
+
+  day.sessions.sort((a, b) => {
+    const at = a.start_time || (a.events[0] && a.events[0].time) || '99:99';
+    const bt = b.start_time || (b.events[0] && b.events[0].time) || '99:99';
+    return at.localeCompare(bt);
+  });
+  resetSessionForm();
   renderExistingSessions(dayId);
-  showToast('Session ajoutée');
+  renderDays();
+  showToast('Session enregistrée');
 }
 
 function deleteSession(dayId, sessionId) {
@@ -624,6 +685,7 @@ function deleteSession(dayId, sessionId) {
     if (!confirm(`Supprimer la session "${sess.name}" et ses ${sess.events.length} événement(s) ?`)) return;
   }
   day.sessions = day.sessions.filter(s => s.id !== sessionId);
+  resetSessionForm();
   renderExistingSessions(dayId);
   renderDays();
 }

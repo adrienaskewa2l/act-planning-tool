@@ -499,6 +499,8 @@ def normalize_schedule(data):
         for session in day.get("sessions", []):
             session.setdefault("id", "")
             session.setdefault("name", "Session")
+            session.setdefault("start_time", "")
+            session.setdefault("end_time", "")
             session.setdefault("events", [])
             session["events"].sort(key=lambda ev: ev.get("time", "00:00"))
             for event in session["events"]:
@@ -540,6 +542,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
   body { font-family: var(--font); background: #f0f2f5; color: #1a1a1a; }
+  body.legend-collapsed .legend { transform: translateX(-160px); }
+  body.legend-collapsed .main { margin-left: 0; }
 
   /* ── TOOLBAR ── */
   .toolbar {
@@ -571,7 +575,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     position: fixed; left: 0; top: var(--header-h); bottom: 0; width: 160px;
     background: white; border-right: 1px solid #e0e0e0;
     overflow-y: auto; padding: 12px 10px;
+    transition: transform .2s ease;
+    z-index: 60;
   }
+  .legend-toggle {
+    position: fixed; left: 10px; top: calc(var(--header-h) + 10px);
+    z-index: 120; border: none; border-radius: 999px;
+    background: var(--green); color: white; cursor: pointer;
+    padding: 8px 11px; font-size: 12px; font-weight: 700;
+    box-shadow: 0 2px 10px rgba(0,0,0,.22);
+  }
+  body:not(.legend-collapsed) .legend-toggle { left: 170px; }
   .legend h3 { font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: .5px; }
   .legend-item {
     display: flex; align-items: center; gap: 6px;
@@ -761,13 +775,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     padding: 3px 8px; border-radius: 20px; font-size: 11px;
     background: #f0f0f0; margin: 2px; cursor: default;
   }
-  .session-tag .del-tag { cursor: pointer; color: #999; font-size: 13px; }
+  .session-tag .edit-tag, .session-tag .del-tag { cursor: pointer; color: #777; font-size: 13px; border:0; background:transparent; padding:0 2px; }
+  .session-tag .edit-tag:hover { color: var(--green); }
   .session-tag .del-tag:hover { color: #e53935; }
   .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .helper-text { font-size: 11px; color: #777; margin-top: 4px; line-height: 1.4; }
 </style>
 </head>
-<body>
+<body class="legend-collapsed">
 
 <!-- TOOLBAR -->
 <header class="toolbar">
@@ -781,6 +796,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </header>
 
 <!-- LEGEND -->
+<button class="legend-toggle" onclick="toggleLegend()" id="legend-toggle">Types</button>
 <aside class="legend" id="legend"></aside>
 
 <!-- MAIN -->
@@ -913,12 +929,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <div class="session-mgr" id="fs-existing"></div>
     </div>
     <div class="form-row">
-      <label>Nouveau nom de session</label>
+      <input type="hidden" id="fs-edit-id">
+      <label>Nom de session</label>
       <input type="text" id="fs-name" placeholder="Ex: Soirée, Matinée, Après-midi…">
     </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0">
+        <label>Début de session</label>
+        <input type="time" id="fs-start" step="300">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label>Fin de session</label>
+        <input type="time" id="fs-end" step="300">
+      </div>
+    </div>
     <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="resetSessionForm()" style="margin-right:auto">Nouveau</button>
       <button class="btn-modal btn-cancel" onclick="closeSessionModal()">Fermer</button>
-      <button class="btn-modal btn-primary" onclick="addSession()">+ Ajouter</button>
+      <button class="btn-modal btn-primary" onclick="saveSession()">&#10003; Enregistrer</button>
     </div>
   </div>
 </div>
@@ -976,7 +1004,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   </div>
 </div>
 
-<script src="/app.js?v=6"></script>
+<script src="/app.js?v=7"></script>
 </body>
 </html>
 """
@@ -1202,7 +1230,13 @@ def build_running_sheet(data, output):
             p_sess = doc.add_paragraph()
             p_sess.paragraph_format.space_before = Pt(4)
             p_sess.paragraph_format.space_after  = Pt(2)
-            run(p_sess, session.get('name',''), bold=True, size=11, color=PINK)
+            session_label = session.get('name','')
+            if session.get('start_time'):
+                session_label += f" ({session.get('start_time')}"
+                if session.get('end_time'):
+                    session_label += f" - {session.get('end_time')}"
+                session_label += ")"
+            run(p_sess, session_label, bold=True, size=11, color=PINK)
 
             # Events table
             tbl = doc.add_table(rows=0, cols=2)
