@@ -1224,9 +1224,9 @@ def build_running_sheet(data, output):
 # ─────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5001"))
-    url = f"http://localhost:{port}"
+    local_url = f"http://localhost:{port}"
     print(f"\n  ACT Conference 2026 – Planning Interactif")
     print(f"  ==========================================")
     print(f"  Démarrage du serveur...")
-    print(f"  Ouvrez votre navigateur sur: {url}\n")
-    app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)
+    print(f"  En local, ouvrez votre navigateur sur: {local_url}\n")
+    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
