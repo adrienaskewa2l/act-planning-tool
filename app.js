@@ -365,8 +365,7 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
   const teamsHtml = (ev.teams||[]).length
     ? `<div class="ev-teams">${esc((ev.teams||[]).join(', '))}</div>` : '';
   div.innerHTML = `
-    <div class="ev-time">${esc(ev.time)}${ev.duration >= 15 ? ' <span style="opacity:.55">(${ev.duration}min)</span>' : ''}</div>
-    <div class="ev-title">${esc(ev.title)}</div>
+    <div class="ev-main-line"><span class="ev-time">${esc(ev.time)}</span><span class="ev-title">${esc(ev.title)}</span></div>
     ${teamsHtml}
     <div class="resize-handle"></div>
   `;
@@ -391,9 +390,7 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
       ev.time = yToTime(timeToY(startTime) + delta);
       div.style.top = timeToY(ev.time) + 'px';
       const timeEl = div.querySelector('.ev-time');
-      if (timeEl) {
-        timeEl.innerHTML = `${esc(ev.time)}${ev.duration >= 15 ? ' <span style="opacity:.55">(' + ev.duration + 'min)</span>' : ''}`;
-      }
+      if (timeEl) timeEl.textContent = ev.time;
     };
     const onUp = () => {
       document.removeEventListener('mousemove', onMove);
@@ -420,8 +417,6 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
       const delta = me.clientY - startY;
       ev.duration = Math.max(5, Math.round((startDur + delta / PX_PER_MIN) / 5) * 5);
       div.style.height = Math.max(ev.duration * PX_PER_MIN, 22) + 'px';
-      const durEl = div.querySelector('.ev-time');
-      if (durEl) durEl.innerHTML = `${esc(ev.time)} <span style="opacity:.55">(${ev.duration}min)</span>`;
     };
     const onUp = () => {
       document.removeEventListener('mousemove', onMove);

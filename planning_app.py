@@ -716,7 +716,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     z-index: 5;
   }
   .event-block.hidden-type { display: none; }
-  .ev-time { font-size: 10px; opacity: .7; font-weight: 600; line-height: 1.2; }
+  .ev-main-line { display: flex; align-items: baseline; gap: 5px; min-width: 0; }
+  .ev-time { font-size: 10px; opacity: .7; font-weight: 600; line-height: 1.2; flex-shrink: 0; }
   .ev-title { font-size: 11px; font-weight: 700; line-height: 1.3; margin-top: 1px; }
   .ev-teams { font-size: 9px; color: var(--pink); margin-top: 2px; line-height: 1.3; }
   .resize-handle {
@@ -1091,7 +1092,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=10"></script>
+<script src="/app.js?v=11"></script>
 </body>
 </html>
 """
