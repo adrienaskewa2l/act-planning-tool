@@ -28,6 +28,35 @@ const DEFAULT_TYPES = {
   TECHNIQUE:    { label: 'Technique', color: '#D5D8DC' }
 };
 
+const SERVICE_TEAMS = [
+  'Team Médias Capture',
+  'Team Médias Projection',
+  'Team Snacking',
+  'Team Logistique',
+  'Team Ménage',
+  'Team Accueil',
+  'Team Louange',
+  'Fil Rouge',
+  'Team Coordo',
+  'Team MC/Infos',
+  'Team Traduction',
+  'Team Hospitalité',
+  'Team Sécurité',
+  'Team Parking',
+  'Team Bible School',
+  'Team Festival',
+  'Team Librairie',
+  'Team Communication RS',
+  'Team Kids',
+  'Team Bébés',
+  'Team Prières',
+  'Team Chauffeurs',
+  'Team Son',
+  'Team Boost',
+  'Permanence Médicale',
+  'Toute la Dream Team'
+];
+
 let schedule = null;
 let hiddenTypes = new Set();
 
@@ -434,6 +463,31 @@ function buildColorPresets() {
   });
 }
 
+function buildTeamSelect(selectedTeams) {
+  const sel = document.getElementById('f-teams');
+  const selected = new Set(selectedTeams || []);
+  const options = [...SERVICE_TEAMS];
+
+  selected.forEach(team => {
+    if (team && !SERVICE_TEAMS.includes(team)) options.push(team);
+  });
+
+  sel.innerHTML = '';
+  options.forEach(team => {
+    const opt = document.createElement('option');
+    opt.value = team;
+    opt.textContent = team;
+    opt.selected = selected.has(team);
+    sel.appendChild(opt);
+  });
+}
+
+function selectedTeamsFromForm() {
+  return Array.from(document.getElementById('f-teams').selectedOptions)
+    .map(opt => opt.value)
+    .filter(Boolean);
+}
+
 function openEditModal(ev, dayId, sessionId) {
   _editEv = ev; _editDay = dayId; _editSession = sessionId;
   buildTypeSelect(ev.type || 'ANNONCES');
@@ -445,7 +499,7 @@ function openEditModal(ev, dayId, sessionId) {
   document.getElementById('f-title').value = ev.title;
   document.getElementById('f-type').value = ev.type || 'ANNONCES';
   document.getElementById('f-color').value = ev.color || typeColor(ev.type);
-  document.getElementById('f-teams').value = (ev.teams||[]).join(', ');
+  buildTeamSelect(ev.teams || []);
   document.getElementById('f-details').value = ev.details || '';
   buildSessionSelect(dayId, sessionId);
   buildColorPresets();
@@ -464,7 +518,7 @@ function openAddModal(dayId, sessionId, time) {
   document.getElementById('f-title').value = '';
   document.getElementById('f-type').value = 'ANNONCES';
   document.getElementById('f-color').value = typeColor('ANNONCES');
-  document.getElementById('f-teams').value = '';
+  buildTeamSelect([]);
   document.getElementById('f-details').value = '';
   // default to first session if none given
   const day = schedule.days.find(d => d.id === dayId);
@@ -499,8 +553,7 @@ function saveEvent() {
   const id = document.getElementById('f-id').value || genId();
   const dayId = document.getElementById('f-day').value;
   const sessionId = document.getElementById('f-session-sel').value;
-  const teams = document.getElementById('f-teams').value
-    .split(',').map(t => t.trim()).filter(t => t);
+  const teams = selectedTeamsFromForm();
 
   const ev = {
     id,

@@ -752,6 +752,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     border-radius: 7px; font-size: 13px; font-family: var(--font);
     outline: none; transition: border-color .2s;
   }
+  .form-row select[multiple] {
+    min-height: 150px;
+    line-height: 1.4;
+  }
   .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
     border-color: var(--green);
   }
@@ -953,8 +957,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <div class="form-row">
-      <label>Équipes responsables <span style="color:#aaa;font-weight:400">(séparées par des virgules)</span></label>
-      <input type="text" id="f-teams" placeholder="Team Louange, Team Son, …">
+      <label>Équipes responsables</label>
+      <select id="f-teams" multiple size="8"></select>
+      <div class="helper-text">Sélection multiple autorisée : Cmd/Ctrl + clic selon votre navigateur.</div>
     </div>
 
     <div class="form-row">
@@ -1086,7 +1091,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=8"></script>
+<script src="/app.js?v=9"></script>
 </body>
 </html>
 """

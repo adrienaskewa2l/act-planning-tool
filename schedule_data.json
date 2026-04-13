@@ -160,17 +160,16 @@
           "end_time": "",
           "events": [
             {
-              "color": "#AED6F1",
+              "color": "#d5f5e3",
               "details": "Arrivée à E140 – Toutes les teams, toute la Dream Team ACT",
               "duration": 30,
               "id": "v001",
               "teams": [
-                "Toutes les teams",
                 "Toute la Dream Team ACT"
               ],
               "time": "08:30",
-              "title": "Arrivée à E140",
-              "type": "LOGISTIQUE"
+              "title": "Arrivée Dream Team",
+              "type": "REUNION"
             },
             {
               "color": "#D5F5E3",
@@ -207,12 +206,11 @@
               "type": "REPETITION"
             },
             {
-              "color": "#FAD7A0",
-              "details": "Ménage – Team E140. Repas tirés des sacs OU snacking déjà opérationnel – Team Snacking ?",
+              "color": "#fad7a0",
+              "details": "Ménage par l'équipe de l'E140. Repas tirés des sacs OU snacking déjà opérationnel – Team Snacking",
               "duration": 90,
               "id": "v004",
               "teams": [
-                "Team E140",
                 "Team Snacking"
               ],
               "time": "12:00",
@@ -220,7 +218,7 @@
               "type": "REPAS"
             },
             {
-              "color": "#F1948A",
+              "color": "#f1948a",
               "details": "Méga-Boost pour toute la Dream Team ACT – Team Boost, mot d'Adrien, mot du Fil Rouge, mot de Matt ?",
               "duration": 30,
               "id": "v005",
@@ -461,27 +459,27 @@
           "end_time": "",
           "events": [
             {
-              "color": "#AED6F1",
+              "color": "#d5f5e3",
               "details": "Arrivée Dream Team",
-              "duration": 15,
+              "duration": 30,
               "id": "s001",
               "teams": [
                 "Toute la Dream Team"
               ],
               "time": "08:30",
               "title": "Arrivée Dream Team",
-              "type": "LOGISTIQUE"
+              "type": "REUNION"
             },
             {
-              "color": "#F1948A",
+              "color": "#f1948a",
               "details": "Boost + point fil rouge",
-              "duration": 45,
+              "duration": 15,
               "id": "s002",
               "teams": [
                 "Team Boost",
                 "Fil Rouge"
               ],
-              "time": "08:45",
+              "time": "09:15",
               "title": "Boost + point fil rouge",
               "type": "BOOST"
             },
@@ -532,11 +530,13 @@
               "type": "LOUANGE"
             },
             {
-              "color": "#FAD7A0",
+              "color": "#fad7a0",
               "details": "Repas",
               "duration": 150,
               "id": "s008",
-              "teams": [],
+              "teams": [
+                "Team Snacking"
+              ],
               "time": "12:00",
               "title": "Repas",
               "type": "REPAS"
@@ -574,7 +574,9 @@
               "details": "Présentation de : \nSOS Yverdon : Pasteurs Majo et Babs\nSOS Strasbourg : Pasteurs Luc et Mathilde\nSOS Buford : Pasteur Fernando \n\nEn format interview (interviewer à trouver) : préparer également supports vidéos, photos...",
               "duration": 60,
               "id": "s010",
-              "teams": [],
+              "teams": [
+                "Team Médias Projection"
+              ],
               "time": "14:30",
               "title": "Intervention 1 : Présentation nouvelles églises SOS",
               "type": "TED_PITCH"
@@ -734,7 +736,7 @@
           "end_time": "",
           "events": [
             {
-              "color": "#aed6f1",
+              "color": "#d5f5e3",
               "details": "Arrivée Dream Team",
               "duration": 30,
               "id": "d001",
@@ -743,7 +745,7 @@
               ],
               "time": "08:30",
               "title": "Arrivée Dream Team",
-              "type": "LOGISTIQUE"
+              "type": "REUNION"
             },
             {
               "color": "#F1948A",
@@ -862,14 +864,28 @@
               "type": "ANNONCES"
             },
             {
-              "color": "#FAD7A0",
+              "color": "#fad7a0",
               "details": "Repas",
-              "duration": 75,
+              "duration": 105,
               "id": "d011",
-              "teams": [],
+              "teams": [
+                "Team Snacking"
+              ],
               "time": "12:45",
               "title": "Repas",
               "type": "REPAS"
+            },
+            {
+              "color": "#aed6f1",
+              "details": "",
+              "duration": 240,
+              "id": "e_olmuxsp",
+              "teams": [
+                "Team Logistique"
+              ],
+              "time": "14:30",
+              "title": "Démontage et rangement",
+              "type": "LOGISTIQUE"
             }
           ],
           "id": "dim_matin",
