@@ -184,22 +184,13 @@
               "type": "REUNION"
             },
             {
-              "color": "#D7BDE2",
+              "color": "#d7bde2",
               "details": "Répétitions de louange. Dernières préparations du snacking. Ajustements techniques, sécurité.",
               "duration": 150,
               "id": "v003",
               "teams": [
                 "Team Louange",
-                "Team Son",
-                "Team Snacking",
-                "Team Médias Capture",
-                "Team Médias Projection",
-                "Team Sécurité",
-                "Team Parking",
-                "Team Kids",
-                "Team Bébés",
-                "Team Hospitalité",
-                "Fil Rouge"
+                "Team Son"
               ],
               "time": "09:30",
               "title": "Répétitions + Préparations multiples",
@@ -223,7 +214,7 @@
               "duration": 30,
               "id": "v005",
               "teams": [
-                "Team Boost"
+                "Toute la Dream Team"
               ],
               "time": "13:30",
               "title": "Méga-Boost – Toute la Dream Team",
@@ -489,7 +480,12 @@
               "duration": 30,
               "id": "s003",
               "teams": [
-                "Team Louange"
+                "Team Médias Capture",
+                "Team Médias Projection",
+                "Team Louange",
+                "Fil Rouge",
+                "Team Coordo",
+                "Team Son"
               ],
               "time": "09:30",
               "title": "Louange",

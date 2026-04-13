@@ -1091,7 +1091,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=9"></script>
+<script src="/app.js?v=10"></script>
 </body>
 </html>
 """

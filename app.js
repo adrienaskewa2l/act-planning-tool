@@ -1,7 +1,7 @@
 
 // ── CONSTANTS ──
 const PX_PER_MIN = 1.6;
-const OVERLAP_OFFSET_PX = 20;
+const EVENT_SIDE_GAP_PX = 4;
 const START_H = 7;
 const END_H = 23;
 const TOTAL_MINS = (END_H - START_H) * 60;
@@ -222,7 +222,7 @@ function renderDays() {
   const timelineH = TOTAL_MINS * PX_PER_MIN;
 
   for (const day of schedule.days) {
-    const overlapLevels = computeOverlapLevels(day);
+    const overlapLayouts = computeOverlapLayouts(day);
     const col = document.createElement('div');
     col.className = 'day-col';
     col.dataset.dayId = day.id;
@@ -278,7 +278,7 @@ function renderDays() {
 
       for (const ev of sessionEvents) {
         if (!ev.time) continue;
-        const block = createEventBlock(ev, day.id, session.id, overlapLevels[ev.id] || 0);
+        const block = createEventBlock(ev, day.id, session.id, overlapLayouts[ev.id]);
         area.appendChild(block);
       }
     }
@@ -291,13 +291,13 @@ function renderDays() {
   document.querySelector('.time-axis').style.height = timelineH + 'px';
 }
 
-function computeOverlapLevels(day) {
+function computeOverlapLayouts(day) {
   const allEvents = [];
   for (const session of day.sessions || []) {
     for (const ev of session.events || []) {
       if (!ev.time) continue;
       const start = timeToMinutes(ev.time);
-      const end = start + (parseInt(ev.duration, 10) || 0);
+      const end = start + Math.max(parseInt(ev.duration, 10) || 0, 5);
       allEvents.push({ id: ev.id, start, end });
     }
   }
@@ -307,31 +307,59 @@ function computeOverlapLevels(day) {
     return b.end - a.end;
   });
 
-  const activeEndsByLevel = [];
-  const levelsById = {};
+  const layoutsById = {};
+  let group = [];
+  let groupEnd = -Infinity;
+
+  const flushGroup = () => {
+    if (!group.length) return;
+
+    const activeEndsByColumn = [];
+    let maxColumns = 1;
+
+    group.forEach(ev => {
+      let column = 0;
+      while (activeEndsByColumn[column] !== undefined && activeEndsByColumn[column] > ev.start) {
+        column += 1;
+      }
+      ev.column = column;
+      activeEndsByColumn[column] = ev.end;
+      maxColumns = Math.max(maxColumns, column + 1);
+    });
+
+    group.forEach(ev => {
+      layoutsById[ev.id] = { column: ev.column || 0, total: maxColumns };
+    });
+
+    group = [];
+    groupEnd = -Infinity;
+  };
 
   for (const ev of allEvents) {
-    let level = 0;
-    while (activeEndsByLevel[level] !== undefined && activeEndsByLevel[level] > ev.start) {
-      level += 1;
+    if (group.length && ev.start >= groupEnd) {
+      flushGroup();
     }
-    levelsById[ev.id] = level;
-    activeEndsByLevel[level] = ev.end;
+    group.push(ev);
+    groupEnd = Math.max(groupEnd, ev.end);
   }
+  flushGroup();
 
-  return levelsById;
+  return layoutsById;
 }
 
-function createEventBlock(ev, dayId, sessionId, overlapLevel) {
+function createEventBlock(ev, dayId, sessionId, overlapLayout) {
   const top = timeToY(ev.time);
   const h = Math.max(ev.duration * PX_PER_MIN, 22);
-  const left = 4 + (overlapLevel * OVERLAP_OFFSET_PX);
+  const column = overlapLayout ? overlapLayout.column : 0;
+  const total = Math.max(overlapLayout ? overlapLayout.total : 1, 1);
+  const leftPct = (column / total) * 100;
+  const widthPct = 100 / total;
   const div = document.createElement('div');
   div.className = 'event-block' + (hiddenTypes.has(ev.type) ? ' hidden-type' : '');
   div.dataset.evId = ev.id;
   div.dataset.type = ev.type;
   const bgColor = ev.color || typeColor(ev.type);
-  div.style.cssText = `top:${top}px;height:${h}px;left:${left}px;right:4px;background:${bgColor};z-index:${3 + overlapLevel}`;
+  div.style.cssText = `top:${top}px;height:${h}px;left:calc(${leftPct}% + ${EVENT_SIDE_GAP_PX}px);width:calc(${widthPct}% - ${EVENT_SIDE_GAP_PX * 2}px);background:${bgColor};z-index:${3 + column}`;
   div.style.borderLeftColor = darken(bgColor, 40);
 
   const teamsHtml = (ev.teams||[]).length
