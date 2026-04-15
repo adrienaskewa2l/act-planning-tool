@@ -27,3 +27,10 @@ Puis ouvrir `http://localhost:5001`.
 
 - Le planning est sauvegarde dans `schedule_data.json`
 - La Running Sheet est generee a la demande depuis le navigateur
+
+## Donnees de planning et deploiement
+
+- `schedule_data.json` contient les donnees vivantes du planning et ne doit pas etre versionne dans Git.
+- En local, l'application utilise `schedule_data.json` dans le dossier du projet.
+- Sur Render, utiliser un stockage persistant et definir la variable d'environnement `SCHEDULE_DATA_FILE`, par exemple `/var/data/schedule_data.json`.
+- GitHub doit contenir le code de l'application, pas les modifications quotidiennes du planning.

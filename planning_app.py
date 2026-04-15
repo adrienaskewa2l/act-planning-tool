@@ -22,7 +22,7 @@ CORS(app, resources={
     }
 })
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_FILE = os.path.join(BASE_DIR, "schedule_data.json")
+DATA_FILE = os.environ.get("SCHEDULE_DATA_FILE", os.path.join(BASE_DIR, "schedule_data.json"))
 JS_FILE = os.path.join(BASE_DIR, "app.js")
 
 # ─────────────────────────────────────────────────────────────────
@@ -1160,6 +1160,7 @@ def get_schedule():
 @app.route("/api/schedule", methods=["POST"])
 def save_schedule():
     data = normalize_schedule(request.get_json())
+    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     return jsonify({"status": "ok"})
