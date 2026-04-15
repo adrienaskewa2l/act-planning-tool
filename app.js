@@ -371,7 +371,10 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
   `;
 
   div.addEventListener('click', e => {
-    if (READ_ONLY) return;
+    if (READ_ONLY) {
+      openViewModal(ev, dayId, sessionId);
+      return;
+    }
     if (!e._resized) openEditModal(ev, dayId, sessionId);
   });
 
@@ -554,6 +557,52 @@ function openAddModal(dayId, sessionId, time) {
 function closeModal() {
   document.getElementById('modal').classList.add('hidden');
   _editEv = null;
+}
+
+function eventEndTime(ev) {
+  if (!ev.time) return '';
+  const total = timeToMinutes(ev.time) + (parseInt(ev.duration, 10) || 0);
+  return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+}
+
+function formatDuration(mins) {
+  const duration = parseInt(mins, 10) || 0;
+  if (!duration) return '';
+  const h = Math.floor(duration / 60);
+  const m = duration % 60;
+  if (!h) return `${m} min`;
+  if (!m) return `${h} h`;
+  return `${h} h ${m}`;
+}
+
+function openViewModal(ev, dayId, sessionId) {
+  const day = schedule.days.find(d => d.id === dayId);
+  const session = day ? day.sessions.find(s => s.id === sessionId) : null;
+  const teams = (ev.teams || []).filter(Boolean);
+  const endTime = eventEndTime(ev);
+  const timeLabel = ev.time
+    ? `${esc(ev.time)}${endTime ? ` - ${esc(endTime)}` : ''}`
+    : 'Horaire non renseigné';
+  const durationLabel = formatDuration(ev.duration);
+  const details = (ev.details || '').trim();
+
+  document.getElementById('view-title').textContent = ev.title || 'Événement';
+  document.getElementById('view-body').innerHTML = `
+    <div class="view-meta">
+      <div><span>Jour</span><strong>${esc(day ? day.name : '')}</strong></div>
+      <div><span>Session</span><strong>${esc(session ? session.name : '')}</strong></div>
+      <div><span>Horaire</span><strong>${timeLabel}</strong></div>
+      <div><span>Durée</span><strong>${esc(durationLabel || '-')}</strong></div>
+      <div><span>Type</span><strong>${esc(typeLabel(ev.type))}</strong></div>
+    </div>
+    ${teams.length ? `<div class="view-section"><h3>Équipes responsables</h3><p>${esc(teams.join(', '))}</p></div>` : ''}
+    ${details ? `<div class="view-section"><h3>Détails / Notes Running Sheet</h3><p>${esc(details)}</p></div>` : ''}
+  `;
+  document.getElementById('modal-view').classList.remove('hidden');
+}
+
+function closeViewModal() {
+  document.getElementById('modal-view').classList.add('hidden');
 }
 
 function onTypeChange() {
@@ -887,6 +936,9 @@ function showToast(msg) {
 // Close modal on overlay click
 document.getElementById('modal').addEventListener('click', e => {
   if (e.target === document.getElementById('modal')) closeModal();
+});
+document.getElementById('modal-view').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-view')) closeViewModal();
 });
 document.getElementById('modal-session').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-session')) closeSessionModal();

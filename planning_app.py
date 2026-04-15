@@ -743,6 +743,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     padding: 24px;
   }
   .modal-card h2 { font-size: 17px; color: var(--green); margin-bottom: 18px; }
+  .view-meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px;
+    margin-bottom: 16px;
+  }
+  .view-meta div {
+    background: #f7f8f8; border: 1px solid #ececec; border-radius: 7px;
+    padding: 9px 10px;
+  }
+  .view-meta span {
+    display: block; font-size: 10px; font-weight: 700; color: #777;
+    text-transform: uppercase; letter-spacing: .4px; margin-bottom: 3px;
+  }
+  .view-meta strong { display: block; font-size: 13px; color: #222; line-height: 1.35; }
+  .view-section { margin-top: 14px; }
+  .view-section h3 {
+    font-size: 11px; font-weight: 700; color: #555;
+    text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px;
+  }
+  .view-section p { font-size: 13px; line-height: 1.45; white-space: pre-wrap; }
   .form-row { margin-bottom: 14px; }
   .form-row label {
     display: block; font-size: 11px; font-weight: 600;
@@ -861,6 +880,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       padding: 18px;
     }
     .form-row-2,
+    .view-meta,
     .meta-grid {
       grid-template-columns: 1fr;
       gap: 10px;
@@ -974,6 +994,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </button>
       <button class="btn-modal btn-cancel" onclick="closeModal()">Annuler</button>
       <button class="btn-modal btn-primary" onclick="saveEvent()">&#10003; Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay hidden" id="modal-view">
+  <div class="modal-card">
+    <h2 id="view-title">Événement</h2>
+    <div id="view-body"></div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-primary" onclick="closeViewModal()">Fermer</button>
     </div>
   </div>
 </div>
@@ -1092,7 +1123,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=11"></script>
+<script src="/app.js?v=12"></script>
 </body>
 </html>
 """
