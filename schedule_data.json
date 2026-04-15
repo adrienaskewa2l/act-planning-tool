@@ -698,7 +698,10 @@
               "details": "Retours festivals SOS : Fior explique comment ça fonctionne, vidéos harvest report, 1 témoignage à trouver pour Lyon (demander à Sarah), Strasbourg, Stockholm, Bienne, Fribourg ",
               "duration": 45,
               "id": "s016",
-              "teams": [],
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
               "time": "16:00",
               "title": "Intervention 2A : Retours festivals SOS",
               "type": "TED_PITCH"
