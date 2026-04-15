@@ -27,8 +27,8 @@
               "type": "LOGISTIQUE"
             },
             {
-              "color": "#AED6F1",
-              "details": "Départ à E140. Adrien part en avance.",
+              "color": "#aed6f1",
+              "details": "Départ à E140.",
               "duration": 15,
               "id": "j002",
               "teams": [
@@ -39,7 +39,7 @@
               "type": "LOGISTIQUE"
             },
             {
-              "color": "#FAD7A0",
+              "color": "#d5f5e3",
               "details": "Installation café/buffet (en route vers E140)",
               "duration": 15,
               "id": "j003",
@@ -48,16 +48,16 @@
               ],
               "time": "08:15",
               "title": "Installation café/buffet",
-              "type": "LOGISTIQUE"
+              "type": "REUNION"
             },
             {
-              "color": "#AED6F1",
+              "color": "#aed6f1",
               "details": "Arrivée à E140. Café/Buffet prêt sur place. Arrivée des responsables.",
               "duration": 30,
               "id": "j004",
               "teams": [
-                "Team Hospitalité",
-                "Team Logistique"
+                "Team Logistique",
+                "Team Hospitalité"
               ],
               "time": "08:30",
               "title": "Arrivée E140 – Café/Buffet prêt",
@@ -107,7 +107,7 @@
               "type": "LOGISTIQUE"
             },
             {
-              "color": "#D7BDE2",
+              "color": "#d7bde2",
               "details": "Arrivée et installation des musiciens (disposition...)",
               "duration": 90,
               "id": "j008",
@@ -133,9 +133,9 @@
               "type": "REPETITION"
             },
             {
-              "color": "#AED6F1",
+              "color": "#aed6f1",
               "details": "Fin de journée d'installation. Départ de tout le monde.",
-              "duration": 15,
+              "duration": 30,
               "id": "j010",
               "teams": [
                 "Toutes les teams"
@@ -224,7 +224,7 @@
               "duration": 30,
               "id": "v005",
               "teams": [
-                "Toute la Dream Team"
+                "Team Boost"
               ],
               "time": "13:30",
               "title": "Méga-Boost – Toute la Dream Team",
@@ -244,7 +244,7 @@
               "type": "REPETITION"
             },
             {
-              "color": "#aed6f1",
+              "color": "#ffd877",
               "details": "Accueil opérationnel : entrée dans le hall, stands ouverts (Snacking, Librairie, Festival, Bible School). Portes de la salle principale fermées. Scan des billets. Orateurs principaux → Green Room.",
               "duration": 75,
               "id": "v007",
@@ -257,8 +257,8 @@
                 "Team Librairie"
               ],
               "time": "14:30",
-              "title": "Accueil opérationnel",
-              "type": "LOGISTIQUE"
+              "title": "Accueil et stands opérationnels",
+              "type": "TECHNIQUE"
             },
             {
               "color": "#d9cafe",
@@ -304,7 +304,7 @@
                 "Team Prière"
               ],
               "time": "16:00",
-              "title": "Intercession + Ouverture des portes",
+              "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
             },
             {
@@ -398,10 +398,11 @@
               "duration": 30,
               "id": "v020",
               "teams": [
+                "Team Accueil",
                 "Team Prières"
               ],
               "time": "19:30",
-              "title": "Intercession",
+              "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
             },
             {
@@ -512,7 +513,7 @@
             {
               "color": "#d5f5e3",
               "details": "Arrivée Dream Team",
-              "duration": 30,
+              "duration": 15,
               "id": "s001",
               "teams": [
                 "Toute la Dream Team"
@@ -530,9 +531,22 @@
                 "Fil Rouge",
                 "Team Boost"
               ],
-              "time": "09:15",
+              "time": "08:45",
               "title": "Boost + point fil rouge",
               "type": "BOOST"
+            },
+            {
+              "color": "#d6eaf8",
+              "details": "",
+              "duration": 30,
+              "id": "e_4iam7l3",
+              "teams": [
+                "Team Accueil",
+                "Team Prières"
+              ],
+              "time": "09:00",
+              "title": "Intercession + ouverture des portes",
+              "type": "INTERCESSION"
             },
             {
               "color": "#d9cafe",
@@ -574,6 +588,19 @@
               "time": "11:00",
               "title": "Louange + ministère",
               "type": "LOUANGE"
+            },
+            {
+              "color": "#d6eaf8",
+              "details": "",
+              "duration": 30,
+              "id": "e_ic8m8j4",
+              "teams": [
+                "Team Accueil",
+                "Team Prières"
+              ],
+              "time": "14:00",
+              "title": "Intercession + ouverture des portes",
+              "type": "INTERCESSION"
             }
           ],
           "id": "sam_matin",
@@ -626,7 +653,7 @@
                 "Fil Rouge",
                 "Team Boost"
               ],
-              "time": "14:15",
+              "time": "13:45",
               "title": "Boost + Point Fil Rouge",
               "type": "BOOST"
             },
@@ -715,7 +742,9 @@
               "details": "Podcast live spécial avec Philippe Deas (contacter Jacob + Johannes) - SOUS RESERVE DE VALIDATION DE JOHANNES OU Johannes et Maria",
               "duration": 60,
               "id": "s020",
-              "teams": [],
+              "teams": [
+                "Team Son"
+              ],
               "time": "17:30",
               "title": "Intervention 3 : Podcast Live Johannes (À CONFIRMER)",
               "type": "TED_PITCH"
@@ -781,10 +810,11 @@
               "duration": 30,
               "id": "s031",
               "teams": [
+                "Team Accueil",
                 "Team Prières"
               ],
               "time": "19:30",
-              "title": "Intercession",
+              "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
             },
             {
@@ -894,16 +924,16 @@
               "type": "BOOST"
             },
             {
-              "color": "#D6EAF8",
+              "color": "#d6eaf8",
               "details": "Intercession / Ouverture des portes",
               "duration": 30,
               "id": "d003",
               "teams": [
-                "Team Prière",
-                "Team Accueil"
+                "Team Accueil",
+                "Team Prières"
               ],
               "time": "09:30",
-              "title": "Intercession + Ouverture des portes",
+              "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
             },
             {
