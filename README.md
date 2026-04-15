@@ -30,7 +30,7 @@ Puis ouvrir `http://localhost:5001`.
 
 ## Donnees de planning et deploiement
 
-- `schedule_data.json` contient les donnees vivantes du planning et ne doit pas etre versionne dans Git.
+- `schedule_data.json` contient les donnees vivantes du planning.
 - En local, l'application utilise `schedule_data.json` dans le dossier du projet.
 - Sur Render, utiliser un stockage persistant et definir la variable d'environnement `SCHEDULE_DATA_FILE`, par exemple `/var/data/schedule_data.json`.
-- GitHub doit contenir le code de l'application, pas les modifications quotidiennes du planning.
+- Sans stockage persistant Render, `schedule_data.json` reste versionne dans Git pour que chaque redeploiement embarque la derniere version connue du planning.
