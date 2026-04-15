@@ -257,7 +257,7 @@
                 "Team Librairie"
               ],
               "time": "14:30",
-              "title": "Accueil et stands opérationnels",
+              "title": "Accueil, snacking et stands opérationnels",
               "type": "TECHNIQUE"
             },
             {
@@ -273,6 +273,19 @@
               "time": "16:30",
               "title": "Louange",
               "type": "LOUANGE"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Les visiteurs partent, le snacking est toujours ouvert pour pouvoir servir ceux qui voudraient prendre quelque chose en partant",
+              "duration": 30,
+              "id": "e_8dr44bl",
+              "teams": [
+                "Team Snacking",
+                "Team Accueil"
+              ],
+              "time": "22:30",
+              "title": "Départ des participants",
+              "type": "TRANSITION"
             }
           ],
           "id": "ven_prep",
@@ -301,7 +314,8 @@
               "id": "v012",
               "teams": [
                 "Team Accueil",
-                "Team Prière"
+                "Team Prières",
+                "Team Boost"
               ],
               "time": "16:00",
               "title": "Intercession + ouverture des portes",
@@ -399,7 +413,8 @@
               "id": "v020",
               "teams": [
                 "Team Accueil",
-                "Team Prières"
+                "Team Prières",
+                "Team Boost"
               ],
               "time": "19:30",
               "title": "Intercession + ouverture des portes",
@@ -542,7 +557,8 @@
               "id": "e_4iam7l3",
               "teams": [
                 "Team Accueil",
-                "Team Prières"
+                "Team Prières",
+                "Team Boost"
               ],
               "time": "09:00",
               "title": "Intercession + ouverture des portes",
@@ -601,6 +617,19 @@
               "time": "14:00",
               "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Les visiteurs partent, le snacking est toujours ouvert pour pouvoir servir ceux qui voudraient prendre quelque chose en partant",
+              "duration": 30,
+              "id": "e_xgtro6h",
+              "teams": [
+                "Team Snacking",
+                "Team Accueil"
+              ],
+              "time": "22:30",
+              "title": "Départ des participants",
+              "type": "TRANSITION"
             }
           ],
           "id": "sam_matin",
@@ -814,7 +843,8 @@
               "id": "s031",
               "teams": [
                 "Team Accueil",
-                "Team Prières"
+                "Team Prières",
+                "Team Boost"
               ],
               "time": "19:30",
               "title": "Intercession + ouverture des portes",
@@ -933,7 +963,8 @@
               "id": "d003",
               "teams": [
                 "Team Accueil",
-                "Team Prières"
+                "Team Prières",
+                "Team Boost"
               ],
               "time": "09:30",
               "title": "Intercession + ouverture des portes",
