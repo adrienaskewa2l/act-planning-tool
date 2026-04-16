@@ -261,6 +261,30 @@
               "type": "TECHNIQUE"
             },
             {
+              "color": "#caf0fe",
+              "details": "Les chauffeurs se rendent au Domaine St Joseph pour récupérer les pasteurs et invités",
+              "duration": 15,
+              "id": "e_79uqfsr",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "15:15",
+              "title": "Pick-up pasteurs à DSJ",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#caf0fe",
+              "details": "Trajet du Domaine St Joseph vers E140",
+              "duration": 30,
+              "id": "e_08ua2x0",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "15:30",
+              "title": "Trajet vers E140",
+              "type": "ANNONCES"
+            },
+            {
               "color": "#d9cafe",
               "details": "",
               "duration": 5,
@@ -322,7 +346,7 @@
               "type": "INTERCESSION"
             },
             {
-              "color": "#a9dfbf",
+              "color": "#d6d6d6",
               "details": "Lancement vidéo pre-roll + countdown – Team Médias Projection",
               "duration": 5,
               "id": "v013",
@@ -331,10 +355,10 @@
               ],
               "time": "16:25",
               "title": "Lancement vidéo pre-roll + countdown",
-              "type": "ANNONCES"
+              "type": "TRANSITION"
             },
             {
-              "color": "#a9dfbf",
+              "color": "#d6d6d6",
               "details": "Mot d'accueil – MC",
               "duration": 5,
               "id": "v015",
@@ -343,7 +367,7 @@
               ],
               "time": "16:35",
               "title": "Mot d'accueil – MC",
-              "type": "ANNONCES"
+              "type": "TRANSITION"
             },
             {
               "color": "#d9cafe",
@@ -360,7 +384,7 @@
               "type": "LOUANGE"
             },
             {
-              "color": "#a9dfbf",
+              "color": "#7fb3d3",
               "details": "Introduction Johannes, Annonces importantes pour le WE",
               "duration": 30,
               "id": "v016",
@@ -369,7 +393,7 @@
               ],
               "time": "17:10",
               "title": "Introduction Johannes + Annonces WE",
-              "type": "ANNONCES"
+              "type": "PRIERE"
             },
             {
               "color": "#d9cafe",
@@ -465,6 +489,18 @@
               "time": "22:00",
               "title": "Levée de fonds – 10K pour ACT et BS",
               "type": "PRIERE"
+            },
+            {
+              "color": "#caf0fe",
+              "details": "Trajet de E140 vers le Domaine St Joseph",
+              "duration": 30,
+              "id": "e_7mbc3ko",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "22:30",
+              "title": "Trajet vers DSJ",
+              "type": "ANNONCES"
             }
           ],
           "id": "sess_e_hmqgn4m",
@@ -526,6 +562,18 @@
               "type": "FUNDRAISING"
             },
             {
+              "color": "#caf0fe",
+              "details": "Les chauffeurs se rendent au Domaine St Joseph pour récupérer les pasteurs et invités",
+              "duration": 15,
+              "id": "e_twux5dg",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "08:15",
+              "title": "Pick-up pasteurs à DSJ",
+              "type": "ANNONCES"
+            },
+            {
               "color": "#d5f5e3",
               "details": "Arrivée Dream Team",
               "duration": 15,
@@ -536,6 +584,18 @@
               "time": "08:30",
               "title": "Arrivée Dream Team",
               "type": "REUNION"
+            },
+            {
+              "color": "#caf0fe",
+              "details": "Trajet du Domaine St Joseph vers E140",
+              "duration": 30,
+              "id": "e_878uso3",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "08:30",
+              "title": "Trajet vers E140",
+              "type": "ANNONCES"
             },
             {
               "color": "#f1948a",
@@ -905,6 +965,18 @@
               "time": "22:15",
               "title": "Levée de fonds – 10K pour ACT et BS",
               "type": "PRIERE"
+            },
+            {
+              "color": "#caf0fe",
+              "details": "Trajet de E140 vers le Domaine St Joseph",
+              "duration": 30,
+              "id": "e_0m1f41t",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "22:30",
+              "title": "Trajet vers DSJ",
+              "type": "ANNONCES"
             }
           ],
           "id": "sess_e_00xjg4l",
@@ -942,6 +1014,30 @@
               "time": "08:30",
               "title": "Arrivée Dream Team",
               "type": "REUNION"
+            },
+            {
+              "color": "#caf0fe",
+              "details": "Les chauffeurs se rendent au Domaine St Joseph pour récupérer les pasteurs et invités",
+              "duration": 15,
+              "id": "e_jvlqbaj",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "08:45",
+              "title": "Pick-up pasteurs à DSJ",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#caf0fe",
+              "details": "Trajet du Domaine St Joseph vers E140",
+              "duration": 30,
+              "id": "e_0u45oos",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "09:00",
+              "title": "Trajet vers E140",
+              "type": "ANNONCES"
             },
             {
               "color": "#F1948A",
@@ -1041,14 +1137,14 @@
               "type": "PRIERE"
             },
             {
-              "color": "#a9dfbf",
+              "color": "#d6d6d6",
               "details": "Clôture conférence, annonces",
               "duration": 15,
               "id": "d010",
               "teams": [],
               "time": "12:30",
               "title": "Clôture conférence + annonces",
-              "type": "ANNONCES"
+              "type": "TRANSITION"
             }
           ],
           "id": "dim_matin",
@@ -1118,8 +1214,8 @@
   "lieu": "Espace 140, Rillieux la Pape",
   "types": {
     "ANNONCES": {
-      "color": "#A9DFBF",
-      "label": "Annonces"
+      "color": "#caf0fe",
+      "label": "Chauffeurs"
     },
     "BOOST": {
       "color": "#F1948A",
