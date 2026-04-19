@@ -563,6 +563,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .btn:hover { opacity: .85; }
   .btn-save { background: #fff; color: var(--green); }
   .btn-docx { background: #4CAF50; color: white; }
+  .btn-pdf { background: #E53935; color: white; }
   .btn-sync { background: #F9E79F; color: #174032; }
   .btn-add  { background: rgba(255,255,255,.18); color: white; border: 1px solid rgba(255,255,255,.4); }
   .toast {
@@ -899,6 +900,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <button data-admin-only class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
   <button data-admin-only class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
   <button data-admin-only class="btn btn-docx" onclick="generateDocx()">&#128196; Running Sheet</button>
+  <button data-admin-only class="btn btn-pdf" onclick="generatePlanningPdf()">PDF Planning</button>
 </header>
 
 <!-- LEGEND -->
@@ -1123,7 +1125,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=12"></script>
+<script src="/app.js?v=13"></script>
 </body>
 </html>
 """
@@ -1177,6 +1179,277 @@ def generate_docx_route():
         download_name="Running_Sheet_ACT_2026.docx",
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
+
+@app.route("/api/generate-planning-pdf", methods=["POST"])
+def generate_planning_pdf_route():
+    data = normalize_schedule(request.get_json())
+    buf = io.BytesIO()
+    build_planning_pdf(data, buf)
+    buf.seek(0)
+    return send_file(
+        buf,
+        as_attachment=True,
+        download_name="Planning_ACT_2026.pdf",
+        mimetype="application/pdf"
+    )
+
+# ─────────────────────────────────────────────────────────────────
+# PLANNING PDF GENERATOR
+# ─────────────────────────────────────────────────────────────────
+def build_planning_pdf(data, output):
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A3
+    from reportlab.lib.units import cm
+    from reportlab.pdfbase.pdfmetrics import stringWidth
+    from reportlab.pdfgen import canvas
+
+    START_H = 7
+    END_H = 23
+    TOTAL_MINS = (END_H - START_H) * 60
+
+    page_w, page_h = A3
+    margin = 1.0 * cm
+    header_h = 1.35 * cm
+    legend_h = 0.6 * cm
+    green = colors.HexColor("#0F4C3A")
+    pink = colors.HexColor("#CF5AFD")
+    black = colors.HexColor("#111111")
+    muted = colors.HexColor("#666666")
+    grid_line = colors.HexColor("#E5E8E8")
+    font = "Helvetica"
+    font_bold = "Helvetica-Bold"
+
+    c = canvas.Canvas(output, pagesize=(page_w, page_h))
+
+    def color_from_hex(value, fallback="#E8F5E9"):
+        try:
+            if not value or not str(value).startswith("#"):
+                return colors.HexColor(fallback)
+            return colors.HexColor(value)
+        except Exception:
+            return colors.HexColor(fallback)
+
+    def text_color_for(bg):
+        brightness = (bg.red * 299 + bg.green * 587 + bg.blue * 114) / 1000
+        return colors.white if brightness < 0.46 else black
+
+    def time_to_minutes(value):
+        try:
+            h, m = [int(part) for part in str(value or "00:00").split(":")[:2]]
+            return h * 60 + m
+        except Exception:
+            return START_H * 60
+
+    def fit_text(text, width, size, font_name=font):
+        text = str(text or "")
+        if stringWidth(text, font_name, size) <= width:
+            return text
+        ellipsis = "..."
+        while text and stringWidth(text + ellipsis, font_name, size) > width:
+            text = text[:-1]
+        return text + ellipsis if text else ellipsis
+
+    def wrap_text(text, width, size, font_name=font_bold, max_lines=2):
+        words = str(text or "").split()
+        if not words:
+            return [""]
+        lines = []
+        current = ""
+        for word in words:
+            candidate = f"{current} {word}".strip()
+            if not current or stringWidth(candidate, font_name, size) <= width:
+                current = candidate
+            else:
+                lines.append(current)
+                current = word
+                if len(lines) == max_lines - 1:
+                    break
+        if current and len(lines) < max_lines:
+            lines.append(current)
+        if len(lines) == max_lines:
+            lines[-1] = fit_text(lines[-1], width, size, font_name)
+        return lines
+
+    def draw_header(day, page_no):
+        c.setFillColor(green)
+        c.rect(0, page_h - header_h, page_w, header_h, stroke=0, fill=1)
+        c.setFillColor(colors.white)
+        c.setFont(font_bold, 16)
+        c.drawString(margin, page_h - 0.82 * cm, f"{data.get('event', 'ACT Conference 2026')} - {day.get('name', '')}")
+        c.setFont(font, 8)
+        c.drawRightString(page_w - margin, page_h - 0.82 * cm, f"Planning horaire portrait - page {page_no}")
+
+    def collect_day_events(day):
+        items = []
+        for session in day.get("sessions", []):
+            for ev in session.get("events", []):
+                if not ev.get("title") or not ev.get("time"):
+                    continue
+                start = time_to_minutes(ev.get("time"))
+                duration = max(int(ev.get("duration") or 0), 5)
+                end = start + duration
+                items.append({"event": ev, "session": session, "start": start, "end": end})
+        items.sort(key=lambda item: (item["start"], -(item["end"] - item["start"])))
+        return items
+
+    def compute_overlap_layouts(items):
+        layouts = {}
+        group = []
+        group_end = -1
+
+        def flush_group():
+            nonlocal group, group_end
+            if not group:
+                return
+            active_ends = []
+            max_cols = 1
+            for item in group:
+                col = 0
+                while col < len(active_ends) and active_ends[col] > item["start"]:
+                    col += 1
+                if col == len(active_ends):
+                    active_ends.append(item["end"])
+                else:
+                    active_ends[col] = item["end"]
+                item["column"] = col
+                max_cols = max(max_cols, col + 1)
+            for item in group:
+                layouts[id(item["event"])] = {"column": item.get("column", 0), "total": max_cols}
+            group = []
+            group_end = -1
+
+        for item in items:
+            if group and item["start"] >= group_end:
+                flush_group()
+            group.append(item)
+            group_end = max(group_end, item["end"])
+        flush_group()
+        return layouts
+
+    def draw_time_grid(grid_x, grid_y, grid_w, grid_h, axis_w, scale):
+        c.setFillColor(colors.white)
+        c.rect(grid_x, grid_y, grid_w, grid_h, stroke=0, fill=1)
+        c.setStrokeColor(grid_line)
+        c.rect(grid_x, grid_y, grid_w, grid_h, stroke=1, fill=0)
+        c.setFont(font, 7)
+        for h in range(START_H, END_H + 1):
+            y = grid_y + grid_h - ((h - START_H) * 60 * scale)
+            c.setStrokeColor(colors.HexColor("#D2D8D6"))
+            c.line(grid_x, y, grid_x + grid_w, y)
+            c.setFillColor(muted)
+            c.drawRightString(grid_x - 6, y - 2, f"{h:02d}:00")
+            if h < END_H:
+                hy = y - 30 * scale
+                c.setStrokeColor(colors.HexColor("#EEF0F0"))
+                c.line(grid_x, hy, grid_x + grid_w, hy)
+
+    def draw_session_lines(day, grid_x, grid_y, grid_w, grid_h, scale):
+        for session in day.get("sessions", []):
+            session_events = session.get("events", [])
+            session_start = session.get("start_time") or (session_events[0].get("time") if session_events else "")
+            if not session_start:
+                continue
+            start = time_to_minutes(session_start)
+            if start < START_H * 60 or start > END_H * 60:
+                continue
+            y = grid_y + grid_h - ((start - START_H * 60) * scale)
+            label = session.get("name", "Session")
+            if session.get("start_time"):
+                label += f" ({session.get('start_time')}"
+                if session.get("end_time"):
+                    label += f" - {session.get('end_time')}"
+                label += ")"
+            c.setStrokeColor(pink)
+            c.setDash(2, 3)
+            c.line(grid_x, y, grid_x + grid_w, y)
+            c.setDash()
+            c.setFillColor(pink)
+            c.setFont(font_bold, 6.8)
+            c.drawString(grid_x + 3, y + 3, fit_text(label, 190, 6.8, font_bold))
+
+    def draw_event_block(item, layout, types, grid_x, grid_y, grid_w, grid_h, scale):
+        ev = item["event"]
+        start = max(item["start"], START_H * 60)
+        end = min(item["end"], END_H * 60)
+        if end <= START_H * 60 or start >= END_H * 60:
+            return
+
+        col_gap = 4
+        top_y = grid_y + grid_h - ((start - START_H * 60) * scale)
+        bottom_y = grid_y + grid_h - ((end - START_H * 60) * scale)
+        block_h = max(top_y - bottom_y, 7)
+        total = max(layout.get("total", 1), 1)
+        column = layout.get("column", 0)
+        block_w = (grid_w - (total + 1) * col_gap) / total
+        x = grid_x + col_gap + column * (block_w + col_gap)
+        y = bottom_y
+
+        bg = color_from_hex(ev.get("color") or types.get(ev.get("type"), {}).get("color"))
+        fg = text_color_for(bg)
+        border = colors.Color(bg.red * 0.72, bg.green * 0.72, bg.blue * 0.72)
+        c.setFillColor(bg)
+        c.roundRect(x, y, block_w, block_h, 3, stroke=0, fill=1)
+        c.setStrokeColor(border)
+        c.roundRect(x, y, block_w, block_h, 3, stroke=1, fill=0)
+
+        title_w = max(block_w - 12, 20)
+        title = ev.get("title", "")
+        teams = ", ".join([team for team in (ev.get("teams") or []) if team])
+        c.setFillColor(fg)
+
+        if block_h < 12:
+            size = 5.2
+            c.setFont(font_bold, size)
+            c.drawString(x + 4, y + 2.5, fit_text(f"{ev.get('time', '')} {title}", title_w, size, font_bold))
+            return
+
+        if block_h < 21:
+            size = 6.2
+            c.setFont(font_bold, size)
+            c.drawString(x + 4, y + block_h - 8, fit_text(f"{ev.get('time', '')} {title}", title_w, size, font_bold))
+            return
+
+        c.setFont(font_bold, 7.3)
+        c.drawString(x + 5, y + block_h - 9, fit_text(ev.get("time", ""), 30, 7.3, font_bold))
+        title_x = x + 37
+        title_lines = wrap_text(title, max(block_w - 43, 20), 7.3, font_bold, max_lines=2 if block_h >= 33 else 1)
+        text_y = y + block_h - 9
+        for line_text in title_lines:
+            c.drawString(title_x, text_y, line_text)
+            text_y -= 8
+
+        if teams and block_h >= 34:
+            c.setFont(font, 5.8)
+            c.setFillColor(pink if fg == black else colors.white)
+            c.drawString(title_x, max(y + 4, text_y), fit_text(teams, max(block_w - 43, 20), 5.8, font))
+
+    def draw_day(day, page_no):
+        draw_header(day, page_no)
+        axis_w = 1.35 * cm
+        grid_x = margin + axis_w
+        grid_y = margin + legend_h
+        grid_w = page_w - margin - grid_x
+        grid_h = page_h - header_h - margin - grid_y - 0.35 * cm
+        scale = grid_h / TOTAL_MINS
+
+        c.setFillColor(muted)
+        c.setFont(font, 7)
+        c.drawString(grid_x, margin + 3, "Les blocs côte à côte indiquent des événements qui se déroulent en même temps.")
+        draw_time_grid(grid_x, grid_y, grid_w, grid_h, axis_w, scale)
+        draw_session_lines(day, grid_x, grid_y, grid_w, grid_h, scale)
+
+        items = collect_day_events(day)
+        layouts = compute_overlap_layouts(items)
+        for item in items:
+            draw_event_block(item, layouts.get(id(item["event"]), {}), data.get("types", {}), grid_x, grid_y, grid_w, grid_h, scale)
+
+    page_no = 0
+    for day in data.get("days", []):
+        page_no += 1
+        draw_day(day, page_no)
+        c.showPage()
+
+    c.save()
 
 # ─────────────────────────────────────────────────────────────────
 # RUNNING SHEET GENERATOR

@@ -925,6 +925,26 @@ async function generateDocx() {
   }
 }
 
+async function generatePlanningPdf() {
+  showToast('Génération du PDF planning...');
+  const r = await fetch('/api/generate-planning-pdf', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(schedule)
+  });
+  if (r.ok) {
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Planning_ACT_2026.pdf';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    showToast('PDF planning téléchargé !');
+  } else {
+    showToast('Erreur lors de la génération du PDF');
+  }
+}
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.innerHTML = msg;
