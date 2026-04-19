@@ -347,7 +347,7 @@
             },
             {
               "color": "#d6d6d6",
-              "details": "Lancement vidéo pre-roll + countdown – Team Médias Projection",
+              "details": "5 min avant le début de la célébration, lancement de la vidéo\nLe volume doit être assez fort pour que les gens comprennent que la célébration va commencer (surtout la dernière minute)",
               "duration": 5,
               "id": "v013",
               "teams": [
@@ -433,7 +433,7 @@
             {
               "color": "#d6eaf8",
               "details": "",
-              "duration": 30,
+              "duration": 25,
               "id": "v020",
               "teams": [
                 "Team Accueil",
@@ -445,8 +445,20 @@
               "type": "INTERCESSION"
             },
             {
+              "color": "#d6d6d6",
+              "details": "5 min avant le début de la célébration, lancement de la vidéo\nLe volume doit être assez fort pour que les gens comprennent que la célébration va commencer (surtout la dernière minute)",
+              "duration": 5,
+              "id": "e_yqvuekm",
+              "teams": [
+                "Team Médias Projection"
+              ],
+              "time": "19:55",
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TRANSITION"
+            },
+            {
               "color": "#d9cafe",
-              "details": "Louange",
+              "details": "Louange pour démarrer la célébration",
               "duration": 45,
               "id": "v021",
               "teams": [
@@ -513,7 +525,7 @@
             {
               "color": "#fad7a0",
               "details": "Repas",
-              "duration": 120,
+              "duration": 115,
               "id": "v018",
               "teams": [
                 "Team Snacking"
@@ -525,7 +537,7 @@
             {
               "color": "#ffd877",
               "details": "Les 3 stands sont opérationnels pendant le repas",
-              "duration": 120,
+              "duration": 115,
               "id": "e_v213zil",
               "teams": [
                 "Team Bible School",
@@ -613,7 +625,7 @@
             {
               "color": "#d6eaf8",
               "details": "",
-              "duration": 30,
+              "duration": 25,
               "id": "e_4iam7l3",
               "teams": [
                 "Team Accueil",
@@ -623,6 +635,18 @@
               "time": "09:00",
               "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "5 min avant le début de la célébration, lancement de la vidéo\nLe volume doit être assez fort pour que les gens comprennent que la célébration va commencer (surtout la dernière minute)",
+              "duration": 5,
+              "id": "e_4n8ahnm",
+              "teams": [
+                "Team Médias Projection"
+              ],
+              "time": "09:25",
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TRANSITION"
             },
             {
               "color": "#d9cafe",
@@ -668,7 +692,7 @@
             {
               "color": "#d6eaf8",
               "details": "",
-              "duration": 30,
+              "duration": 25,
               "id": "e_ic8m8j4",
               "teams": [
                 "Team Accueil",
@@ -702,7 +726,7 @@
             {
               "color": "#fad7a0",
               "details": "Repas",
-              "duration": 150,
+              "duration": 145,
               "id": "s008",
               "teams": [
                 "Team Snacking"
@@ -714,7 +738,7 @@
             {
               "color": "#ffd877",
               "details": "Stands opérationnels pendant le repas",
-              "duration": 150,
+              "duration": 145,
               "id": "e_nem8n3h",
               "teams": [
                 "Team Bible School",
@@ -745,6 +769,18 @@
               "time": "13:45",
               "title": "Boost + Point Fil Rouge",
               "type": "BOOST"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "5 min avant le début de la célébration, lancement de la vidéo\nLe volume doit être assez fort pour que les gens comprennent que la célébration va commencer (surtout la dernière minute)",
+              "duration": 5,
+              "id": "e_wwqckq5",
+              "teams": [
+                "Team Médias Projection"
+              ],
+              "time": "14:25",
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TRANSITION"
             },
             {
               "color": "#00c148",
@@ -852,7 +888,7 @@
             {
               "color": "#ffd877",
               "details": "Les 3 stands sont opérationnels pendant le repas",
-              "duration": 90,
+              "duration": 85,
               "id": "e_23vuv8t",
               "teams": [
                 "Team Bible School",
@@ -866,7 +902,7 @@
             {
               "color": "#fad7a0",
               "details": "Repas",
-              "duration": 90,
+              "duration": 85,
               "id": "s021",
               "teams": [
                 "Team Snacking"
@@ -899,7 +935,7 @@
             {
               "color": "#d6eaf8",
               "details": "",
-              "duration": 30,
+              "duration": 25,
               "id": "s031",
               "teams": [
                 "Team Accueil",
@@ -909,6 +945,18 @@
               "time": "19:30",
               "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "5 min avant le début de la célébration, lancement de la vidéo\nLe volume doit être assez fort pour que les gens comprennent que la célébration va commencer (surtout la dernière minute)",
+              "duration": 5,
+              "id": "e_fjvmrjk",
+              "teams": [
+                "Team Médias Projection"
+              ],
+              "time": "19:55",
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TRANSITION"
             },
             {
               "color": "#d9cafe",
@@ -1055,7 +1103,7 @@
             {
               "color": "#d6eaf8",
               "details": "Intercession / Ouverture des portes",
-              "duration": 30,
+              "duration": 25,
               "id": "d003",
               "teams": [
                 "Team Accueil",
@@ -1065,6 +1113,18 @@
               "time": "09:30",
               "title": "Intercession + ouverture des portes",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "5 min avant le début de la célébration, lancement de la vidéo\nLe volume doit être assez fort pour que les gens comprennent que la célébration va commencer (surtout la dernière minute)",
+              "duration": 5,
+              "id": "e_arlj9ip",
+              "teams": [
+                "Team Médias Projection"
+              ],
+              "time": "09:55",
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TRANSITION"
             },
             {
               "color": "#d9cafe",
