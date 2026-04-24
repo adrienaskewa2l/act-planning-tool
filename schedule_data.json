@@ -821,7 +821,7 @@
             {
               "color": "#00c148",
               "details": "Retours festivals SOS : Fior explique comment ça fonctionne, vidéos harvest report, 1 témoignage à trouver pour Lyon (demander à Sarah), Strasbourg, Stockholm, Bienne, Fribourg ",
-              "duration": 45,
+              "duration": 30,
               "id": "s016",
               "teams": [
                 "Team Médias Projection",
@@ -833,12 +833,28 @@
             },
             {
               "color": "#00c148",
-              "details": "BS Kilgoris (Alicia), Stockholm (Christopher ou Whitney), Lyon (Gaetana) + DEMANDER SUPPORTS et annoncer inscriptions",
+              "details": "Présentation de la Lyon BS (Gaetana), annonce des inscriptions ouvertes au stand. Quelques mots sur les 2 autres BS, sans intervenant dédié\n\nDemander supports de présentation ",
               "duration": 15,
               "id": "e_ls1t3gh",
-              "teams": [],
-              "time": "16:45",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "16:30",
               "title": "Intervention 2B : Présentation SOS Bible Schools",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#00c148",
+              "details": "Présentation du festival LOVE Europe\n\nDemander supports",
+              "duration": 15,
+              "id": "e_2p7t80g",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "16:45",
+              "title": "Intervention 2C : Présentation de LOVE Europe",
               "type": "TED_PITCH"
             },
             {
@@ -867,14 +883,14 @@
             },
             {
               "color": "#00c148",
-              "details": "Podcast live spécial avec Philippe Deas (contacter Jacob + Johannes) - SOUS RESERVE DE VALIDATION DE JOHANNES OU Johannes et Maria",
+              "details": "Podcast live spécial avec Philippe Deas (contacter Jacob + Johannes)",
               "duration": 60,
               "id": "s020",
               "teams": [
                 "Team Son"
               ],
               "time": "17:30",
-              "title": "Intervention 3 : Podcast Live Johannes (À CONFIRMER)",
+              "title": "Intervention 3 : Podcast Live Johannes",
               "type": "TED_PITCH"
             }
           ],
