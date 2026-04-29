@@ -716,6 +716,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     transform: scaleX(1.01);
     z-index: 5;
   }
+  body.pdf-selection-mode .event-block {
+    cursor: pointer;
+    opacity: .28;
+    filter: grayscale(.35) saturate(.7);
+    box-shadow: 0 0 0 1px rgba(15,76,58,.12);
+  }
+  body.pdf-selection-mode .event-block:hover {
+    opacity: .5;
+    filter: grayscale(.15) saturate(.85);
+    box-shadow: 0 0 0 2px rgba(15,76,58,.22), 0 2px 12px rgba(0,0,0,.12);
+    transform: scale(1.01);
+  }
+  body.pdf-selection-mode .event-block.pdf-selected {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    z-index: 8;
+  }
+  .event-block.pdf-selected {
+    box-shadow: 0 0 0 3px #E53935, 0 4px 14px rgba(0,0,0,.18);
+  }
   .event-block.hidden-type { display: none; }
   .ev-main-line { display: flex; align-items: baseline; gap: 5px; min-width: 0; }
   .ev-time { font-size: 10px; opacity: .7; font-weight: 600; line-height: 1.2; flex-shrink: 0; }
@@ -796,6 +817,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .modal-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
   .btn-modal { padding: 8px 16px; border: none; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .btn-primary { background: var(--green); color: white; }
+  .btn-pdf-primary { background: #E53935; color: white; }
   .btn-danger  { background: #e53935; color: white; }
   .btn-cancel  { background: #f5f5f5; color: #333; }
   .btn-modal:hover { opacity: .88; }
@@ -814,6 +836,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .session-tag .del-tag:hover { color: #e53935; }
   .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .helper-text { font-size: 11px; color: #777; margin-top: 4px; line-height: 1.4; }
+  .pdf-export-options { display: grid; gap: 10px; }
+  .pdf-option-card {
+    border: 1px solid #e2e5e5; border-radius: 8px; padding: 14px;
+    background: #fafbfb;
+  }
+  .pdf-option-card h3 { font-size: 14px; color: var(--green); margin-bottom: 4px; }
+  .pdf-option-card p { font-size: 12px; color: #666; line-height: 1.45; }
+  .pdf-selection-bar {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    z-index: 210; display: flex; align-items: center; gap: 10px;
+    background: rgba(15,76,58,.96); color: white; border-radius: 8px;
+    padding: 10px 12px; box-shadow: 0 8px 28px rgba(0,0,0,.22);
+  }
+  .pdf-selection-bar.hidden { display: none; }
+  .pdf-selection-bar strong { font-size: 13px; font-weight: 700; }
+  .pdf-selection-bar .btn-mini {
+    border: none; border-radius: 7px; padding: 7px 10px; cursor: pointer;
+    font-size: 12px; font-weight: 700;
+  }
+  .pdf-selection-bar .btn-export { background: #E53935; color: white; }
+  .pdf-selection-bar .btn-cancel { background: rgba(255,255,255,.15); color: white; }
   body.read-only [data-admin-only] { display: none !important; }
   body.read-only .resize-handle { display: none; }
 
@@ -900,7 +943,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <button data-admin-only class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
   <button data-admin-only class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
   <button data-admin-only class="btn btn-docx" onclick="generateDocx()">&#128196; Running Sheet</button>
-  <button data-admin-only class="btn btn-pdf" onclick="generatePlanningPdf()">PDF Planning</button>
+  <button data-admin-only class="btn btn-pdf" onclick="openPdfExportModal()">PDF Planning</button>
 </header>
 
 <!-- LEGEND -->
@@ -917,6 +960,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- PDF SELECTION BAR -->
+<div class="pdf-selection-bar hidden" id="pdf-selection-bar">
+  <strong id="pdf-selection-count">0 événement(s) sélectionné(s)</strong>
+  <button class="btn-mini btn-export" onclick="exportSelectedPlanningPdf()">Exporter la sélection</button>
+  <button class="btn-mini btn-cancel" onclick="cancelPdfSelectionMode()">Annuler</button>
+</div>
 
 <!-- EDIT MODAL -->
 <div class="modal-overlay hidden" id="modal">
@@ -1007,6 +1057,30 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div id="view-body"></div>
     <div class="modal-actions">
       <button class="btn-modal btn-primary" onclick="closeViewModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF EXPORT MODAL -->
+<div class="modal-overlay hidden" id="modal-pdf-export">
+  <div class="modal-card">
+    <h2>Export PDF du planning</h2>
+    <div class="pdf-export-options">
+      <div class="pdf-option-card">
+        <h3>Tout exporter</h3>
+        <p>Génère le planning PDF complet avec tous les événements actuellement présents dans l’outil.</p>
+      </div>
+      <div class="modal-actions" style="margin-top:8px">
+        <button class="btn-modal btn-pdf-primary" onclick="exportAllPlanningPdf()">Tout exporter</button>
+      </div>
+      <div class="pdf-option-card">
+        <h3>Choisir les événements sur le planning</h3>
+        <p>Active un mode de sélection visuelle. Clique directement sur les blocs à garder dans le PDF, puis valide l’export.</p>
+      </div>
+      <div class="modal-actions" style="margin-top:8px">
+        <button class="btn-modal btn-primary" onclick="startPdfSelectionMode()">Choisir sur le planning</button>
+        <button class="btn-modal btn-cancel" onclick="closePdfExportModal()">Annuler</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1125,7 +1199,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=13"></script>
+<script src="/app.js?v=14"></script>
 </body>
 </html>
 """

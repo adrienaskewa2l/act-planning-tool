@@ -22,7 +22,7 @@ Puis ouvrir `http://localhost:5001`.
 - Ajouter des details pour la Running Sheet
 - Mettre a jour les infos generales de l'evenement
 - Exporter une Running Sheet `.docx`
-- Exporter le planning en PDF couleur
+- Exporter le planning en PDF couleur, en entier ou par sélection visuelle d'événements
 
 ## Sauvegarde
 

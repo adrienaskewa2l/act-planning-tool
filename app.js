@@ -59,6 +59,8 @@ const SERVICE_TEAMS = [
 
 let schedule = null;
 let hiddenTypes = new Set();
+let pdfSelectionMode = false;
+let pdfSelectedEventIds = new Set();
 
 // ── TIME UTILITIES ──
 function timeToY(t) {
@@ -170,6 +172,7 @@ function renderAll() {
   renderTimeAxis();
   renderLegend();
   renderDays();
+  updatePdfSelectionUi();
 }
 
 function renderTimeAxis() {
@@ -252,6 +255,7 @@ function renderDays() {
     // Click on empty area → add event
     area.addEventListener('click', function(e) {
       if (READ_ONLY) return;
+      if (pdfSelectionMode) return;
       if (e.target === area) {
         const rect = area.getBoundingClientRect();
         const y = e.clientY - rect.top + area.parentElement.parentElement.scrollTop;
@@ -355,7 +359,7 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
   const leftPct = (column / total) * 100;
   const widthPct = 100 / total;
   const div = document.createElement('div');
-  div.className = 'event-block' + (hiddenTypes.has(ev.type) ? ' hidden-type' : '');
+  div.className = 'event-block' + (hiddenTypes.has(ev.type) ? ' hidden-type' : '') + (pdfSelectedEventIds.has(ev.id) ? ' pdf-selected' : '');
   div.dataset.evId = ev.id;
   div.dataset.type = ev.type;
   const bgColor = ev.color || typeColor(ev.type);
@@ -375,12 +379,17 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
       openViewModal(ev, dayId, sessionId);
       return;
     }
+    if (pdfSelectionMode) {
+      togglePdfEventSelection(ev.id);
+      return;
+    }
     if (!e._resized) openEditModal(ev, dayId, sessionId);
   });
 
   if (READ_ONLY) return div;
 
   div.addEventListener('mousedown', e => {
+    if (pdfSelectionMode) return;
     if (e.target.classList.contains('resize-handle') || e.button !== 0) return;
     const startY = e.clientY;
     const startTime = ev.time;
@@ -413,6 +422,7 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
 
   // Resize
   div.querySelector('.resize-handle').addEventListener('mousedown', e => {
+    if (pdfSelectionMode) return;
     e.stopPropagation(); e.preventDefault();
     const startY = e.clientY;
     const startDur = ev.duration;
@@ -925,12 +935,71 @@ async function generateDocx() {
   }
 }
 
-async function generatePlanningPdf() {
+function openPdfExportModal() {
+  pdfSelectedEventIds.clear();
+  pdfSelectionMode = false;
+  document.getElementById('modal-pdf-export').classList.remove('hidden');
+  updatePdfSelectionUi();
+  renderDays();
+}
+
+function closePdfExportModal() {
+  document.getElementById('modal-pdf-export').classList.add('hidden');
+}
+
+function startPdfSelectionMode() {
+  closePdfExportModal();
+  pdfSelectedEventIds.clear();
+  pdfSelectionMode = true;
+  updatePdfSelectionUi();
+  renderDays();
+  showToast('Clique sur les événements à exporter, puis valide.');
+}
+
+function cancelPdfSelectionMode() {
+  pdfSelectionMode = false;
+  pdfSelectedEventIds.clear();
+  updatePdfSelectionUi();
+  renderDays();
+}
+
+function togglePdfEventSelection(eventId) {
+  if (pdfSelectedEventIds.has(eventId)) pdfSelectedEventIds.delete(eventId);
+  else pdfSelectedEventIds.add(eventId);
+  updatePdfSelectionUi();
+  renderDays();
+}
+
+function updatePdfSelectionUi() {
+  document.body.classList.toggle('pdf-selection-mode', pdfSelectionMode);
+  const bar = document.getElementById('pdf-selection-bar');
+  if (!bar) return;
+  bar.classList.toggle('hidden', !pdfSelectionMode);
+  const count = document.getElementById('pdf-selection-count');
+  if (count) count.textContent = `${pdfSelectedEventIds.size} événement(s) sélectionné(s)`;
+}
+
+function buildPdfExportSchedule(onlySelected) {
+  const copy = JSON.parse(JSON.stringify(schedule));
+  if (!onlySelected) return copy;
+
+  copy.days = (copy.days || []).map(day => {
+    const sessions = (day.sessions || []).map(session => ({
+      ...session,
+      events: (session.events || []).filter(ev => pdfSelectedEventIds.has(ev.id))
+    })).filter(session => (session.events || []).length);
+    return { ...day, sessions };
+  }).filter(day => (day.sessions || []).length);
+
+  return copy;
+}
+
+async function generatePlanningPdf(payloadSchedule) {
   showToast('Génération du PDF planning...');
   const r = await fetch('/api/generate-planning-pdf', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(schedule)
+    body: JSON.stringify(payloadSchedule || schedule)
   });
   if (r.ok) {
     const blob = await r.blob();
@@ -943,6 +1012,24 @@ async function generatePlanningPdf() {
   } else {
     showToast('Erreur lors de la génération du PDF');
   }
+}
+
+async function exportAllPlanningPdf() {
+  closePdfExportModal();
+  await generatePlanningPdf(buildPdfExportSchedule(false));
+}
+
+async function exportSelectedPlanningPdf() {
+  if (!pdfSelectedEventIds.size) {
+    showToast('Sélectionne au moins un événement');
+    return;
+  }
+  const payload = buildPdfExportSchedule(true);
+  pdfSelectionMode = false;
+  pdfSelectedEventIds.clear();
+  updatePdfSelectionUi();
+  renderDays();
+  await generatePlanningPdf(payload);
 }
 
 function showToast(msg) {
@@ -968,6 +1055,9 @@ document.getElementById('modal-type').addEventListener('click', e => {
 });
 document.getElementById('modal-meta').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-meta')) closeMetaModal();
+});
+document.getElementById('modal-pdf-export').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-pdf-export')) closePdfExportModal();
 });
 
 // Start
