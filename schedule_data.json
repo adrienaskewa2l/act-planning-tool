@@ -286,7 +286,7 @@
             },
             {
               "color": "#d9cafe",
-              "details": "",
+              "details": "Un seul chant pour commencer la célébration",
               "duration": 5,
               "id": "e_03vhiry",
               "teams": [
@@ -295,7 +295,7 @@
                 "Team Son"
               ],
               "time": "16:30",
-              "title": "Louange",
+              "title": "Louange / Worship",
               "type": "LOUANGE"
             },
             {
@@ -366,7 +366,7 @@
                 "Team MC/Infos"
               ],
               "time": "16:35",
-              "title": "Mot d'accueil – MC",
+              "title": "Mot d'accueil par le MC / Welcome by MC",
               "type": "TRANSITION"
             },
             {
@@ -380,7 +380,7 @@
                 "Team Son"
               ],
               "time": "16:40",
-              "title": "Louange",
+              "title": "Louange / Worship",
               "type": "LOUANGE"
             },
             {
@@ -392,7 +392,7 @@
                 "Johannes"
               ],
               "time": "17:10",
-              "title": "Introduction Johannes + Annonces WE",
+              "title": "Introduction Johannes + Informations WE",
               "type": "PRIERE"
             },
             {
@@ -406,7 +406,7 @@
                 "Team Son"
               ],
               "time": "17:40",
-              "title": "Louange",
+              "title": "Louange / Worship",
               "type": "LOUANGE"
             }
           ],
@@ -465,7 +465,7 @@
                 "Team Louange"
               ],
               "time": "20:00",
-              "title": "Louange",
+              "title": "Louange / Worship",
               "type": "LOUANGE"
             },
             {
@@ -477,7 +477,7 @@
                 "Dennis"
               ],
               "time": "20:45",
-              "title": "Prédication Dennis",
+              "title": "Prédication par Dennis / Message by Dennis",
               "type": "PREDICATION"
             },
             {
@@ -489,7 +489,7 @@
                 "Team Louange"
               ],
               "time": "21:30",
-              "title": "Louange + ministère",
+              "title": "Louange + ministère / Worship + ministry",
               "type": "LOUANGE"
             },
             {
@@ -499,7 +499,7 @@
               "id": "v024",
               "teams": [],
               "time": "22:00",
-              "title": "Levée de fonds – 10K pour ACT et BS",
+              "title": "Levée de fonds / Fundraising – 10K for ACT et BS Lyon",
               "type": "PRIERE"
             },
             {
@@ -662,7 +662,7 @@
                 "Team Son"
               ],
               "time": "09:30",
-              "title": "Louange",
+              "title": "Louange / Worship",
               "type": "LOUANGE"
             },
             {
@@ -674,7 +674,7 @@
                 "Dennis"
               ],
               "time": "10:00",
-              "title": "Prédication Dennis",
+              "title": "Prédication par Dennis / Message by Dennis",
               "type": "PREDICATION"
             },
             {
@@ -686,7 +686,7 @@
                 "Team Louange"
               ],
               "time": "11:00",
-              "title": "Louange + ministère",
+              "title": "Louange + ministère / Worship + ministry",
               "type": "LOUANGE"
             },
             {
@@ -890,7 +890,7 @@
                 "Team Son"
               ],
               "time": "17:30",
-              "title": "Intervention 3 : Podcast Live Johannes",
+              "title": "Intervention 3 : Podcast Live Johannes and Maria",
               "type": "TED_PITCH"
             }
           ],
@@ -983,7 +983,7 @@
                 "Team Louange"
               ],
               "time": "20:00",
-              "title": "Louange Résistance",
+              "title": "Louange Résistance / Worship by Résistance",
               "type": "LOUANGE"
             },
             {
@@ -995,7 +995,7 @@
                 "Johannes"
               ],
               "time": "20:30",
-              "title": "Prédication Johannes",
+              "title": "Prédication par Johannes / Message by Johannes",
               "type": "PREDICATION"
             },
             {
@@ -1007,7 +1007,7 @@
                 "Johannes"
               ],
               "time": "21:30",
-              "title": "Temps de prière",
+              "title": "Temps de prière / Prayer time",
               "type": "PRIERE"
             },
             {
@@ -1017,7 +1017,7 @@
               "id": "s035",
               "teams": [],
               "time": "22:00",
-              "title": "Ministère",
+              "title": "Ministère / Ministry time",
               "type": "PRIERE"
             },
             {
@@ -1027,7 +1027,7 @@
               "id": "s036",
               "teams": [],
               "time": "22:15",
-              "title": "Levée de fonds – 10K pour ACT et BS",
+              "title": "Levée de fonds / Fundraising – 10K for ACT et BS",
               "type": "PRIERE"
             },
             {
@@ -1151,7 +1151,7 @@
                 "Team Louange"
               ],
               "time": "10:00",
-              "title": "Louange",
+              "title": "Louange / Worship",
               "type": "LOUANGE"
             },
             {
@@ -1163,7 +1163,7 @@
                 "Johannes"
               ],
               "time": "10:30",
-              "title": "Ste Cène",
+              "title": "Ste Cène / Holy Communion",
               "type": "PRIERE"
             },
             {
@@ -1175,7 +1175,7 @@
                 "Johannes"
               ],
               "time": "10:45",
-              "title": "Temps de prière",
+              "title": "Temps de prière / Prayer time",
               "type": "PRIERE"
             },
             {
@@ -1187,7 +1187,7 @@
                 "Dennis"
               ],
               "time": "11:00",
-              "title": "Prédication Dennis",
+              "title": "Prédication Dennis / Message by Dennis",
               "type": "PREDICATION"
             },
             {
@@ -1199,7 +1199,7 @@
                 "Team Louange"
               ],
               "time": "12:00",
-              "title": "Louange + ministère",
+              "title": "Louange + ministère / Worship + ministry",
               "type": "LOUANGE"
             },
             {
@@ -1209,7 +1209,7 @@
               "id": "d009",
               "teams": [],
               "time": "12:15",
-              "title": "Levée de fonds – 10K pour ACT et BS",
+              "title": "Levée de fonds / Fundraising – 10K for ACT et BS",
               "type": "PRIERE"
             },
             {
@@ -1219,7 +1219,7 @@
               "id": "d010",
               "teams": [],
               "time": "12:30",
-              "title": "Clôture conférence + annonces",
+              "title": "Clôture conférence + annonces / Conference closing + informations",
               "type": "TRANSITION"
             }
           ],
