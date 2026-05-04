@@ -805,6 +805,21 @@
               "type": "LOUANGE"
             },
             {
+              "color": "#ffd877",
+              "details": "Accueil opérationnel : entrée dans le hall, stands ouverts (Snacking, Librairie, Festival, Bible School). Portes de la salle principale fermées. Scan des billets. Orateurs principaux → Green Room.",
+              "duration": 30,
+              "id": "e_6pd3rj3",
+              "teams": [
+                "Team Accueil",
+                "Team Bible School",
+                "Team Festival",
+                "Team Librairie"
+              ],
+              "time": "08:45",
+              "title": "Stands et accueil opérationnels",
+              "type": "TECHNIQUE"
+            },
+            {
               "color": "#d357fe",
               "details": "Ouverture des portes et placement",
               "duration": 15,
@@ -1522,6 +1537,21 @@
               "time": "09:15",
               "title": "Balances louange",
               "type": "LOUANGE"
+            },
+            {
+              "color": "#ffd877",
+              "details": "Accueil opérationnel : entrée dans le hall, stands ouverts (Snacking, Librairie, Festival, Bible School). Portes de la salle principale fermées. Scan des billets. Orateurs principaux → Green Room.",
+              "duration": 30,
+              "id": "e_kgrktky",
+              "teams": [
+                "Team Accueil",
+                "Team Bible School",
+                "Team Festival",
+                "Team Librairie"
+              ],
+              "time": "09:15",
+              "title": "Stands et accueil opérationnels",
+              "type": "TECHNIQUE"
             },
             {
               "color": "#d357fe",
