@@ -245,7 +245,7 @@
             {
               "color": "#ffd877",
               "details": "Accueil opérationnel : entrée dans le hall, stands ouverts (Snacking, Librairie, Festival, Bible School). Portes de la salle principale fermées. Scan des billets. Orateurs principaux → Green Room.",
-              "duration": 75,
+              "duration": 105,
               "id": "v007",
               "teams": [
                 "Team Snacking",
@@ -258,7 +258,15 @@
               "time": "14:30",
               "title": "Accueil, snacking et stands opérationnels",
               "type": "TECHNIQUE"
-            },
+            }
+          ],
+          "id": "ven_prep",
+          "name": "Préparation",
+          "start_time": "08:00"
+        },
+        {
+          "end_time": "18:00",
+          "events": [
             {
               "color": "#caf0fe",
               "details": "Les chauffeurs se rendent au Domaine St Joseph pour récupérer les pasteurs et invités",
@@ -272,39 +280,6 @@
               "type": "ANNONCES"
             },
             {
-              "color": "#caf0fe",
-              "details": "Trajet du Domaine St Joseph vers E140",
-              "duration": 30,
-              "id": "e_08ua2x0",
-              "teams": [
-                "Team Chauffeurs"
-              ],
-              "time": "15:30",
-              "title": "Trajet vers E140",
-              "type": "ANNONCES"
-            },
-            {
-              "color": "#d6d6d6",
-              "details": "Les visiteurs partent, le snacking est toujours ouvert pour pouvoir servir ceux qui voudraient prendre quelque chose en partant",
-              "duration": 30,
-              "id": "e_8dr44bl",
-              "teams": [
-                "Team Snacking",
-                "Team Accueil"
-              ],
-              "time": "22:20",
-              "title": "Départ des participants",
-              "type": "TRANSITION"
-            }
-          ],
-          "id": "ven_prep",
-          "name": "Préparation",
-          "start_time": "08:00"
-        },
-        {
-          "end_time": "18:00",
-          "events": [
-            {
               "color": "#f1948a",
               "details": "Boost",
               "duration": 15,
@@ -315,6 +290,18 @@
               "time": "15:30",
               "title": "Boost + Point Fil Rouge",
               "type": "BOOST"
+            },
+            {
+              "color": "#caf0fe",
+              "details": "Trajet du Domaine St Joseph vers E140",
+              "duration": 30,
+              "id": "e_08ua2x0",
+              "teams": [
+                "Team Chauffeurs"
+              ],
+              "time": "15:30",
+              "title": "Trajet vers E140",
+              "type": "ANNONCES"
             },
             {
               "color": "#d6eaf8",
@@ -508,7 +495,7 @@
             },
             {
               "color": "#d6eaf8",
-              "details": "",
+              "details": "Intercession – Josias, Team Prière, équipiers volontaires (hors service).",
               "duration": 30,
               "id": "v020",
               "teams": [
@@ -670,6 +657,19 @@
               "time": "22:20",
               "title": "Trajet vers DSJ",
               "type": "ANNONCES"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Les visiteurs partent, le snacking est toujours ouvert pour pouvoir servir ceux qui voudraient prendre quelque chose en partant",
+              "duration": 30,
+              "id": "e_8dr44bl",
+              "teams": [
+                "Team Snacking",
+                "Team Accueil"
+              ],
+              "time": "22:20",
+              "title": "Départ des participants",
+              "type": "TRANSITION"
             }
           ],
           "id": "sess_e_hmqgn4m",
@@ -781,7 +781,7 @@
             },
             {
               "color": "#d6eaf8",
-              "details": "",
+              "details": "Intercession – Josias, Team Prière, équipiers volontaires (hors service).",
               "duration": 30,
               "id": "e_4iam7l3",
               "teams": [
@@ -806,7 +806,7 @@
             },
             {
               "color": "#d357fe",
-              "details": "",
+              "details": "Ouverture des portes et placement",
               "duration": 15,
               "id": "e_tf9dhc2",
               "teams": [
@@ -946,7 +946,7 @@
             },
             {
               "color": "#d357fe",
-              "details": "",
+              "details": "Ouverture des portes et placement",
               "duration": 15,
               "id": "e_n4whozy",
               "teams": [
@@ -955,19 +955,6 @@
               "time": "14:15",
               "title": "Ouverture des portes",
               "type": "CELEBRATION"
-            },
-            {
-              "color": "#d6d6d6",
-              "details": "Les visiteurs partent, le snacking est toujours ouvert pour pouvoir servir ceux qui voudraient prendre quelque chose en partant",
-              "duration": 30,
-              "id": "e_xgtro6h",
-              "teams": [
-                "Team Snacking",
-                "Team Accueil"
-              ],
-              "time": "22:30",
-              "title": "Départ des participants",
-              "type": "TRANSITION"
             }
           ],
           "id": "sam_matin",
@@ -1254,7 +1241,7 @@
             {
               "color": "#ffd877",
               "details": "Les 3 stands sont opérationnels pendant le repas",
-              "duration": 85,
+              "duration": 80,
               "id": "e_23vuv8t",
               "teams": [
                 "Team Bible School",
@@ -1268,7 +1255,7 @@
             {
               "color": "#fad7a0",
               "details": "Repas",
-              "duration": 85,
+              "duration": 80,
               "id": "s021",
               "teams": [
                 "Team Snacking"
@@ -1294,23 +1281,46 @@
                 "Fil Rouge",
                 "Team Boost"
               ],
-              "time": "19:15",
+              "time": "19:00",
               "title": "Boost + point fil rouge",
               "type": "BOOST"
             },
             {
               "color": "#d6eaf8",
-              "details": "",
-              "duration": 25,
+              "details": "Intercession – Josias, Team Prière, équipiers volontaires (hors service).",
+              "duration": 30,
               "id": "s031",
               "teams": [
-                "Team Accueil",
-                "Team Prières",
-                "Team Boost"
+                "Team Prières"
               ],
-              "time": "19:30",
-              "title": "Intercession + ouverture des portes",
+              "time": "19:15",
+              "title": "Intercession",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Balances louange",
+              "duration": 30,
+              "id": "e_t4fcydk",
+              "teams": [
+                "Team Louange",
+                "Team Son"
+              ],
+              "time": "19:15",
+              "title": "Balances louange",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#d357fe",
+              "details": "Ouverture des portes et placement",
+              "duration": 15,
+              "id": "e_sn3md3n",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "19:45",
+              "title": "Ouverture des portes",
+              "type": "CELEBRATION"
             },
             {
               "color": "#d6d6d6",
@@ -1391,6 +1401,19 @@
               "time": "22:30",
               "title": "Trajet vers DSJ",
               "type": "ANNONCES"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Les visiteurs partent, le snacking est toujours ouvert pour pouvoir servir ceux qui voudraient prendre quelque chose en partant",
+              "duration": 30,
+              "id": "e_xgtro6h",
+              "teams": [
+                "Team Snacking",
+                "Team Accueil"
+              ],
+              "time": "22:30",
+              "title": "Départ des participants",
+              "type": "TRANSITION"
             }
           ],
           "id": "sess_e_00xjg4l",
