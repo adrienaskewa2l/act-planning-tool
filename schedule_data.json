@@ -945,17 +945,16 @@
               "type": "PRIERE"
             },
             {
-              "color": "#d6eaf8",
+              "color": "#d357fe",
               "details": "",
-              "duration": 25,
-              "id": "e_ic8m8j4",
+              "duration": 15,
+              "id": "e_n4whozy",
               "teams": [
-                "Team Accueil",
-                "Team Prières"
+                "Team Accueil"
               ],
-              "time": "14:00",
-              "title": "Intercession + ouverture des portes",
-              "type": "INTERCESSION"
+              "time": "14:15",
+              "title": "Ouverture des portes",
+              "type": "CELEBRATION"
             },
             {
               "color": "#d6d6d6",
@@ -981,7 +980,7 @@
             {
               "color": "#fad7a0",
               "details": "Repas",
-              "duration": 145,
+              "duration": 140,
               "id": "s008",
               "teams": [
                 "Team Snacking"
@@ -993,7 +992,7 @@
             {
               "color": "#ffd877",
               "details": "Stands opérationnels pendant le repas",
-              "duration": 145,
+              "duration": 140,
               "id": "e_nem8n3h",
               "teams": [
                 "Team Bible School",
@@ -1021,7 +1020,7 @@
                 "Fil Rouge",
                 "Team Boost"
               ],
-              "time": "13:45",
+              "time": "14:00",
               "title": "Boost + Point Fil Rouge",
               "type": "BOOST"
             },
@@ -1038,16 +1037,45 @@
               "type": "TRANSITION"
             },
             {
+              "color": "#d6d6d6",
+              "details": "Intro session nouvelles églises par Matt\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_go3ddii",
+              "teams": [
+                "Team Médias Projection",
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "14:30",
+              "title": "Intro Matt",
+              "type": "TRANSITION"
+            },
+            {
               "color": "#00c148",
-              "details": "Présentation de : \nSOS Yverdon : Pasteurs Majo et Babs\nSOS Strasbourg : Pasteurs Luc et Mathilde\nSOS Buford : Pasteur Fernando \n\nEn format interview (interviewer à trouver) : préparer également supports vidéos, photos...",
-              "duration": 60,
+              "details": "Présentation de : \nSOS Yverdon : Pasteurs Majo et Babs - 12 min\nSOS Strasbourg : Pasteurs Luc et Mathilde - 12 min\nSOS Buford : Pasteur Fernando et Liz - 12 min\nTraduction tout le long par Danick\n\nChaque couple présente son projet\nPréparer également supports vidéos, photos...\n\n10 dernières minutes : prière avec Johannes et Tim (trad par Tim)\n\nPrévoir chaises hautes x2",
+              "duration": 50,
               "id": "s010",
               "teams": [
                 "Team Médias Projection"
               ],
-              "time": "14:30",
+              "time": "14:35",
               "title": "Intervention 1 : Présentation nouvelles églises SOS",
               "type": "TED_PITCH"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Infos sur la suite du programme (pause, stands, reprise) par Matt : allez manger !\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_i45wgra",
+              "teams": [
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "15:25",
+              "title": "Infos programme par Matt",
+              "type": "TRANSITION"
             },
             {
               "color": "#ffd877",
@@ -1074,21 +1102,48 @@
               "type": "TRANSITION"
             },
             {
+              "color": "#d6d6d6",
+              "details": "5 min avant le début de la célébration, lancement de la vidéo\nLe volume doit être assez fort pour que les gens comprennent que la célébration va commencer (surtout la dernière minute)",
+              "duration": 5,
+              "id": "e_xz1xrn6",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "15:55",
+              "title": "Lancement vidéo pre-roll + countdown",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Introduction session festival + BS + surprise par Matt\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_gnoxw5v",
+              "teams": [
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "16:00",
+              "title": "Intro session",
+              "type": "TRANSITION"
+            },
+            {
               "color": "#00c148",
-              "details": "Retours festivals SOS : \n- Vidéo harvest report : 3 min\n- Fiore explique comment ça fonctionne : 6-7 min\n- 1 témoignage de Lyon (demander à Sarah) : 4-5 min\n- 1 témoignage de  Strasbourg : 4-5 min \n- 1 témoignage de Bienne ou Fribourg : 4-5 min \n- 1 témoignage de Stockholm : 4-5 min",
-              "duration": 30,
+              "details": "Retours festivals SOS : \n- Vidéo harvest report : 3 min\n- Fiore explique comment ça fonctionne : 10 min\n- 1 témoignage LIVE de Lyon (Divi) : 3 min\n- 1 témoignage VIDEO de Stockholm : 3 min\n- 1 témoignage LIVE de Strasbourg : 3 min \n- 1 témoignage LIVE de Bienne ou Fribourg : 3 min ",
+              "duration": 25,
               "id": "s016",
               "teams": [
                 "Team Médias Projection",
                 "Team Son"
               ],
-              "time": "16:00",
+              "time": "16:05",
               "title": "Intervention 2A : Retours festivals SOS",
               "type": "TED_PITCH"
             },
             {
               "color": "#00c148",
-              "details": "Présentation de la Lyon BS (Gaetana), annonce des inscriptions ouvertes au stand. Quelques mots sur les 2 autres BS, sans intervenant dédié\n\nDemander supports de présentation ",
+              "details": "Présentation de la Lyon BS (Gaetana), annonce des inscriptions ouvertes au stand. Quelques mots sur les 2 autres BS, sans intervenant dédié\n\nDemander supports de présentation dont vidéo Matt et Sarah",
               "duration": 15,
               "id": "e_ls1t3gh",
               "teams": [
@@ -1102,7 +1157,7 @@
             {
               "color": "#00c148",
               "details": "Présentation du festival LOVE Europe par Victoria SCHNEGG et Romain SCHNEGG\n\nDemander supports",
-              "duration": 15,
+              "duration": 12,
               "id": "e_2p7t80g",
               "teams": [
                 "Team Médias Projection",
@@ -1111,6 +1166,20 @@
               "time": "16:45",
               "title": "Intervention 2C : Présentation de LOVE Europe",
               "type": "TED_PITCH"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Infos sur la suite du programme (pause, stands, reprise) par Matt : allez manger !\nTraduit par Danick",
+              "duration": 3,
+              "id": "e_yzy142y",
+              "teams": [
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "16:57",
+              "title": "Infos programme par Matt",
+              "type": "TRANSITION"
             },
             {
               "color": "#ffd877",
@@ -1137,16 +1206,42 @@
               "type": "TRANSITION"
             },
             {
-              "color": "#00c148",
-              "details": "Podcast live spécial avec Philippe Deas (contacter Jacob + Johannes)",
-              "duration": 60,
-              "id": "s020",
+              "color": "#d6d6d6",
+              "details": "Infos sur la session d'interview Johannes et Maria par Matt, occasion d'en savoir plus sur eux deux et notamment Maria\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_za6j8jk",
               "teams": [
+                "Team MC/Infos",
+                "Team Traduction",
                 "Team Son"
               ],
               "time": "17:30",
+              "title": "Intro session par Matt",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#00c148",
+              "details": "Interview de Johannes et Maria par Walter\nWalter traduit par Danick\nJohannes et Maria traduits par Sarah\n\nDemander supports d'archives\n\nPrévoir chaises hautes x5",
+              "duration": 50,
+              "id": "s020",
+              "teams": [
+                "Team Médias Projection",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "17:35",
               "title": "Intervention 3 : Podcast Live Johannes and Maria",
               "type": "TED_PITCH"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Infos sur la suite du programme (pause, stands, reprise) par Matt : allez manger !\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_wa7ol16",
+              "teams": [],
+              "time": "18:25",
+              "title": "Infos programme par Matt",
+              "type": "TRANSITION"
             }
           ],
           "id": "sam_soiree",
