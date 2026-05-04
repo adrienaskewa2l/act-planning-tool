@@ -595,7 +595,7 @@
             },
             {
               "color": "#d9cafe",
-              "details": "Louange, ministère…\nTraduit par Sarah",
+              "details": "Louange, ministère conduit par Dennis…\nTraduit par Sarah",
               "duration": 30,
               "id": "v023",
               "teams": [
@@ -631,7 +631,7 @@
                 "Team Son"
               ],
               "time": "21:55",
-              "title": "Update d'une église : Fribourg",
+              "title": "Vidéo update Fribourg",
               "type": "PRIERE"
             },
             {
@@ -731,6 +731,18 @@
               "type": "FUNDRAISING"
             },
             {
+              "color": "#d5f5e3",
+              "details": "Arrivée Dream Team",
+              "duration": 30,
+              "id": "s001",
+              "teams": [
+                "Toute la Dream Team"
+              ],
+              "time": "08:00",
+              "title": "Arrivée Dream Team",
+              "type": "REUNION"
+            },
+            {
               "color": "#caf0fe",
               "details": "Les chauffeurs se rendent au Domaine St Joseph pour récupérer les pasteurs et invités",
               "duration": 15,
@@ -741,18 +753,6 @@
               "time": "08:15",
               "title": "Pick-up pasteurs à DSJ",
               "type": "ANNONCES"
-            },
-            {
-              "color": "#d5f5e3",
-              "details": "Arrivée Dream Team",
-              "duration": 15,
-              "id": "s001",
-              "teams": [
-                "Toute la Dream Team"
-              ],
-              "time": "08:30",
-              "title": "Arrivée Dream Team",
-              "type": "REUNION"
             },
             {
               "color": "#caf0fe",
@@ -775,23 +775,46 @@
                 "Fil Rouge",
                 "Team Boost"
               ],
-              "time": "08:45",
+              "time": "08:30",
               "title": "Boost + point fil rouge",
               "type": "BOOST"
             },
             {
               "color": "#d6eaf8",
               "details": "",
-              "duration": 25,
+              "duration": 30,
               "id": "e_4iam7l3",
               "teams": [
-                "Team Accueil",
-                "Team Prières",
-                "Team Boost"
+                "Team Prières"
               ],
-              "time": "09:00",
-              "title": "Intercession + ouverture des portes",
+              "time": "08:45",
+              "title": "Intercession",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Balances louange",
+              "duration": 30,
+              "id": "e_7rldb2g",
+              "teams": [
+                "Team Louange",
+                "Team Son"
+              ],
+              "time": "08:45",
+              "title": "Balances louange",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#d357fe",
+              "details": "",
+              "duration": 15,
+              "id": "e_tf9dhc2",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "09:15",
+              "title": "Ouverture des portes",
+              "type": "CELEBRATION"
             },
             {
               "color": "#d6d6d6",
@@ -824,10 +847,11 @@
             },
             {
               "color": "#82e0aa",
-              "details": "Prédication Dennis",
+              "details": "Prédication Dennis\nTraduit par Sarah",
               "duration": 60,
               "id": "s004",
               "teams": [
+                "Team Médias Projection",
                 "Dennis"
               ],
               "time": "10:00",
@@ -836,15 +860,89 @@
             },
             {
               "color": "#d9cafe",
-              "details": "Louange, ministère…",
-              "duration": 60,
+              "details": "Louange, ministère conduit par Dennis\nTraduit par Sarah",
+              "duration": 30,
               "id": "s007",
               "teams": [
-                "Team Louange"
+                "Team Médias Projection",
+                "Team Louange",
+                "Team Traduction",
+                "Team Son"
               ],
               "time": "11:00",
               "title": "Louange + ministère / Worship + ministry",
               "type": "LOUANGE"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Matt introduit la vidéo d'update de Malmö\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_p1ph5vl",
+              "teams": [
+                "Team Médias Projection",
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Boost"
+              ],
+              "time": "11:30",
+              "title": "Transition par Matt",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#7fb3d3",
+              "details": "",
+              "duration": 5,
+              "id": "e_5dl988x",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "11:35",
+              "title": "Vidéo update Malmö",
+              "type": "PRIERE"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Matt donne des infos sur la suite du programme (stands, repas, heure de reprise) + intro Tim pour l'offrande\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_y12mh5s",
+              "teams": [
+                "Team Médias Projection",
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "11:40",
+              "title": "Infos programme par Matt",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Tim présente le temps d'offrande\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_0jxmgjw",
+              "teams": [
+                "Team Médias Projection",
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "11:45",
+              "title": "Tim présente le temps d'offrande",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#7fb3d3",
+              "details": "",
+              "duration": 10,
+              "id": "e_kdpvvs2",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "11:50",
+              "title": "Levée de fonds / Fundraising – 10K for ACT et BS Lyon",
+              "type": "PRIERE"
             },
             {
               "color": "#d6eaf8",

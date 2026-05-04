@@ -566,6 +566,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .btn-pdf { background: #E53935; color: white; }
   .btn-sync { background: #F9E79F; color: #174032; }
   .btn-add  { background: rgba(255,255,255,.18); color: white; border: 1px solid rgba(255,255,255,.4); }
+  .zoom-controls {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+    border-radius: 8px; padding: 4px;
+  }
+  .zoom-btn {
+    width: 30px; height: 30px; border: none; border-radius: 6px; cursor: pointer;
+    background: rgba(255,255,255,.18); color: white; font-size: 18px; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .zoom-btn:hover { background: rgba(255,255,255,.3); }
+  .zoom-value {
+    min-width: 44px; text-align: center; font-size: 12px; font-weight: 700; color: white;
+  }
   .toast {
     position: fixed; bottom: 20px; right: 20px; background: #333; color: white;
     padding: 10px 18px; border-radius: 8px; font-size: 13px;
@@ -944,6 +958,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <button data-admin-only class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
   <button data-admin-only class="btn btn-docx" onclick="generateDocx()">&#128196; Running Sheet</button>
   <button data-admin-only class="btn btn-pdf" onclick="openPdfExportModal()">PDF Planning</button>
+  <div class="zoom-controls" aria-label="Zoom du planning">
+    <button class="zoom-btn" type="button" onclick="adjustZoom(-0.2)" title="Réduire le zoom">-</button>
+    <span class="zoom-value" id="zoom-value">100%</span>
+    <button class="zoom-btn" type="button" onclick="adjustZoom(0.2)" title="Augmenter le zoom">+</button>
+  </div>
 </header>
 
 <!-- LEGEND -->
@@ -1199,7 +1218,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=14"></script>
+<script src="/app.js?v=15"></script>
 </body>
 </html>
 """

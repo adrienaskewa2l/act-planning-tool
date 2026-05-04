@@ -1,6 +1,10 @@
 
 // ── CONSTANTS ──
-const PX_PER_MIN = 1.6;
+const DEFAULT_PX_PER_MIN_DESKTOP = 1.6;
+const DEFAULT_PX_PER_MIN_MOBILE = 1.35;
+const MIN_PX_PER_MIN = 0.9;
+const MAX_PX_PER_MIN = 3.2;
+const ZOOM_STEP = 0.2;
 const EVENT_SIDE_GAP_PX = 4;
 const START_H = 7;
 const END_H = 23;
@@ -61,18 +65,34 @@ let schedule = null;
 let hiddenTypes = new Set();
 let pdfSelectionMode = false;
 let pdfSelectedEventIds = new Set();
+let pxPerMin = typeof window !== 'undefined' && window.innerWidth <= 760
+  ? DEFAULT_PX_PER_MIN_MOBILE
+  : DEFAULT_PX_PER_MIN_DESKTOP;
+
+function currentPxPerMin() {
+  return pxPerMin;
+}
+
+function applyZoomUi() {
+  document.documentElement.style.setProperty('--px-per-min', String(currentPxPerMin()));
+  const zoomValue = document.getElementById('zoom-value');
+  if (zoomValue) {
+    const base = window.innerWidth <= 760 ? DEFAULT_PX_PER_MIN_MOBILE : DEFAULT_PX_PER_MIN_DESKTOP;
+    zoomValue.textContent = `${Math.round((currentPxPerMin() / base) * 100)}%`;
+  }
+}
 
 // ── TIME UTILITIES ──
 function timeToY(t) {
   const [h, m] = t.split(':').map(Number);
-  return ((h - START_H) * 60 + m) * PX_PER_MIN;
+  return ((h - START_H) * 60 + m) * currentPxPerMin();
 }
 function timeToMinutes(t) {
   const [h, m] = String(t || '00:00').split(':').map(Number);
   return h * 60 + m;
 }
 function yToTime(y) {
-  const totalMin = Math.round(y / PX_PER_MIN / 5) * 5;
+  const totalMin = Math.round(y / currentPxPerMin() / 5) * 5;
   const clamped = Math.max(0, Math.min(totalMin, TOTAL_MINS - 15));
   const h = START_H + Math.floor(clamped / 60);
   const m = clamped % 60;
@@ -169,6 +189,7 @@ async function persistLocalSchedule() {
 
 function renderAll() {
   applyReadOnlyMode();
+  applyZoomUi();
   renderTimeAxis();
   renderLegend();
   renderDays();
@@ -177,10 +198,10 @@ function renderAll() {
 
 function renderTimeAxis() {
   const ax = document.getElementById('time-axis');
-  ax.style.height = TOTAL_MINS * PX_PER_MIN + 'px';
+  ax.style.height = TOTAL_MINS * currentPxPerMin() + 'px';
   ax.innerHTML = '';
   for (let h = START_H; h <= END_H; h++) {
-    const y = (h - START_H) * 60 * PX_PER_MIN;
+    const y = (h - START_H) * 60 * currentPxPerMin();
     const lbl = document.createElement('div');
     lbl.className = 'hour-label';
     lbl.style.top = y + 'px';
@@ -222,7 +243,7 @@ function toggleLegend() {
 function renderDays() {
   const row = document.getElementById('days-row');
   row.innerHTML = '';
-  const timelineH = TOTAL_MINS * PX_PER_MIN;
+  const timelineH = TOTAL_MINS * currentPxPerMin();
 
   for (const day of schedule.days) {
     const overlapLayouts = computeOverlapLayouts(day);
@@ -248,7 +269,7 @@ function renderDays() {
     for (let m = 30; m < TOTAL_MINS; m += 60) {
       const line = document.createElement('div');
       line.className = 'half-line';
-      line.style.top = m * PX_PER_MIN + 'px';
+      line.style.top = m * currentPxPerMin() + 'px';
       area.appendChild(line);
     }
 
@@ -353,7 +374,7 @@ function computeOverlapLayouts(day) {
 
 function createEventBlock(ev, dayId, sessionId, overlapLayout) {
   const top = timeToY(ev.time);
-  const h = Math.max(ev.duration * PX_PER_MIN, 22);
+  const h = Math.max(ev.duration * currentPxPerMin(), 22);
   const column = overlapLayout ? overlapLayout.column : 0;
   const total = Math.max(overlapLayout ? overlapLayout.total : 1, 1);
   const leftPct = (column / total) * 100;
@@ -428,8 +449,8 @@ function createEventBlock(ev, dayId, sessionId, overlapLayout) {
     const startDur = ev.duration;
     const onMove = me => {
       const delta = me.clientY - startY;
-      ev.duration = Math.max(5, Math.round((startDur + delta / PX_PER_MIN) / 5) * 5);
-      div.style.height = Math.max(ev.duration * PX_PER_MIN, 22) + 'px';
+      ev.duration = Math.max(5, Math.round((startDur + delta / currentPxPerMin()) / 5) * 5);
+      div.style.height = Math.max(ev.duration * currentPxPerMin(), 22) + 'px';
     };
     const onUp = () => {
       document.removeEventListener('mousemove', onMove);
@@ -876,6 +897,11 @@ function saveMeta() {
   schedule.attendance.dimanche = document.getElementById('m-att-dimanche').value.trim();
   closeMetaModal();
   showToast('Infos générales enregistrées');
+}
+
+function adjustZoom(delta) {
+  pxPerMin = Math.max(MIN_PX_PER_MIN, Math.min(MAX_PX_PER_MIN, Math.round((pxPerMin + delta) * 100) / 100));
+  renderAll();
 }
 
 // ── SAVE / GENERATE ──
