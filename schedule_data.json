@@ -232,15 +232,14 @@
             },
             {
               "color": "#d7bde2",
-              "details": "Répétitions de louange",
-              "duration": 120,
+              "details": "Répétitions rap et danse : \n- Victo 14h - 14h30\n- Margaux + équipe : 14h30 - 15h45 ",
+              "duration": 105,
               "id": "v006",
               "teams": [
-                "Team Louange",
                 "Team Son"
               ],
               "time": "14:00",
-              "title": "Répétitions de louange",
+              "title": "Répétitions danse Margaux et Rap Victo",
               "type": "REPETITION"
             },
             {
@@ -285,20 +284,6 @@
               "type": "ANNONCES"
             },
             {
-              "color": "#d9cafe",
-              "details": "Un seul chant pour commencer la célébration",
-              "duration": 5,
-              "id": "e_03vhiry",
-              "teams": [
-                "Team Médias Projection",
-                "Team Louange",
-                "Team Son"
-              ],
-              "time": "16:30",
-              "title": "Louange / Worship",
-              "type": "LOUANGE"
-            },
-            {
               "color": "#d6d6d6",
               "details": "Les visiteurs partent, le snacking est toujours ouvert pour pouvoir servir ceux qui voudraient prendre quelque chose en partant",
               "duration": 30,
@@ -307,7 +292,7 @@
                 "Team Snacking",
                 "Team Accueil"
               ],
-              "time": "22:30",
+              "time": "22:20",
               "title": "Départ des participants",
               "type": "TRANSITION"
             }
@@ -327,23 +312,46 @@
               "teams": [
                 "Team Boost"
               ],
-              "time": "15:45",
+              "time": "15:30",
               "title": "Boost + Point Fil Rouge",
               "type": "BOOST"
             },
             {
               "color": "#d6eaf8",
-              "details": "Intercession – Josias, Team Prière, équipiers volontaires (hors service). Ouverture des portes de la salle principale – Team Accueil.",
-              "duration": 25,
+              "details": "Intercession – Josias, Team Prière, équipiers volontaires (hors service).",
+              "duration": 30,
               "id": "v012",
               "teams": [
-                "Team Accueil",
-                "Team Prières",
-                "Team Boost"
+                "Team Prières"
               ],
-              "time": "16:00",
-              "title": "Intercession + ouverture des portes",
+              "time": "15:45",
+              "title": "Intercession",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "30 min de balances avec louange et son\nFin impérative 15 min avant le début de la célébration",
+              "duration": 30,
+              "id": "e_h6oqj2b",
+              "teams": [
+                "Team Louange",
+                "Team Son"
+              ],
+              "time": "15:45",
+              "title": "Balances louange",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#d357fe",
+              "details": "Ouverture des portes et placement",
+              "duration": 15,
+              "id": "e_u5t1ira",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "16:15",
+              "title": "Ouverture des portes",
+              "type": "CELEBRATION"
             },
             {
               "color": "#d6d6d6",
@@ -359,55 +367,123 @@
             },
             {
               "color": "#d6d6d6",
-              "details": "Mot d'accueil – MC",
-              "duration": 5,
+              "details": "Mot d'accueil – Matt \nTraduction Sarah depuis le plateau",
+              "duration": 4,
               "id": "v015",
               "teams": [
-                "Team MC/Infos"
+                "Team MC/Infos",
+                "Team Traduction"
               ],
-              "time": "16:35",
+              "time": "16:30",
               "title": "Mot d'accueil par le MC / Welcome by MC",
               "type": "TRANSITION"
             },
             {
-              "color": "#d9cafe",
-              "details": "Louange",
-              "duration": 30,
+              "color": "#d357fe",
+              "details": "Danse d'ouverture - 10 personnes\nPrévoir projection type visualizer",
+              "duration": 5,
+              "id": "e_03vhiry",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "16:35",
+              "title": "Danse d'ouverture",
+              "type": "CELEBRATION"
+            },
+            {
+              "color": "#d357fe",
+              "details": "Rap par Victo\nVoir pour projeter quelque chose ?",
+              "duration": 5,
               "id": "v017",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "16:40",
+              "title": "Rap Victo",
+              "type": "CELEBRATION"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Matt donne un mot type salutation voisin (trad par lui-même)\nClavier commence pendant que Matt parle",
+              "duration": 2,
+              "id": "e_q36gims",
+              "teams": [
+                "Team Louange",
+                "Team MC/Infos"
+              ],
+              "time": "16:45",
+              "title": "Mot du MC + louange se met en place",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Set de louange",
+              "duration": 25,
+              "id": "e_jpd2ocr",
               "teams": [
                 "Team Médias Projection",
                 "Team Louange",
                 "Team Son"
               ],
-              "time": "16:40",
-              "title": "Louange / Worship",
+              "time": "16:50",
+              "title": "Louange",
               "type": "LOUANGE"
             },
             {
-              "color": "#7fb3d3",
-              "details": "Introduction Johannes, Annonces importantes pour le WE",
-              "duration": 30,
+              "color": "#d6d6d6",
+              "details": "Présentation de Johannes par Matt\nTraduction par Sarah",
+              "duration": 3,
               "id": "v016",
               "teams": [
-                "Johannes"
+                "Team MC/Infos",
+                "Team Traduction"
               ],
-              "time": "17:10",
-              "title": "Introduction Johannes + Informations WE",
+              "time": "17:15",
+              "title": "Présentation Johannes par Matt",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#7fb3d3",
+              "details": "Ouverture par Johannes : prière, infos diverses...\nTraduit par Majo",
+              "duration": 35,
+              "id": "e_a8c4pl6",
+              "teams": [
+                "Team Médias Projection",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "17:20",
+              "title": "Ouverture conférence par Johannes",
               "type": "PRIERE"
             },
             {
               "color": "#d9cafe",
-              "details": "",
-              "duration": 20,
+              "details": "Dernier chant pour clôturer célébration",
+              "duration": 5,
               "id": "e_s5vhlxy",
               "teams": [
                 "Team Médias Projection",
                 "Team Louange",
                 "Team Son"
               ],
-              "time": "17:40",
+              "time": "17:55",
               "title": "Louange / Worship",
               "type": "LOUANGE"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Infos pratiques (stands, snacking...) par Matt\nTraduit par Sarah",
+              "duration": 5,
+              "id": "e_rp5rm7d",
+              "teams": [
+                "Team MC/Infos",
+                "Team Traduction"
+              ],
+              "time": "18:00",
+              "title": "Infos par MC",
+              "type": "TRANSITION"
             }
           ],
           "id": "ven_ouverture",
@@ -426,23 +502,46 @@
                 "Fil Rouge",
                 "Team Boost"
               ],
-              "time": "19:15",
+              "time": "19:00",
               "title": "Boost + point fil rouge",
               "type": "BOOST"
             },
             {
               "color": "#d6eaf8",
               "details": "",
-              "duration": 25,
+              "duration": 30,
               "id": "v020",
               "teams": [
-                "Team Accueil",
-                "Team Prières",
-                "Team Boost"
+                "Team Prières"
               ],
-              "time": "19:30",
-              "title": "Intercession + ouverture des portes",
+              "time": "19:15",
+              "title": "Intercession",
               "type": "INTERCESSION"
+            },
+            {
+              "color": "#d9cafe",
+              "details": "Balances louange",
+              "duration": 30,
+              "id": "e_xro642r",
+              "teams": [
+                "Team Louange",
+                "Team Son"
+              ],
+              "time": "19:15",
+              "title": "Balances louange",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#d357fe",
+              "details": "Ouverture des portes et placement",
+              "duration": 15,
+              "id": "e_3wj5ihy",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "19:45",
+              "title": "Ouverture des portes",
+              "type": "CELEBRATION"
             },
             {
               "color": "#d6d6d6",
@@ -459,46 +558,104 @@
             {
               "color": "#d9cafe",
               "details": "Louange pour démarrer la célébration",
-              "duration": 45,
+              "duration": 30,
               "id": "v021",
               "teams": [
-                "Team Louange"
+                "Team Louange",
+                "Team Son"
               ],
               "time": "20:00",
               "title": "Louange / Worship",
               "type": "LOUANGE"
             },
             {
+              "color": "#d6d6d6",
+              "details": "Matt présente Dennis\nTraduit par Danick",
+              "duration": 5,
+              "id": "e_rmh6xx1",
+              "teams": [
+                "Team MC/Infos",
+                "Team Traduction"
+              ],
+              "time": "20:30",
+              "title": "Présentation de Dennis par Matt",
+              "type": "TRANSITION"
+            },
+            {
               "color": "#82e0aa",
-              "details": "Prédication Dennis",
+              "details": "Prédication Dennis\nTraduit par Sarah",
               "duration": 45,
               "id": "v022",
               "teams": [
-                "Dennis"
+                "Team Traduction"
               ],
-              "time": "20:45",
+              "time": "20:35",
               "title": "Prédication par Dennis / Message by Dennis",
               "type": "PREDICATION"
             },
             {
               "color": "#d9cafe",
-              "details": "Louange, ministère…",
+              "details": "Louange, ministère…\nTraduit par Sarah",
               "duration": 30,
               "id": "v023",
               "teams": [
-                "Team Louange"
+                "Team Louange",
+                "Team Traduction"
               ],
-              "time": "21:30",
+              "time": "21:20",
               "title": "Louange + ministère / Worship + ministry",
               "type": "LOUANGE"
             },
             {
+              "color": "#d6d6d6",
+              "details": "Matt donne des infos pratiques sur le programme du lendemain + restauration et stands ouverts pendant 30 min + intro updates des églises SOS - on commence tout de suite par Fribourg + intro Danick\nTraduit par Majo",
+              "duration": 5,
+              "id": "e_3kzz7nw",
+              "teams": [
+                "Team Médias Projection",
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "21:50",
+              "title": "Annonces programme par Matt",
+              "type": "TRANSITION"
+            },
+            {
+              "color": "#7fb3d3",
+              "details": "Diffusion vidéo update SOS Fribourg",
+              "duration": 3,
+              "id": "e_4yd88qe",
+              "teams": [
+                "Team Médias Projection",
+                "Team Son"
+              ],
+              "time": "21:55",
+              "title": "Update d'une église : Fribourg",
+              "type": "PRIERE"
+            },
+            {
+              "color": "#d6d6d6",
+              "details": "Danick présente la levée de fonds qui va suivre + explique le fonctionnement des dons sur le QR Code, objectif 10 K sur le WE\nTraduit par Majo\nACT 27 + BS Lyon (teaser qu'on en saura plus demain)",
+              "duration": 5,
+              "id": "e_p2d0gpm",
+              "teams": [
+                "Team Médias Projection",
+                "Team MC/Infos",
+                "Team Traduction",
+                "Team Son"
+              ],
+              "time": "22:00",
+              "title": "Présentation levée de fonds",
+              "type": "TRANSITION"
+            },
+            {
               "color": "#7fb3d3",
               "details": "Levée de fonds : 10K pour ACT et BS",
-              "duration": 30,
+              "duration": 15,
               "id": "v024",
               "teams": [],
-              "time": "22:00",
+              "time": "22:05",
               "title": "Levée de fonds / Fundraising – 10K for ACT et BS Lyon",
               "type": "PRIERE"
             },
@@ -510,7 +667,7 @@
               "teams": [
                 "Team Chauffeurs"
               ],
-              "time": "22:30",
+              "time": "22:20",
               "title": "Trajet vers DSJ",
               "type": "ANNONCES"
             }
@@ -525,7 +682,7 @@
             {
               "color": "#fad7a0",
               "details": "Repas",
-              "duration": 115,
+              "duration": 110,
               "id": "v018",
               "teams": [
                 "Team Snacking"
@@ -537,7 +694,7 @@
             {
               "color": "#ffd877",
               "details": "Les 3 stands sont opérationnels pendant le repas",
-              "duration": 115,
+              "duration": 110,
               "id": "e_v213zil",
               "teams": [
                 "Team Bible School",
