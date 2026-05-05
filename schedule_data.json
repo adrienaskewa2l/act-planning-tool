@@ -282,11 +282,10 @@
             },
             {
               "color": "#f1948a",
-              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)",
+              "details": "Boost",
               "duration": 15,
               "id": "v010",
               "teams": [
-                "Fil Rouge",
                 "Team Boost"
               ],
               "time": "15:30",
@@ -382,7 +381,7 @@
             },
             {
               "color": "#d357fe",
-              "details": "Rap par Victo\nProjeter les paroles + traduction",
+              "details": "Rap par Victo\nVoir pour projeter quelque chose ?",
               "duration": 5,
               "id": "v017",
               "teams": [
@@ -484,7 +483,7 @@
           "events": [
             {
               "color": "#f1948a",
-              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)",
+              "details": "Boost + point fil rouge",
               "duration": 15,
               "id": "v019",
               "teams": [
@@ -546,7 +545,7 @@
             },
             {
               "color": "#d9cafe",
-              "details": "Set de louange",
+              "details": "Louange pour démarrer la célébration",
               "duration": 30,
               "id": "v021",
               "teams": [
@@ -785,7 +784,7 @@
             },
             {
               "color": "#f1948a",
-              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)",
+              "details": "Boost + point fil rouge",
               "duration": 15,
               "id": "s002",
               "teams": [
@@ -862,7 +861,7 @@
             },
             {
               "color": "#d9cafe",
-              "details": "Set de louange",
+              "details": "Louange",
               "duration": 30,
               "id": "s003",
               "teams": [
@@ -1032,7 +1031,7 @@
           "events": [
             {
               "color": "#f1948a",
-              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)",
+              "details": "Bien vérifier que tous les supports médias sont prêts : vidéos, photos\nVérifier que tous les micros sont bien chargés et fonctionnent \nPréparer les transitions de parole\nPréparer les accessoires et mobiliers nécessaires (chaises, tables...) ",
               "duration": 15,
               "id": "e_out8oe9",
               "teams": [
@@ -1098,10 +1097,11 @@
             },
             {
               "color": "#ffd877",
-              "details": "Les 3 stands sont opérationnels pendant la pause",
+              "details": "Les 3 stands sont opérationnels pendant la pause\nLe Snacking est ouvert pendant la pause",
               "duration": 30,
               "id": "e_a0oad6k",
               "teams": [
+                "Team Snacking",
                 "Team Bible School",
                 "Team Festival",
                 "Team Librairie"
@@ -1202,10 +1202,11 @@
             },
             {
               "color": "#ffd877",
-              "details": "Les 3 stands sont opérationnels pendant la pause",
+              "details": "Les 3 stands sont opérationnels pendant la pause\nLe Snacking est ouvert pendant la pause",
               "duration": 30,
               "id": "e_iwvnjr0",
               "teams": [
+                "Team Snacking",
                 "Team Bible School",
                 "Team Festival",
                 "Team Librairie"
@@ -1306,7 +1307,7 @@
           "events": [
             {
               "color": "#f1948a",
-              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)\nATTENTION : équipe louange ne sera probablement pas au boot (en balances)",
+              "details": "Boost + point fil rouge\nATTENTION : équipe louange ne sera probablement pas au boot (en balances)",
               "duration": 15,
               "id": "s030",
               "teams": [
@@ -1368,7 +1369,7 @@
             },
             {
               "color": "#d357fe",
-              "details": "Rap par Victo\nProjeter les paroles + traduction",
+              "details": "",
               "duration": 5,
               "id": "e_p0alypy",
               "teams": [
@@ -1533,13 +1534,13 @@
               "type": "ANNONCES"
             },
             {
-              "color": "#f1948a",
-              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)\nAttention : Ste Cène, vérifier que l'équipe d'accueil est prête en haut des gradins AVANT le début de la distribution",
+              "color": "#F1948A",
+              "details": "Boost + point fil rouge (attention Ste Cène)",
               "duration": 15,
               "id": "d002",
               "teams": [
-                "Fil Rouge",
-                "Team Boost"
+                "Team Boost",
+                "Fil Rouge"
               ],
               "time": "09:00",
               "title": "Boost + point fil rouge (attention Ste Cène)",
@@ -1587,7 +1588,7 @@
             },
             {
               "color": "#d357fe",
-              "details": "Ouverture des portes et placement",
+              "details": "",
               "duration": 15,
               "id": "e_9j9j20i",
               "teams": [
@@ -1652,7 +1653,7 @@
             },
             {
               "color": "#d9cafe",
-              "details": "Set de louange",
+              "details": "Louange",
               "duration": 25,
               "id": "d004",
               "teams": [
