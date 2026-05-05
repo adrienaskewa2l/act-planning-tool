@@ -65,7 +65,7 @@
             },
             {
               "color": "#aed6f1",
-              "details": "Briefing organisation + lancement. Installation des équipes (Logistique, Kids, Bébés, Ménage). Préparation snacking (ados + jeunes). Communication RS stories. Installation des stands (Bible School, Festival, Librairie).",
+              "details": "Briefing organisation + lancement. Installation des équipes (Logistique, Kids, Bébés, Ménage, Son, Technique). Préparation snacking (ados + jeunes). Communication RS stories. Installation des stands (Bible School, Festival, Librairie).",
               "duration": 210,
               "id": "j005",
               "teams": [
@@ -77,6 +77,7 @@
                 "Team Librairie",
                 "Team Kids",
                 "Team Bébés",
+                "Team Son",
                 "Team Communication",
                 "Team Médias"
               ],
@@ -116,7 +117,7 @@
                 "Team Son"
               ],
               "time": "14:00",
-              "title": "Arrivée louange + technique + installation",
+              "title": "Arrivée équipe louange",
               "type": "REPETITION"
             },
             {
@@ -1153,7 +1154,7 @@
                 "Team Son"
               ],
               "time": "16:30",
-              "title": "Intervention 2B : Présentation SOS Bible Schools",
+              "title": "Intervention 2B : Présentation SOS Lyon Bible School",
               "type": "TED_PITCH"
             },
             {
