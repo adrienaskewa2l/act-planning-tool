@@ -671,6 +671,21 @@
               "time": "22:20",
               "title": "Départ des participants",
               "type": "TRANSITION"
+            },
+            {
+              "color": "#ffd877",
+              "details": "Les stands (librairie, festival, Bible School et Snacking) sont ouverts 30 min après la fin de la session ",
+              "duration": 30,
+              "id": "e_7mfdwzz",
+              "teams": [
+                "Team Snacking",
+                "Team Bible School",
+                "Team Festival",
+                "Team Librairie"
+              ],
+              "time": "22:20",
+              "title": "Stands ouverts",
+              "type": "TECHNIQUE"
             }
           ],
           "id": "sess_e_hmqgn4m",
@@ -683,26 +698,26 @@
             {
               "color": "#fad7a0",
               "details": "Repas",
-              "duration": 110,
+              "duration": 105,
               "id": "v018",
               "teams": [
                 "Team Snacking"
               ],
-              "time": "18:00",
+              "time": "18:05",
               "title": "Repas",
               "type": "REPAS"
             },
             {
               "color": "#ffd877",
               "details": "Les 3 stands sont opérationnels pendant le repas",
-              "duration": 110,
+              "duration": 105,
               "id": "e_v213zil",
               "teams": [
                 "Team Bible School",
                 "Team Festival",
                 "Team Librairie"
               ],
-              "time": "18:00",
+              "time": "18:05",
               "title": "Stands",
               "type": "TECHNIQUE"
             }
@@ -1439,6 +1454,21 @@
               "time": "22:20",
               "title": "Départ des participants",
               "type": "TRANSITION"
+            },
+            {
+              "color": "#ffd877",
+              "details": "Les stands (librairie, festival, Bible School et Snacking) sont ouverts 30 min après la fin de la session ",
+              "duration": 30,
+              "id": "e_il9zb21",
+              "teams": [
+                "Team Snacking",
+                "Team Bible School",
+                "Team Festival",
+                "Team Librairie"
+              ],
+              "time": "22:20",
+              "title": "Stands ouverts",
+              "type": "TECHNIQUE"
             }
           ],
           "id": "sess_e_00xjg4l",
