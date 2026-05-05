@@ -421,7 +421,7 @@
             },
             {
               "color": "#d6d6d6",
-              "details": "Présentation de Johannes par Matt\nTraduction par Sarah",
+              "details": "Présentation de Johannes par Matt\nTraduit par Sarah",
               "duration": 3,
               "id": "v016",
               "teams": [
@@ -477,6 +477,40 @@
           "id": "ven_ouverture",
           "name": "Célébration d'ouverture",
           "start_time": "16:00"
+        },
+        {
+          "end_time": "20:00",
+          "events": [
+            {
+              "color": "#fad7a0",
+              "details": "Repas",
+              "duration": 105,
+              "id": "v018",
+              "teams": [
+                "Team Snacking"
+              ],
+              "time": "18:05",
+              "title": "Repas",
+              "type": "REPAS"
+            },
+            {
+              "color": "#ffd877",
+              "details": "Les 3 stands sont opérationnels pendant le repas",
+              "duration": 105,
+              "id": "e_v213zil",
+              "teams": [
+                "Team Bible School",
+                "Team Festival",
+                "Team Librairie"
+              ],
+              "time": "18:05",
+              "title": "Stands",
+              "type": "TECHNIQUE"
+            }
+          ],
+          "id": "sess_e_j0y6s5u",
+          "name": "Repas soir Jour 1",
+          "start_time": "18:00"
         },
         {
           "end_time": "22:30",
@@ -611,7 +645,7 @@
             },
             {
               "color": "#7fb3d3",
-              "details": "Diffusion vidéo update SOS Fribourg",
+              "details": "Diffusion vidéo update SOS Fribourg et SOS Stockholm",
               "duration": 3,
               "id": "e_4yd88qe",
               "teams": [
@@ -690,41 +724,7 @@
           ],
           "id": "sess_e_hmqgn4m",
           "name": "Célébration 2",
-          "start_time": "18:00"
-        },
-        {
-          "end_time": "20:00",
-          "events": [
-            {
-              "color": "#fad7a0",
-              "details": "Repas",
-              "duration": 105,
-              "id": "v018",
-              "teams": [
-                "Team Snacking"
-              ],
-              "time": "18:05",
-              "title": "Repas",
-              "type": "REPAS"
-            },
-            {
-              "color": "#ffd877",
-              "details": "Les 3 stands sont opérationnels pendant le repas",
-              "duration": 105,
-              "id": "e_v213zil",
-              "teams": [
-                "Team Bible School",
-                "Team Festival",
-                "Team Librairie"
-              ],
-              "time": "18:05",
-              "title": "Stands",
-              "type": "TECHNIQUE"
-            }
-          ],
-          "id": "sess_e_j0y6s5u",
-          "name": "Repas soir Jour 1",
-          "start_time": "18:00"
+          "start_time": "20:00"
         }
       ]
     },
@@ -921,7 +921,7 @@
             },
             {
               "color": "#7fb3d3",
-              "details": "",
+              "details": "Diffusion vidéo update SOS Malmö et SOS Lyon",
               "duration": 5,
               "id": "e_5dl988x",
               "teams": [
@@ -1149,7 +1149,7 @@
             },
             {
               "color": "#00c148",
-              "details": "Retours festivals SOS : \n- Vidéo harvest report : 3 min\n- Fiore explique comment ça fonctionne : 10 min\n- 1 témoignage LIVE de Lyon (Divi) : 3 min\n- 1 témoignage VIDEO de Stockholm : 3 min\n- 1 témoignage LIVE de Strasbourg : 3 min \n- 1 témoignage LIVE de Bienne ou Fribourg : 3 min\nTraduit par Danick sauf vidéo sous-titrée",
+              "details": "Retours festivals SOS : \n- Vidéo harvest report : 3 min\n- Fiore explique comment ça fonctionne : 10 min\n- 1 témoignage LIVE de Lyon (Divi) : 3 min\n- 1 témoignage VIDEO de Stockholm : 3 min\n- 1 témoignage LIVE de Strasbourg (Maïa) : 3 min \n- 1 témoignage LIVE de Bienne ou Fribourg : 3 min\nTraduit par Danick sauf vidéo sous-titrée",
               "duration": 25,
               "id": "s016",
               "teams": [
@@ -1640,7 +1640,7 @@
             },
             {
               "color": "#7fb3d3",
-              "details": "",
+              "details": "Diffusion vidéo update SOS Bienne et SOS Kilgoris",
               "duration": 5,
               "id": "e_c8lvkbq",
               "teams": [
