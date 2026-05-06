@@ -483,17 +483,17 @@
           "end_time": "22:30",
           "events": [
             {
-              "id": "v019",
-              "time": "19:00",
-              "duration": 15,
-              "title": "Boost + point fil rouge",
-              "type": "BOOST",
               "color": "#f1948a",
+              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)",
+              "duration": 15,
+              "id": "v019",
               "teams": [
                 "Fil Rouge",
                 "Team Boost"
               ],
-              "details": "Boost et Point Fil rouge : détail de la célébration à venir, vérification des supports, des enchainements, du matériel nécessaires (micros, chaises, pupitres...)"
+              "time": "19:00",
+              "title": "Boost + point fil rouge",
+              "type": "BOOST"
             },
             {
               "color": "#d6eaf8",
@@ -597,7 +597,7 @@
             },
             {
               "color": "#d6d6d6",
-              "details": "Matt donne des infos pratiques sur le programme du lendemain + restauration et stands ouverts pendant 30 min + intro updates des églises SOS - on commence tout de suite par Fribourg et Stockholm + intro Danick\nTraduit par Majo",
+              "details": "Matt donne des infos pratiques sur le programme du lendemain + restauration et stands ouverts pendant 30 min + intro updates des églises SOS - on commence tout de suite par Fribourg et Stockholm + intro Christopher\nTraduit par Majo",
               "duration": 5,
               "id": "e_3kzz7nw",
               "teams": [
@@ -625,7 +625,7 @@
             },
             {
               "color": "#d6d6d6",
-              "details": "Danick présente la levée de fonds qui va suivre + explique le fonctionnement des dons sur le QR Code, objectif 10 K sur le WE\nTraduit par Majo\nACT 27 + BS Lyon (teaser qu'on en saura plus demain)",
+              "details": "Christopher présente la levée de fonds qui va suivre + explique le fonctionnement des dons sur le QR Code, objectif 10 K sur le WE\nTraduit par Majo\nACT 27 + BS Lyon (teaser qu'on en saura plus demain)",
               "duration": 5,
               "id": "e_p2d0gpm",
               "teams": [
@@ -1176,7 +1176,7 @@
             },
             {
               "color": "#00c148",
-              "details": "Présentation du festival LOVE Europe par Victoria SCHNEGG et Romain SCHNEGG\n\nDemander supports",
+              "details": "Présentation du festival LOVE Europe par Danick\nDemander supports",
               "duration": 12,
               "id": "e_2p7t80g",
               "teams": [
