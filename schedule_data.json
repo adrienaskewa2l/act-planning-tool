@@ -597,7 +597,7 @@
             },
             {
               "color": "#d6d6d6",
-              "details": "Matt donne des infos pratiques sur le programme du lendemain + restauration et stands ouverts pendant 30 min + intro updates des églises SOS - on commence tout de suite par Fribourg et Stockholm + intro Christopher\nTraduit par Majo",
+              "details": "Matt donne des infos pratiques sur le programme du lendemain + restauration et stands ouverts pendant 30 min + intro updates des églises SOS - on commence tout de suite par Fribourg et Stockholm + intro Christopher\nTraduit par Danick",
               "duration": 5,
               "id": "e_3kzz7nw",
               "teams": [
@@ -625,7 +625,7 @@
             },
             {
               "color": "#d6d6d6",
-              "details": "Christopher présente la levée de fonds qui va suivre + explique le fonctionnement des dons sur le QR Code, objectif 10 K sur le WE\nTraduit par Majo\nACT 27 + BS Lyon (teaser qu'on en saura plus demain)",
+              "details": "Christopher présente l'offrande miracle qui va suivre + explique le fonctionnement des dons sur le QR Code, objectif 10 K sur le WE\nTraduit par Danick\nACT 27 + BS Lyon (teaser qu'on en saura plus demain)",
               "duration": 5,
               "id": "e_p2d0gpm",
               "teams": [
@@ -635,7 +635,7 @@
                 "Team Son"
               ],
               "time": "22:00",
-              "title": "Présentation levée de fonds",
+              "title": "Présentation Offrande Miracle",
               "type": "TRANSITION"
             },
             {
@@ -645,7 +645,7 @@
               "id": "v024",
               "teams": [],
               "time": "22:05",
-              "title": "Levée de fonds – 10K pour ACT 27 et BS Lyon",
+              "title": "Offrande Miracle – 10K pour ACT 27 et BS Lyon",
               "type": "PRIERE"
             },
             {
@@ -960,7 +960,7 @@
                 "Team Son"
               ],
               "time": "11:45",
-              "title": "Tim présente le temps d'offrande",
+              "title": "Tim présente l'Offrande Miracle",
               "type": "TRANSITION"
             },
             {
@@ -973,7 +973,7 @@
                 "Team Son"
               ],
               "time": "11:50",
-              "title": "Levée de fonds – 10K pour ACT 27 et BS Lyon",
+              "title": "Offrande Miracle – 10K pour ACT 27 et BS Lyon",
               "type": "PRIERE"
             },
             {
@@ -1176,7 +1176,7 @@
             },
             {
               "color": "#00c148",
-              "details": "Présentation du festival LOVE Europe par Danick\nDemander supports",
+              "details": "Présentation du festival LOVE Europe par Danick\nTraduit par Sarah\nDemander supports",
               "duration": 12,
               "id": "e_2p7t80g",
               "teams": [
