@@ -1418,7 +1418,13 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .btn { border: none; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 700; padding: 10px 14px; }
   .btn-primary { background: #0F4C3A; color: white; width: 100%; }
   .btn-link { background: #eef4f2; color: #0F4C3A; }
-  .btn-admin { background: #E53935; color: white; }
+  .btn-admin { background: #0F4C3A; color: white; }
+  .btn-menu { width: 36px; height: 36px; padding: 0; background: #f3f5f7; color: #44515c; font-size: 20px; line-height: 1; }
+  .card-menu { position: relative; }
+  .menu-popover { display: none; position: absolute; right: 0; top: 42px; min-width: 210px; background: white; border: 1px solid #dfe5e9; border-radius: 8px; box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); padding: 6px; z-index: 20; }
+  .card-menu.open .menu-popover { display: block; }
+  .menu-popover button { width: 100%; border: none; background: transparent; color: #b42318; cursor: pointer; border-radius: 6px; padding: 10px 11px; text-align: left; font-size: 13px; font-weight: 700; }
+  .menu-popover button:hover { background: #fff1f0; }
   .cards { display: grid; gap: 14px; }
   .card { background: white; border: 1px solid #e3e7ea; border-radius: 8px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05); padding: 18px; display: grid; gap: 10px; }
   .card-head { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
@@ -1502,6 +1508,37 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       window.location.href = created.admin_url;
     }
 
+    function toggleEventMenu(event, button) {
+      event.stopPropagation();
+      const menu = button.closest('.card-menu');
+      document.querySelectorAll('.card-menu.open').forEach(openMenu => {
+        if (openMenu !== menu) openMenu.classList.remove('open');
+      });
+      menu.classList.toggle('open');
+    }
+
+    async function deleteEventFromHome(event, button) {
+      event.stopPropagation();
+      const eventId = button.dataset.eventId;
+      const eventName = button.dataset.eventName || 'cet événement';
+      button.closest('.card-menu').classList.remove('open');
+
+      if (!confirm(`Êtes-vous sûr de supprimer l'évènement "${eventName}" ?`)) return;
+      if (!confirm(`Dernière validation : supprimer définitivement l'évènement "${eventName}" ?`)) return;
+
+      const r = await fetch(`/api/events/${encodeURIComponent(eventId)}`, { method: 'DELETE' });
+      if (!r.ok) {
+        showToast('Impossible de supprimer l\\'événement');
+        return;
+      }
+      showToast('Événement supprimé');
+      window.location.reload();
+    }
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.card-menu.open').forEach(menu => menu.classList.remove('open'));
+    });
+
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -1556,7 +1593,12 @@ def render_home_page():
                 <span>{event_location}</span>
               </div>
             </div>
-            <span class="badge">{event_id}</span>
+            <div class="card-menu">
+              <button class="btn btn-menu" onclick="toggleEventMenu(event, this)" aria-label="Options de l'événement">...</button>
+              <div class="menu-popover">
+                <button data-event-id="{event_id}" data-event-name="{event_name}" onclick="deleteEventFromHome(event, this)">Supprimer l'évènement</button>
+              </div>
+            </div>
           </div>
           <div class="actions">
             <button class="btn btn-link" onclick="window.location.href='/events/{event_id}'">Consultation</button>
@@ -1618,6 +1660,20 @@ def create_event():
         "admin_url": f"/events/{event_id}/admin",
         "public_url": f"/events/{event_id}",
     })
+
+
+@app.route("/api/events/<event_id>", methods=["DELETE"])
+def delete_event(event_id):
+    events = load_events_index()
+    if not any(event.get("id") == event_id for event in events):
+        return jsonify({"error": "not_found"}), 404
+
+    save_events_index([event for event in events if event.get("id") != event_id])
+    path = event_file_path(event_id)
+    if os.path.exists(path):
+        os.remove(path)
+
+    return jsonify({"status": "ok"})
 
 
 @app.route("/events/<event_id>/api/schedule", methods=["GET"])
