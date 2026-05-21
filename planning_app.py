@@ -726,6 +726,7 @@ def save_events_index(events):
     os.makedirs(os.path.dirname(EVENTS_INDEX_FILE), exist_ok=True)
     with open(EVENTS_INDEX_FILE, "w", encoding="utf-8") as f:
         json.dump(events, f, ensure_ascii=False, indent=2)
+        f.write("\n")
 
 
 def get_event_meta(event_id):
@@ -1614,7 +1615,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
           <label>Équipes nécessaires</label>
           <div class="team-picker" id="new-team-picker"></div>
         </div>
-        <button class="btn btn-primary" onclick="createEvent()">Créer et ouvrir</button>
+        <button class="btn btn-primary" type="button" id="btn-create-event">Créer et ouvrir</button>
         <p class="helper">Chaque événement démarre avec un planning vide prêt à être rempli, tout en conservant les outils d'édition et d'export déjà existants.</p>
       </aside>
       <main class="cards">
@@ -1697,13 +1698,25 @@ HOME_TEMPLATE = """<!DOCTYPE html>
         showToast('Donne un nom à l\\'événement');
         return;
       }
-      const r = await fetch('/api/events', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-      });
+      let r;
+      try {
+        r = await fetch('/api/events', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.error(err);
+        showToast('Impossible de contacter le serveur local');
+        return;
+      }
       if (!r.ok) {
-        showToast('Impossible de créer l\\'événement');
+        let message = 'Impossible de créer l\\'événement';
+        try {
+          const error = await r.json();
+          if (error && error.message) message = error.message;
+        } catch (err) {}
+        showToast(message);
         return;
       }
       const created = await r.json();
@@ -1837,6 +1850,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       document.querySelectorAll('.card-menu.open').forEach(menu => menu.classList.remove('open'));
     });
 
+    document.getElementById('btn-create-event').addEventListener('click', createEvent);
     document.getElementById('new-day-count').addEventListener('change', renderDayLocationFields);
     renderCreateTeams();
 
@@ -1957,7 +1971,13 @@ def create_event():
         service_teams=payload.get("service_teams") or [],
         day_locations=payload.get("day_locations") or [],
     )
-    save_event_schedule(event_id, schedule)
+    try:
+        save_event_schedule(event_id, schedule)
+    except OSError as exc:
+        return jsonify({
+            "error": "write_failed",
+            "message": f"Impossible de créer les fichiers de l'événement : {exc}",
+        }), 500
     return jsonify({
         "status": "ok",
         "event_id": event_id,
