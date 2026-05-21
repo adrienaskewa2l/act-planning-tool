@@ -633,6 +633,15 @@ def event_file_path(event_id):
     return os.path.join(EVENTS_DIR, f"{event_id}.json")
 
 
+def unique_event_id(base_id, existing_ids):
+    event_id = base_id or "evenement"
+    counter = 2
+    while event_id in existing_ids:
+        event_id = f"{base_id}-{counter}"
+        counter += 1
+    return event_id
+
+
 def format_day_label(dt):
     return f"{FRENCH_WEEKDAYS[dt.weekday()]} {dt.day} {FRENCH_MONTHS[dt.month - 1]}"
 
@@ -1521,8 +1530,10 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .card-menu { position: relative; }
   .menu-popover { display: none; position: absolute; right: 0; top: 42px; min-width: 210px; background: white; border: 1px solid #dfe5e9; border-radius: 8px; box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); padding: 6px; z-index: 20; }
   .card-menu.open .menu-popover { display: block; }
-  .menu-popover button { width: 100%; border: none; background: transparent; color: #b42318; cursor: pointer; border-radius: 6px; padding: 10px 11px; text-align: left; font-size: 13px; font-weight: 700; }
-  .menu-popover button:hover { background: #fff1f0; }
+  .menu-popover button { width: 100%; border: none; background: transparent; color: #26323d; cursor: pointer; border-radius: 6px; padding: 10px 11px; text-align: left; font-size: 13px; font-weight: 700; }
+  .menu-popover button:hover { background: #eef4f2; }
+  .menu-popover button.menu-danger { color: #b42318; }
+  .menu-popover button.menu-danger:hover { background: #fff1f0; }
   .cards { display: grid; gap: 14px; }
   .card { background: white; border: 1px solid #e3e7ea; border-radius: 8px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05); padding: 18px; display: grid; gap: 10px; }
   .card-head { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
@@ -1634,7 +1645,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       const picker = document.getElementById('new-team-picker');
       picker.innerHTML = globalTeams.map(team => `
         <label>
-          <input type="checkbox" value="${escHtml(team)}" checked>
+          <input type="checkbox" value="${escHtml(team)}">
           ${escHtml(team)}
         </label>
       `).join('');
@@ -1693,6 +1704,50 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       });
       if (!r.ok) {
         showToast('Impossible de créer l\\'événement');
+        return;
+      }
+      const created = await r.json();
+      window.location.href = created.admin_url;
+    }
+
+    async function renameEventFromHome(event, button) {
+      event.stopPropagation();
+      const eventId = button.dataset.eventId;
+      const eventName = button.dataset.eventName || '';
+      button.closest('.card-menu').classList.remove('open');
+
+      const newName = prompt('Nouveau nom de l\\'évènement', eventName);
+      if (!newName || !newName.trim() || newName.trim() === eventName) return;
+
+      const r = await fetch(`/api/events/${encodeURIComponent(eventId)}/rename`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: newName.trim()})
+      });
+      if (!r.ok) {
+        showToast('Impossible de renommer l\\'événement');
+        return;
+      }
+      showToast('Événement renommé');
+      window.location.reload();
+    }
+
+    async function duplicateEventFromHome(event, button) {
+      event.stopPropagation();
+      const eventId = button.dataset.eventId;
+      const eventName = button.dataset.eventName || 'cet événement';
+      button.closest('.card-menu').classList.remove('open');
+
+      const newName = prompt('Nom de la copie', `Copie de ${eventName}`);
+      if (!newName || !newName.trim()) return;
+
+      const r = await fetch(`/api/events/${encodeURIComponent(eventId)}/duplicate`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: newName.trim()})
+      });
+      if (!r.ok) {
+        showToast('Impossible de dupliquer l\\'événement');
         return;
       }
       const created = await r.json();
@@ -1843,7 +1898,9 @@ def render_home_page():
             <div class="card-menu">
               <button class="btn btn-menu" onclick="toggleEventMenu(event, this)" aria-label="Options de l'événement">...</button>
               <div class="menu-popover">
-                <button data-event-id="{event_id}" data-event-name="{event_name}" onclick="deleteEventFromHome(event, this)">Supprimer l'évènement</button>
+                <button data-event-id="{event_id}" data-event-name="{event_name}" onclick="renameEventFromHome(event, this)">Renommer l'évènement</button>
+                <button data-event-id="{event_id}" data-event-name="{event_name}" onclick="duplicateEventFromHome(event, this)">Dupliquer l'évènement</button>
+                <button class="menu-danger" data-event-id="{event_id}" data-event-name="{event_name}" onclick="deleteEventFromHome(event, this)">Supprimer l'évènement</button>
               </div>
             </div>
           </div>
@@ -1889,12 +1946,8 @@ def create_event():
         return jsonify({"error": "name_required"}), 400
 
     base_id = slugify(name)
-    event_id = base_id
     existing_ids = {event.get("id") for event in load_events_index()}
-    counter = 2
-    while event_id in existing_ids:
-        event_id = f"{base_id}-{counter}"
-        counter += 1
+    event_id = unique_event_id(base_id, existing_ids)
 
     schedule = build_blank_schedule(
         name=name,
@@ -1923,6 +1976,40 @@ def save_settings_teams():
     payload = request.get_json() or {}
     settings = save_app_settings({"service_teams": payload.get("service_teams") or []})
     return jsonify(settings)
+
+
+@app.route("/api/events/<event_id>/rename", methods=["POST"])
+def rename_event(event_id):
+    payload = request.get_json() or {}
+    name = (payload.get("name") or "").strip()
+    if not name:
+        return jsonify({"error": "name_required"}), 400
+
+    schedule = load_event_schedule(event_id)
+    schedule["event"] = name
+    save_event_schedule(event_id, schedule)
+    return jsonify({
+        "status": "ok",
+        "event_id": event_id,
+        "admin_url": f"/events/{event_id}/admin",
+        "public_url": f"/events/{event_id}",
+    })
+
+
+@app.route("/api/events/<event_id>/duplicate", methods=["POST"])
+def duplicate_event(event_id):
+    payload = request.get_json() or {}
+    source = load_event_schedule(event_id)
+    name = (payload.get("name") or "").strip() or f"Copie de {source.get('event', 'Événement')}"
+    new_id = unique_event_id(slugify(name), {event.get("id") for event in load_events_index()})
+    source["event"] = name
+    save_event_schedule(new_id, source)
+    return jsonify({
+        "status": "ok",
+        "event_id": new_id,
+        "admin_url": f"/events/{new_id}/admin",
+        "public_url": f"/events/{new_id}",
+    })
 
 
 @app.route("/api/events/<event_id>", methods=["DELETE"])
