@@ -33,7 +33,7 @@ const DEFAULT_TYPES = {
   TECHNIQUE:    { label: 'Technique', color: '#D5D8DC' }
 };
 
-const SERVICE_TEAMS = [
+const DEFAULT_SERVICE_TEAMS = [
   'Team Médias Capture',
   'Team Médias Projection',
   'Team Snacking',
@@ -61,6 +61,16 @@ const SERVICE_TEAMS = [
   'Permanence Médicale',
   'Toute la Dream Team'
 ];
+
+function serviceTeams() {
+  if (schedule && Array.isArray(schedule.service_teams) && schedule.service_teams.length) {
+    return schedule.service_teams;
+  }
+  if (typeof window !== 'undefined' && Array.isArray(window.SERVICE_TEAMS) && window.SERVICE_TEAMS.length) {
+    return window.SERVICE_TEAMS;
+  }
+  return DEFAULT_SERVICE_TEAMS;
+}
 
 let schedule = null;
 let hiddenTypes = new Set();
@@ -113,6 +123,7 @@ function ensureScheduleShape() {
     if (schedule.attendance[key] === undefined) schedule.attendance[key] = '';
   });
   schedule.types = schedule.types || {};
+  schedule.service_teams = Array.isArray(schedule.service_teams) ? schedule.service_teams.filter(Boolean) : [];
   Object.entries(DEFAULT_TYPES).forEach(([key, config]) => {
     if (!schedule.types[key]) schedule.types[key] = { ...config };
   });
@@ -524,10 +535,11 @@ function buildColorPresets() {
 function buildTeamSelect(selectedTeams) {
   const sel = document.getElementById('f-teams');
   const selected = new Set(selectedTeams || []);
-  const options = [...SERVICE_TEAMS];
+  const baseTeams = serviceTeams();
+  const options = [...baseTeams];
 
   selected.forEach(team => {
-    if (team && !SERVICE_TEAMS.includes(team)) options.push(team);
+    if (team && !baseTeams.includes(team)) options.push(team);
   });
 
   sel.innerHTML = '';

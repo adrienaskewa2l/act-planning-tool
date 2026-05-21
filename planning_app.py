@@ -27,10 +27,40 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LEGACY_DATA_FILE = os.environ.get("SCHEDULE_DATA_FILE", os.path.join(BASE_DIR, "schedule_data.json"))
 EVENTS_DIR = os.path.join(BASE_DIR, "events")
 EVENTS_INDEX_FILE = os.path.join(BASE_DIR, "events_index.json")
+APP_SETTINGS_FILE = os.path.join(BASE_DIR, "app_settings.json")
 JS_FILE = os.path.join(BASE_DIR, "app.js")
 APP_TITLE = "Gestionnaire d'évènements - SOS Lyon"
 DEFAULT_EVENT_ID = "act-conference-2026"
 RENDER_BASE_URL = os.environ.get("RENDER_BASE_URL", "https://act-planning-tool.onrender.com").rstrip("/")
+
+DEFAULT_SERVICE_TEAMS = [
+    "Team Médias Capture",
+    "Team Médias Projection",
+    "Team Snacking",
+    "Team Logistique",
+    "Team Ménage",
+    "Team Accueil",
+    "Team Louange",
+    "Fil Rouge",
+    "Team Coordo",
+    "Team MC/Infos",
+    "Team Traduction",
+    "Team Hospitalité",
+    "Team Sécurité",
+    "Team Parking",
+    "Team Bible School",
+    "Team Festival",
+    "Team Librairie",
+    "Team Communication RS",
+    "Team Kids",
+    "Team Bébés",
+    "Team Prières",
+    "Team Chauffeurs",
+    "Team Son",
+    "Team Boost",
+    "Permanence Médicale",
+    "Toute la Dream Team",
+]
 
 # ─────────────────────────────────────────────────────────────────
 # DONNÉES INITIALES (depuis le PDF + Running Sheet)
@@ -481,6 +511,61 @@ def default_copy():
     return json.loads(json.dumps(DEFAULT_SCHEDULE))
 
 
+def unique_nonempty(values):
+    seen = set()
+    result = []
+    for value in values:
+        text = str(value or "").strip()
+        if text and text not in seen:
+            seen.add(text)
+            result.append(text)
+    return result
+
+
+def teams_from_schedule(schedule):
+    teams = []
+    for day in (schedule or {}).get("days", []):
+        for session in day.get("sessions", []):
+            for event in session.get("events", []):
+                teams.extend(event.get("teams") or [])
+    return unique_nonempty(teams)
+
+
+def default_settings():
+    seed = []
+    default_event_file = event_file_path(DEFAULT_EVENT_ID)
+    if os.path.exists(default_event_file):
+        try:
+            with open(default_event_file, encoding="utf-8") as f:
+                seed.extend(teams_from_schedule(json.load(f)))
+        except (OSError, json.JSONDecodeError):
+            pass
+    seed.extend(teams_from_schedule(DEFAULT_SCHEDULE))
+    seed.extend(DEFAULT_SERVICE_TEAMS)
+    return {"service_teams": unique_nonempty(seed)}
+
+
+def load_app_settings():
+    if not os.path.exists(APP_SETTINGS_FILE):
+        settings = default_settings()
+        save_app_settings(settings)
+        return settings
+    with open(APP_SETTINGS_FILE, encoding="utf-8") as f:
+        settings = json.load(f)
+    settings["service_teams"] = unique_nonempty(settings.get("service_teams") or [])
+    if not settings["service_teams"]:
+        settings["service_teams"] = default_settings()["service_teams"]
+    return settings
+
+
+def save_app_settings(settings):
+    clean = {"service_teams": unique_nonempty((settings or {}).get("service_teams") or [])}
+    with open(APP_SETTINGS_FILE, "w", encoding="utf-8") as f:
+        json.dump(clean, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    return clean
+
+
 def normalize_schedule(data):
     schedule = data or default_copy()
     schedule.setdefault("version", DEFAULT_SCHEDULE["version"])
@@ -491,6 +576,8 @@ def normalize_schedule(data):
     schedule.setdefault("conference_dates", DEFAULT_SCHEDULE["conference_dates"])
     schedule.setdefault("attendance", {})
     schedule.setdefault("types", {})
+    schedule.setdefault("service_teams", [])
+    schedule["service_teams"] = unique_nonempty(schedule.get("service_teams") or [])
 
     for key, value in DEFAULT_SCHEDULE["attendance"].items():
         schedule["attendance"].setdefault(key, value)
@@ -502,6 +589,7 @@ def normalize_schedule(data):
         day.setdefault("id", "")
         day.setdefault("name", "")
         day.setdefault("date", "")
+        day.setdefault("location", "")
         day.setdefault("sessions", [])
         for session in day.get("sessions", []):
             session.setdefault("id", "")
@@ -559,7 +647,7 @@ def format_conference_dates(start_dt, day_count):
     return f"{format_day_label(start_dt).title()} - {format_day_label(end_dt).title()}"
 
 
-def build_blank_schedule(name, start_date=None, day_count=1, location=""):
+def build_blank_schedule(name, start_date=None, day_count=1, location="", service_teams=None, day_locations=None):
     day_count = max(1, min(int(day_count or 1), 10))
     if start_date:
         try:
@@ -569,14 +657,17 @@ def build_blank_schedule(name, start_date=None, day_count=1, location=""):
     else:
         start_dt = datetime.now()
 
+    day_locations = day_locations or []
     days = []
     for idx in range(day_count):
         current = start_dt + timedelta(days=idx)
         day_id = f"jour{idx + 1}"
+        day_location = str(day_locations[idx]).strip() if idx < len(day_locations) else ""
         days.append({
             "id": day_id,
             "name": format_day_label(current),
             "date": current.strftime("%Y-%m-%d"),
+            "location": day_location,
             "sessions": [
                 {
                     "id": f"{day_id}_programme",
@@ -597,15 +688,20 @@ def build_blank_schedule(name, start_date=None, day_count=1, location=""):
         "conference_dates": format_conference_dates(start_dt, day_count),
         "attendance": {"vendredi": "", "samedi": "", "dimanche": ""},
         "types": {key: value.copy() for key, value in DEFAULT_SCHEDULE["types"].items()},
+        "service_teams": unique_nonempty(
+            service_teams if service_teams is not None else load_app_settings().get("service_teams") or []
+        ),
         "days": days
     })
 
 
 def event_summary_from_schedule(event_id, schedule):
+    day_locations = unique_nonempty(day.get("location") for day in schedule.get("days", []))
+    location = " / ".join(day_locations) if day_locations else schedule.get("lieu", "")
     return {
         "id": event_id,
         "name": schedule.get("event", "Événement"),
-        "location": schedule.get("lieu", ""),
+        "location": location,
         "date_label": schedule.get("conference_dates", "") or schedule.get("installation_dates", ""),
     }
 
@@ -1388,6 +1484,7 @@ window.SCHEDULE_API_URL = "__SCHEDULE_API_URL__";
 window.DOCX_API_URL = "__DOCX_API_URL__";
 window.PDF_API_URL = "__PDF_API_URL__";
 window.RENDER_SCHEDULE_URL = "__RENDER_SCHEDULE_URL__";
+window.SERVICE_TEAMS = __SERVICE_TEAMS__;
 </script>
 <script src="/app.js?v=16"></script>
 </body>
@@ -1404,7 +1501,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f5f7; color: #1f2933; }
   .page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
-  .hero { margin-bottom: 26px; }
+  .hero { margin-bottom: 26px; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
   .hero h1 { font-size: 30px; color: #0F4C3A; margin-bottom: 6px; }
   .hero p { font-size: 15px; color: #5b6772; line-height: 1.5; }
   .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
@@ -1417,6 +1514,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .form-row input:focus, .form-row select:focus { outline: none; border-color: #0F4C3A; }
   .btn { border: none; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 700; padding: 10px 14px; }
   .btn-primary { background: #0F4C3A; color: white; width: 100%; }
+  .btn-secondary { background: white; color: #0F4C3A; border: 1px solid #cfd9d5; }
   .btn-link { background: #eef4f2; color: #0F4C3A; }
   .btn-admin { background: #0F4C3A; color: white; }
   .btn-menu { width: 36px; height: 36px; padding: 0; background: #f3f5f7; color: #44515c; font-size: 20px; line-height: 1; }
@@ -1433,10 +1531,27 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .meta { display: grid; gap: 4px; font-size: 13px; color: #5f6b75; }
   .actions { display: flex; flex-wrap: wrap; gap: 8px; }
   .helper { margin-top: 10px; font-size: 12px; color: #6b7280; line-height: 1.45; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #35424d; }
+  .checkbox-row input { width: auto; }
+  .team-picker { max-height: 170px; overflow: auto; border: 1px solid #d2d9de; border-radius: 7px; padding: 8px; display: grid; gap: 6px; background: #fbfcfd; }
+  .team-picker label { display: flex; gap: 8px; align-items: center; font-size: 13px; color: #35424d; text-transform: none; letter-spacing: 0; font-weight: 500; margin: 0; }
+  .team-picker input { width: auto; }
+  .day-locations { display: none; gap: 10px; margin-bottom: 12px; }
+  .day-locations.show { display: grid; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, .45); display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
+  .modal-overlay.hidden { display: none; }
+  .modal-card { width: min(560px, 100%); max-height: 88vh; overflow: auto; background: white; border-radius: 8px; border: 1px solid #dfe5e9; box-shadow: 0 22px 60px rgba(15, 23, 42, .24); padding: 18px; }
+  .modal-card h2 { font-size: 18px; color: #0F4C3A; margin-bottom: 12px; }
+  .team-settings-list { display: grid; gap: 8px; margin-bottom: 12px; }
+  .team-row { display: grid; grid-template-columns: 1fr 36px; gap: 8px; align-items: center; }
+  .team-row input { width: 100%; padding: 9px 10px; border: 1px solid #d2d9de; border-radius: 7px; font-size: 14px; }
+  .btn-icon { width: 36px; height: 36px; padding: 0; background: #fff1f0; color: #b42318; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
   .toast { position: fixed; right: 18px; bottom: 18px; background: #17212b; color: white; padding: 10px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .25s; }
   .toast.show { opacity: 1; }
   @media (max-width: 860px) {
     .layout { grid-template-columns: 1fr; }
+    .hero { display: grid; }
     .hero h1 { font-size: 26px; }
   }
 </style>
@@ -1444,8 +1559,11 @@ HOME_TEMPLATE = """<!DOCTYPE html>
 <body>
   <div class="page">
     <section class="hero">
-      <h1>Gestionnaire d'évènements - SOS Lyon</h1>
-      <p>Crée, consulte et pilote plusieurs événements depuis un même outil. Chaque événement ouvre son propre planning interactif, ses exports et sa synchronisation.</p>
+      <div>
+        <h1>Gestionnaire d'évènements - SOS Lyon</h1>
+        <p>Crée, consulte et pilote plusieurs événements depuis un même outil. Chaque événement ouvre son propre planning interactif, ses exports et sa synchronisation.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="openSettings()">Paramètres</button>
     </section>
     <section class="layout">
       <aside class="panel">
@@ -1474,6 +1592,17 @@ HOME_TEMPLATE = """<!DOCTYPE html>
           <label>Lieu</label>
           <input type="text" id="new-location" placeholder="Ex: Espace 140, Rillieux-la-Pape">
         </div>
+        <div class="form-row">
+          <label class="checkbox-row">
+            <input type="checkbox" id="new-different-locations" onchange="renderDayLocationFields()">
+            Lieux différents en fonction des jours
+          </label>
+        </div>
+        <div class="day-locations" id="new-day-locations"></div>
+        <div class="form-row">
+          <label>Équipes nécessaires</label>
+          <div class="team-picker" id="new-team-picker"></div>
+        </div>
         <button class="btn btn-primary" onclick="createEvent()">Créer et ouvrir</button>
         <p class="helper">Chaque événement démarre avec un planning vide prêt à être rempli, tout en conservant les outils d'édition et d'export déjà existants.</p>
       </aside>
@@ -1482,14 +1611,76 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       </main>
     </section>
   </div>
+  <div class="modal-overlay hidden" id="settings-modal">
+    <div class="modal-card">
+      <h2>Paramètres des équipes</h2>
+      <div class="team-settings-list" id="settings-team-list"></div>
+      <button class="btn btn-link" onclick="addSettingsTeam()">Ajouter une équipe</button>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeSettings()">Annuler</button>
+        <button class="btn btn-admin" onclick="saveSettingsTeams()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
   <script>
+    let globalTeams = __SERVICE_TEAMS_JSON__;
+
+    function escHtml(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderCreateTeams() {
+      const picker = document.getElementById('new-team-picker');
+      picker.innerHTML = globalTeams.map(team => `
+        <label>
+          <input type="checkbox" value="${escHtml(team)}" checked>
+          ${escHtml(team)}
+        </label>
+      `).join('');
+    }
+
+    function selectedCreateTeams() {
+      return Array.from(document.querySelectorAll('#new-team-picker input:checked'))
+        .map(input => input.value)
+        .filter(Boolean);
+    }
+
+    function renderDayLocationFields() {
+      const container = document.getElementById('new-day-locations');
+      const enabled = document.getElementById('new-different-locations').checked;
+      const count = parseInt(document.getElementById('new-day-count').value, 10) || 1;
+      container.classList.toggle('show', enabled);
+      if (!enabled) {
+        container.innerHTML = '';
+        return;
+      }
+      const existing = {};
+      container.querySelectorAll('input[data-day-index]').forEach(input => {
+        existing[input.dataset.dayIndex] = input.value;
+      });
+      container.innerHTML = Array.from({length: count}, (_, idx) => `
+        <div class="form-row" style="margin:0">
+          <label>Lieu jour ${idx + 1}</label>
+          <input type="text" data-day-index="${idx}" value="${escHtml(existing[idx] || '')}" placeholder="Lieu du jour ${idx + 1}">
+        </div>
+      `).join('');
+    }
+
+    function createDayLocationsPayload() {
+      if (!document.getElementById('new-different-locations').checked) return [];
+      return Array.from(document.querySelectorAll('#new-day-locations input[data-day-index]'))
+        .map(input => input.value.trim());
+    }
+
     async function createEvent() {
       const payload = {
         name: document.getElementById('new-name').value.trim(),
         start_date: document.getElementById('new-start-date').value,
         day_count: document.getElementById('new-day-count').value,
-        location: document.getElementById('new-location').value.trim()
+        location: document.getElementById('new-location').value.trim(),
+        service_teams: selectedCreateTeams(),
+        day_locations: createDayLocationsPayload()
       };
       if (!payload.name) {
         showToast('Donne un nom à l\\'événement');
@@ -1506,6 +1697,58 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       }
       const created = await r.json();
       window.location.href = created.admin_url;
+    }
+
+    function openSettings() {
+      renderSettingsTeams();
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function renderSettingsTeams() {
+      const list = document.getElementById('settings-team-list');
+      list.innerHTML = globalTeams.map(team => `
+        <div class="team-row">
+          <input type="text" value="${escHtml(team)}">
+          <button class="btn btn-icon" onclick="this.closest('.team-row').remove()" aria-label="Supprimer cette équipe">×</button>
+        </div>
+      `).join('');
+    }
+
+    function addSettingsTeam() {
+      const list = document.getElementById('settings-team-list');
+      list.insertAdjacentHTML('beforeend', `
+        <div class="team-row">
+          <input type="text" value="" placeholder="Nouvelle équipe">
+          <button class="btn btn-icon" onclick="this.closest('.team-row').remove()" aria-label="Supprimer cette équipe">×</button>
+        </div>
+      `);
+      const inputs = list.querySelectorAll('input');
+      inputs[inputs.length - 1].focus();
+    }
+
+    async function saveSettingsTeams() {
+      const teams = Array.from(document.querySelectorAll('#settings-team-list input'))
+        .map(input => input.value.trim())
+        .filter(Boolean)
+        .filter((team, index, all) => all.indexOf(team) === index);
+      const r = await fetch('/api/settings/teams', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({service_teams: teams})
+      });
+      if (!r.ok) {
+        showToast('Impossible de sauvegarder les équipes');
+        return;
+      }
+      const saved = await r.json();
+      globalTeams = saved.service_teams || [];
+      renderCreateTeams();
+      closeSettings();
+      showToast('Équipes mises à jour');
     }
 
     function toggleEventMenu(event, button) {
@@ -1539,6 +1782,9 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       document.querySelectorAll('.card-menu.open').forEach(menu => menu.classList.remove('open'));
     });
 
+    document.getElementById('new-day-count').addEventListener('change', renderDayLocationFields);
+    renderCreateTeams();
+
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -1570,6 +1816,7 @@ def render_event_page(event_id, read_only):
         "__DOCX_API_URL__": f"/events/{event_id}/api/generate-docx",
         "__PDF_API_URL__": f"/events/{event_id}/api/generate-planning-pdf",
         "__RENDER_SCHEDULE_URL__": f"{RENDER_BASE_URL}/events/{event_id}/api/schedule",
+        "__SERVICE_TEAMS__": json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False),
     }
     for key, value in replacements.items():
         html = html.replace(key, value)
@@ -1606,7 +1853,9 @@ def render_home_page():
           </div>
         </article>
         """)
-    return Response(HOME_TEMPLATE.replace("__EVENT_CARDS__", "".join(cards) or "<div class='panel'><p>Aucun événement pour l'instant.</p></div>"), mimetype="text/html; charset=utf-8")
+    html = HOME_TEMPLATE.replace("__EVENT_CARDS__", "".join(cards) or "<div class='panel'><p>Aucun événement pour l'instant.</p></div>")
+    html = html.replace("__SERVICE_TEAMS_JSON__", json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False))
+    return Response(html, mimetype="text/html; charset=utf-8")
 
 
 @app.route("/")
@@ -1652,6 +1901,8 @@ def create_event():
         start_date=payload.get("start_date") or "",
         day_count=payload.get("day_count") or 1,
         location=payload.get("location") or "",
+        service_teams=payload.get("service_teams") or [],
+        day_locations=payload.get("day_locations") or [],
     )
     save_event_schedule(event_id, schedule)
     return jsonify({
@@ -1660,6 +1911,18 @@ def create_event():
         "admin_url": f"/events/{event_id}/admin",
         "public_url": f"/events/{event_id}",
     })
+
+
+@app.route("/api/settings/teams", methods=["GET"])
+def get_settings_teams():
+    return jsonify(load_app_settings())
+
+
+@app.route("/api/settings/teams", methods=["POST"])
+def save_settings_teams():
+    payload = request.get_json() or {}
+    settings = save_app_settings({"service_teams": payload.get("service_teams") or []})
+    return jsonify(settings)
 
 
 @app.route("/api/events/<event_id>", methods=["DELETE"])
