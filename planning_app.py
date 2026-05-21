@@ -6,8 +6,10 @@ Lancez:  python3 planning_app.py
 Puis ouvrez: http://localhost:5001
 """
 
-import os, json, io
-from flask import Flask, jsonify, request, send_file, Response
+import os, json, io, re, shutil, unicodedata
+from datetime import datetime, timedelta
+from html import escape
+from flask import Flask, jsonify, request, send_file, Response, redirect, url_for, abort
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -22,8 +24,13 @@ CORS(app, resources={
     }
 })
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_FILE = os.environ.get("SCHEDULE_DATA_FILE", os.path.join(BASE_DIR, "schedule_data.json"))
+LEGACY_DATA_FILE = os.environ.get("SCHEDULE_DATA_FILE", os.path.join(BASE_DIR, "schedule_data.json"))
+EVENTS_DIR = os.path.join(BASE_DIR, "events")
+EVENTS_INDEX_FILE = os.path.join(BASE_DIR, "events_index.json")
 JS_FILE = os.path.join(BASE_DIR, "app.js")
+APP_TITLE = "Gestionnaire d'évènements - SOS Lyon"
+DEFAULT_EVENT_ID = "act-conference-2026"
+RENDER_BASE_URL = os.environ.get("RENDER_BASE_URL", "https://act-planning-tool.onrender.com").rstrip("/")
 
 # ─────────────────────────────────────────────────────────────────
 # DONNÉES INITIALES (depuis le PDF + Running Sheet)
@@ -519,6 +526,162 @@ def normalize_schedule(data):
                     }
     return schedule
 
+
+FRENCH_WEEKDAYS = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE"]
+FRENCH_MONTHS = [
+    "JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+    "JUILLET", "AOUT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DECEMBRE"
+]
+
+
+def slugify(value):
+    normalized = unicodedata.normalize("NFD", str(value or ""))
+    ascii_value = normalized.encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", ascii_value).strip("-").lower()
+    return slug or "evenement"
+
+
+def event_file_path(event_id):
+    return os.path.join(EVENTS_DIR, f"{event_id}.json")
+
+
+def format_day_label(dt):
+    return f"{FRENCH_WEEKDAYS[dt.weekday()]} {dt.day} {FRENCH_MONTHS[dt.month - 1]}"
+
+
+def format_conference_dates(start_dt, day_count):
+    end_dt = start_dt + timedelta(days=max(day_count - 1, 0))
+    if start_dt.date() == end_dt.date():
+        return format_day_label(start_dt).title()
+    if start_dt.month == end_dt.month:
+        month = FRENCH_MONTHS[start_dt.month - 1].title()
+        return f"{FRENCH_WEEKDAYS[start_dt.weekday()].title()} {start_dt.day} - {FRENCH_WEEKDAYS[end_dt.weekday()].title()} {end_dt.day} {month}"
+    return f"{format_day_label(start_dt).title()} - {format_day_label(end_dt).title()}"
+
+
+def build_blank_schedule(name, start_date=None, day_count=1, location=""):
+    day_count = max(1, min(int(day_count or 1), 10))
+    if start_date:
+        try:
+            start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+        except ValueError:
+            start_dt = datetime.now()
+    else:
+        start_dt = datetime.now()
+
+    days = []
+    for idx in range(day_count):
+        current = start_dt + timedelta(days=idx)
+        day_id = f"jour{idx + 1}"
+        days.append({
+            "id": day_id,
+            "name": format_day_label(current),
+            "date": current.strftime("%Y-%m-%d"),
+            "sessions": [
+                {
+                    "id": f"{day_id}_programme",
+                    "name": "Programme",
+                    "start_time": "",
+                    "end_time": "",
+                    "events": []
+                }
+            ]
+        })
+
+    return normalize_schedule({
+        "version": "1.0",
+        "event": name,
+        "lieu": location,
+        "dresscode": "",
+        "installation_dates": "",
+        "conference_dates": format_conference_dates(start_dt, day_count),
+        "attendance": {"vendredi": "", "samedi": "", "dimanche": ""},
+        "types": {key: value.copy() for key, value in DEFAULT_SCHEDULE["types"].items()},
+        "days": days
+    })
+
+
+def event_summary_from_schedule(event_id, schedule):
+    return {
+        "id": event_id,
+        "name": schedule.get("event", "Événement"),
+        "location": schedule.get("lieu", ""),
+        "date_label": schedule.get("conference_dates", "") or schedule.get("installation_dates", ""),
+    }
+
+
+def load_events_index():
+    ensure_event_storage()
+    with open(EVENTS_INDEX_FILE, encoding="utf-8") as f:
+        events = json.load(f)
+    return sorted(events, key=lambda event: (event.get("date_label", ""), event.get("name", "")))
+
+
+def save_events_index(events):
+    os.makedirs(os.path.dirname(EVENTS_INDEX_FILE), exist_ok=True)
+    with open(EVENTS_INDEX_FILE, "w", encoding="utf-8") as f:
+        json.dump(events, f, ensure_ascii=False, indent=2)
+
+
+def get_event_meta(event_id):
+    return next((event for event in load_events_index() if event.get("id") == event_id), None)
+
+
+def load_event_schedule(event_id):
+    path = event_file_path(event_id)
+    if not os.path.exists(path):
+        abort(404)
+    with open(path, encoding="utf-8") as f:
+        return normalize_schedule(json.load(f))
+
+
+def save_event_schedule(event_id, data):
+    normalized = normalize_schedule(data)
+    os.makedirs(EVENTS_DIR, exist_ok=True)
+    with open(event_file_path(event_id), "w", encoding="utf-8") as f:
+        json.dump(normalized, f, ensure_ascii=False, indent=2)
+
+    if event_id == DEFAULT_EVENT_ID:
+        with open(LEGACY_DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(normalized, f, ensure_ascii=False, indent=2)
+
+    events = load_events_index()
+    summary = event_summary_from_schedule(event_id, normalized)
+    updated = False
+    for idx, event in enumerate(events):
+        if event.get("id") == event_id:
+            events[idx] = summary
+            updated = True
+            break
+    if not updated:
+        events.append(summary)
+    save_events_index(events)
+    return normalized
+
+
+def ensure_event_storage():
+    os.makedirs(EVENTS_DIR, exist_ok=True)
+
+    if not os.path.exists(EVENTS_INDEX_FILE):
+        if os.path.exists(LEGACY_DATA_FILE):
+            shutil.copyfile(LEGACY_DATA_FILE, event_file_path(DEFAULT_EVENT_ID))
+            with open(LEGACY_DATA_FILE, encoding="utf-8") as f:
+                legacy_schedule = normalize_schedule(json.load(f))
+        else:
+            legacy_schedule = default_copy()
+            with open(event_file_path(DEFAULT_EVENT_ID), "w", encoding="utf-8") as f:
+                json.dump(legacy_schedule, f, ensure_ascii=False, indent=2)
+
+        save_events_index([event_summary_from_schedule(DEFAULT_EVENT_ID, legacy_schedule)])
+        return
+
+    with open(EVENTS_INDEX_FILE, encoding="utf-8") as f:
+        indexed_events = json.load(f)
+    meta = next((event for event in indexed_events if event.get("id") == DEFAULT_EVENT_ID), None)
+    default_event_file = event_file_path(DEFAULT_EVENT_ID)
+    if meta and not os.path.exists(default_event_file) and os.path.exists(LEGACY_DATA_FILE):
+        shutil.copyfile(LEGACY_DATA_FILE, default_event_file)
+
 # ─────────────────────────────────────────────────────────────────
 # HTML TEMPLATE
 # ─────────────────────────────────────────────────────────────────
@@ -527,7 +690,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ACT 2026 – Planning</title>
+<title>__PAGE_TITLE__</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -555,6 +718,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.3);
   }
   .toolbar h1 { font-size: 16px; font-weight: 600; flex: 1; }
+  .toolbar h1 small { display: block; font-size: 11px; font-weight: 500; opacity: .85; }
   .toolbar .logo { font-size: 22px; }
   .btn {
     padding: 7px 14px; border: none; border-radius: 8px; cursor: pointer;
@@ -951,7 +1115,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <!-- TOOLBAR -->
 <header class="toolbar">
   <span class="logo">&#128197;</span>
-  <h1>ACT Conference 2026 &mdash; Planning Interactif</h1>
+  <h1>Gestionnaire d'évènements - SOS Lyon<small>__EVENT_NAME__</small></h1>
+  <button class="btn btn-add" onclick="window.location.href='/'">Accueil</button>
   <button data-admin-only class="btn btn-add" onclick="openMetaModal()">Infos</button>
   <button data-admin-only class="btn btn-add" onclick="openAddSessionModal()">+ Session</button>
   <button data-admin-only class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
@@ -1217,72 +1382,281 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   </div>
 </div>
 
-<script>window.READ_ONLY = __READ_ONLY__;</script>
-<script src="/app.js?v=15"></script>
+<script>
+window.READ_ONLY = __READ_ONLY__;
+window.SCHEDULE_API_URL = "__SCHEDULE_API_URL__";
+window.DOCX_API_URL = "__DOCX_API_URL__";
+window.PDF_API_URL = "__PDF_API_URL__";
+window.RENDER_SCHEDULE_URL = "__RENDER_SCHEDULE_URL__";
+</script>
+<script src="/app.js?v=16"></script>
 </body>
 </html>
 """
 
+HOME_TEMPLATE = """<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestionnaire d'évènements - SOS Lyon</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f5f7; color: #1f2933; }
+  .page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+  .hero { margin-bottom: 26px; }
+  .hero h1 { font-size: 30px; color: #0F4C3A; margin-bottom: 6px; }
+  .hero p { font-size: 15px; color: #5b6772; line-height: 1.5; }
+  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+  .panel { background: white; border: 1px solid #e3e7ea; border-radius: 8px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05); padding: 18px; }
+  .panel h2 { font-size: 18px; color: #0F4C3A; margin-bottom: 12px; }
+  .panel p { font-size: 13px; color: #5f6b75; line-height: 1.45; }
+  .form-row { margin-bottom: 12px; }
+  .form-row label { display: block; font-size: 11px; font-weight: 700; color: #66727c; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px; }
+  .form-row input, .form-row select { width: 100%; padding: 9px 10px; border: 1px solid #d2d9de; border-radius: 7px; font-size: 14px; }
+  .form-row input:focus, .form-row select:focus { outline: none; border-color: #0F4C3A; }
+  .btn { border: none; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 700; padding: 10px 14px; }
+  .btn-primary { background: #0F4C3A; color: white; width: 100%; }
+  .btn-link { background: #eef4f2; color: #0F4C3A; }
+  .btn-admin { background: #E53935; color: white; }
+  .cards { display: grid; gap: 14px; }
+  .card { background: white; border: 1px solid #e3e7ea; border-radius: 8px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05); padding: 18px; display: grid; gap: 10px; }
+  .card-head { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+  .card-head h3 { font-size: 19px; color: #12212f; }
+  .badge { background: #eef4f2; color: #0F4C3A; border-radius: 999px; padding: 4px 8px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .meta { display: grid; gap: 4px; font-size: 13px; color: #5f6b75; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .helper { margin-top: 10px; font-size: 12px; color: #6b7280; line-height: 1.45; }
+  .toast { position: fixed; right: 18px; bottom: 18px; background: #17212b; color: white; padding: 10px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .25s; }
+  .toast.show { opacity: 1; }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <h1>Gestionnaire d'évènements - SOS Lyon</h1>
+      <p>Crée, consulte et pilote plusieurs événements depuis un même outil. Chaque événement ouvre son propre planning interactif, ses exports et sa synchronisation.</p>
+    </section>
+    <section class="layout">
+      <aside class="panel">
+        <h2>Créer un événement</h2>
+        <div class="form-row">
+          <label>Nom</label>
+          <input type="text" id="new-name" placeholder="Ex: Convention Jeunesse 2027">
+        </div>
+        <div class="form-row">
+          <label>Date de début</label>
+          <input type="date" id="new-start-date">
+        </div>
+        <div class="form-row">
+          <label>Nombre de jours</label>
+          <select id="new-day-count">
+            <option value="1">1 jour</option>
+            <option value="2">2 jours</option>
+            <option value="3">3 jours</option>
+            <option value="4">4 jours</option>
+            <option value="5">5 jours</option>
+            <option value="6">6 jours</option>
+            <option value="7">7 jours</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Lieu</label>
+          <input type="text" id="new-location" placeholder="Ex: Espace 140, Rillieux-la-Pape">
+        </div>
+        <button class="btn btn-primary" onclick="createEvent()">Créer et ouvrir</button>
+        <p class="helper">Chaque événement démarre avec un planning vide prêt à être rempli, tout en conservant les outils d'édition et d'export déjà existants.</p>
+      </aside>
+      <main class="cards">
+        __EVENT_CARDS__
+      </main>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    async function createEvent() {
+      const payload = {
+        name: document.getElementById('new-name').value.trim(),
+        start_date: document.getElementById('new-start-date').value,
+        day_count: document.getElementById('new-day-count').value,
+        location: document.getElementById('new-location').value.trim()
+      };
+      if (!payload.name) {
+        showToast('Donne un nom à l\\'événement');
+        return;
+      }
+      const r = await fetch('/api/events', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if (!r.ok) {
+        showToast('Impossible de créer l\\'événement');
+        return;
+      }
+      const created = await r.json();
+      window.location.href = created.admin_url;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+  </script>
+</body>
+</html>
+"""
+
+ensure_event_storage()
+
 # ─────────────────────────────────────────────────────────────────
 # FLASK ROUTES
 # ─────────────────────────────────────────────────────────────────
+def render_event_page(event_id, read_only):
+    meta = get_event_meta(event_id)
+    if not meta:
+        abort(404)
+    event_name = escape(meta["name"])
+    html = HTML_TEMPLATE
+    replacements = {
+        "__PAGE_TITLE__": escape(f"{meta['name']} - {APP_TITLE}"),
+        "__EVENT_NAME__": event_name,
+        "__READ_ONLY__": "true" if read_only else "false",
+        "__SCHEDULE_API_URL__": f"/events/{event_id}/api/schedule",
+        "__DOCX_API_URL__": f"/events/{event_id}/api/generate-docx",
+        "__PDF_API_URL__": f"/events/{event_id}/api/generate-planning-pdf",
+        "__RENDER_SCHEDULE_URL__": f"{RENDER_BASE_URL}/events/{event_id}/api/schedule",
+    }
+    for key, value in replacements.items():
+        html = html.replace(key, value)
+    return Response(html, mimetype="text/html; charset=utf-8")
+
+
+def render_home_page():
+    cards = []
+    for event in load_events_index():
+        event_id = escape(event.get("id", ""))
+        event_name = escape(event.get("name", "Événement"))
+        event_location = escape(event.get("location", ""))
+        event_date = escape(event.get("date_label", ""))
+        cards.append(f"""
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h3>{event_name}</h3>
+              <div class="meta">
+                <span>{event_date}</span>
+                <span>{event_location}</span>
+              </div>
+            </div>
+            <span class="badge">{event_id}</span>
+          </div>
+          <div class="actions">
+            <button class="btn btn-link" onclick="window.location.href='/events/{event_id}'">Consultation</button>
+            <button class="btn btn-admin" onclick="window.location.href='/events/{event_id}/admin'">Gérer</button>
+          </div>
+        </article>
+        """)
+    return Response(HOME_TEMPLATE.replace("__EVENT_CARDS__", "".join(cards) or "<div class='panel'><p>Aucun événement pour l'instant.</p></div>"), mimetype="text/html; charset=utf-8")
+
+
 @app.route("/")
 def index():
-    # Page publique Render: consultation seulement.
-    html = HTML_TEMPLATE.replace("__READ_ONLY__", "true")
-    return Response(html, mimetype="text/html; charset=utf-8")
+    return render_home_page()
 
 @app.route("/admin")
 def admin():
-    # Page d'édition complète. Non protégée volontairement pour garder la solution légère.
-    html = HTML_TEMPLATE.replace("__READ_ONLY__", "false")
-    return Response(html, mimetype="text/html; charset=utf-8")
+    return redirect(url_for("event_admin", event_id=DEFAULT_EVENT_ID))
+
+
+@app.route("/events/<event_id>")
+def event_public(event_id):
+    return render_event_page(event_id, True)
+
+
+@app.route("/events/<event_id>/admin")
+def event_admin(event_id):
+    return render_event_page(event_id, False)
 
 @app.route("/app.js")
 def app_js():
     with open(JS_FILE, encoding="utf-8") as f:
         return Response(f.read(), mimetype="application/javascript; charset=utf-8")
 
-@app.route("/api/schedule", methods=["GET"])
-def get_schedule():
-    # Endpoint de synchronisation: Render et localhost exposent le même JSON.
-    # La version locale l'utilise pour récupérer la source de vérité hébergée.
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, encoding="utf-8") as f:
-            return jsonify(normalize_schedule(json.load(f)))
-    return jsonify(default_copy())
+@app.route("/api/events", methods=["POST"])
+def create_event():
+    payload = request.get_json() or {}
+    name = (payload.get("name") or "").strip()
+    if not name:
+        return jsonify({"error": "name_required"}), 400
 
-@app.route("/api/schedule", methods=["POST"])
-def save_schedule():
-    data = normalize_schedule(request.get_json())
-    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    base_id = slugify(name)
+    event_id = base_id
+    existing_ids = {event.get("id") for event in load_events_index()}
+    counter = 2
+    while event_id in existing_ids:
+        event_id = f"{base_id}-{counter}"
+        counter += 1
+
+    schedule = build_blank_schedule(
+        name=name,
+        start_date=payload.get("start_date") or "",
+        day_count=payload.get("day_count") or 1,
+        location=payload.get("location") or "",
+    )
+    save_event_schedule(event_id, schedule)
+    return jsonify({
+        "status": "ok",
+        "event_id": event_id,
+        "admin_url": f"/events/{event_id}/admin",
+        "public_url": f"/events/{event_id}",
+    })
+
+
+@app.route("/events/<event_id>/api/schedule", methods=["GET"])
+def get_schedule(event_id):
+    return jsonify(load_event_schedule(event_id))
+
+
+@app.route("/events/<event_id>/api/schedule", methods=["POST"])
+def save_schedule(event_id):
+    data = request.get_json()
+    save_event_schedule(event_id, data)
     return jsonify({"status": "ok"})
 
-@app.route("/api/generate-docx", methods=["POST"])
-def generate_docx_route():
+
+@app.route("/events/<event_id>/api/generate-docx", methods=["POST"])
+def generate_docx_route(event_id):
     data = normalize_schedule(request.get_json())
     buf = io.BytesIO()
     build_running_sheet(data, buf)
     buf.seek(0)
+    event_name = slugify(data.get("event", event_id)).replace("-", "_")
     return send_file(
         buf,
         as_attachment=True,
-        download_name="Running_Sheet_ACT_2026.docx",
+        download_name=f"Running_Sheet_{event_name}.docx",
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
 
-@app.route("/api/generate-planning-pdf", methods=["POST"])
-def generate_planning_pdf_route():
+@app.route("/events/<event_id>/api/generate-planning-pdf", methods=["POST"])
+def generate_planning_pdf_route(event_id):
     data = normalize_schedule(request.get_json())
     buf = io.BytesIO()
     build_planning_pdf(data, buf)
     buf.seek(0)
+    event_name = slugify(data.get("event", event_id)).replace("-", "_")
     return send_file(
         buf,
         as_attachment=True,
-        download_name="Planning_ACT_2026.pdf",
+        download_name=f"Planning_{event_name}.pdf",
         mimetype="application/pdf"
     )
 

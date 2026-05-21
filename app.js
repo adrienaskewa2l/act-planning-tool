@@ -10,10 +10,11 @@ const START_H = 7;
 const END_H = 23;
 const TOTAL_MINS = (END_H - START_H) * 60;
 
-// Renseignez ici l'URL JSON de la version Render, puis gardez /api/schedule.
-// Exemple: const RENDER_SCHEDULE_URL = 'https://mon-app.onrender.com/api/schedule';
-const RENDER_SCHEDULE_URL = 'https://act-planning-tool.onrender.com/api/schedule';
 const READ_ONLY = typeof window !== 'undefined' && Boolean(window.READ_ONLY);
+const SCHEDULE_API_URL = typeof window !== 'undefined' && window.SCHEDULE_API_URL ? window.SCHEDULE_API_URL : '/api/schedule';
+const DOCX_API_URL = typeof window !== 'undefined' && window.DOCX_API_URL ? window.DOCX_API_URL : '/api/generate-docx';
+const PDF_API_URL = typeof window !== 'undefined' && window.PDF_API_URL ? window.PDF_API_URL : '/api/generate-planning-pdf';
+const RENDER_SCHEDULE_URL = typeof window !== 'undefined' && window.RENDER_SCHEDULE_URL ? window.RENDER_SCHEDULE_URL : SCHEDULE_API_URL;
 
 const DEFAULT_TYPES = {
   LOUANGE:      { label: 'Louange', color: '#C39BD3' },
@@ -168,7 +169,7 @@ function applyReadOnlyMode() {
 // ── LOAD + RENDER ──
 async function loadSchedule() {
   try {
-    const r = await fetch('/api/schedule');
+    const r = await fetch(SCHEDULE_API_URL);
     schedule = await r.json();
     ensureScheduleShape();
     renderAll();
@@ -179,7 +180,7 @@ async function loadSchedule() {
 }
 
 async function persistLocalSchedule() {
-  const r = await fetch('/api/schedule', {
+  const r = await fetch(SCHEDULE_API_URL, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(schedule)
@@ -943,7 +944,7 @@ async function syncFromOnline() {
 
 async function generateDocx() {
   showToast('&#9201; Génération du Running Sheet...');
-  const r = await fetch('/api/generate-docx', {
+  const r = await fetch(DOCX_API_URL, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(schedule)
@@ -1022,7 +1023,7 @@ function buildPdfExportSchedule(onlySelected) {
 
 async function generatePlanningPdf(payloadSchedule) {
   showToast('Génération du PDF planning...');
-  const r = await fetch('/api/generate-planning-pdf', {
+  const r = await fetch(PDF_API_URL, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payloadSchedule || schedule)
