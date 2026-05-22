@@ -835,12 +835,10 @@ def write_event_schedule_for_import(event_id, data, slug=None):
     return event_summary_from_schedule(event_id, normalized, slug=slug)
 
 
-def merge_imported_events(imported_events):
-    by_id = {event.get("id"): event for event in load_events_index()}
-    for event in imported_events:
-        if event.get("id"):
-            by_id[event["id"]] = event
-    save_events_index(list(by_id.values()))
+def delete_event_file(event_id):
+    path = event_file_path(event_id)
+    if os.path.exists(path):
+        os.remove(path)
 
 
 def fetch_url_text(url):
@@ -872,6 +870,7 @@ def fetch_online_events_payload(base_url):
 def import_events_payload(payload):
     events = normalize_event_index(payload.get("events") or [])
     schedules = payload.get("schedules") or {}
+    previous_ids = {event.get("id") for event in load_events_index()}
     imported_events = []
     imported_ids = []
 
@@ -888,14 +887,21 @@ def import_events_payload(payload):
         )
         imported_ids.append(event_id)
 
-    if imported_events:
-        merge_imported_events(imported_events)
+    imported_id_set = set(imported_ids)
+    deleted_ids = sorted(event_id for event_id in previous_ids - imported_id_set if event_id)
+    for event_id in deleted_ids:
+        delete_event_file(event_id)
+
+    save_events_index(imported_events)
 
     settings = payload.get("settings")
     if settings and settings.get("service_teams"):
         save_app_settings(settings)
 
-    return imported_ids
+    return {
+        "imported_ids": imported_ids,
+        "deleted_ids": deleted_ids,
+    }
 
 
 def ensure_event_storage():
@@ -1999,7 +2005,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
         return;
       }
       const result = await r.json();
-      showToast(`${result.imported_count || 0} événement(s) synchronisé(s)`);
+      showToast(`${result.imported_count || 0} événement(s) synchronisé(s), ${result.deleted_count || 0} supprimé(s)`);
       window.setTimeout(() => window.location.reload(), 700);
     }
 
@@ -2323,17 +2329,21 @@ def sync_from_online_events():
     base_url = (payload.get("base_url") or RENDER_BASE_URL).rstrip("/")
     try:
         online_payload = fetch_online_events_payload(base_url)
-        imported_ids = import_events_payload(online_payload)
+        sync_result = import_events_payload(online_payload)
     except Exception as exc:
         return jsonify({
             "error": "sync_failed",
             "message": f"Impossible de synchroniser depuis {base_url} : {exc}",
         }), 500
+    imported_ids = sync_result["imported_ids"]
+    deleted_ids = sync_result["deleted_ids"]
     return jsonify({
         "status": "ok",
         "source": base_url,
         "imported_ids": imported_ids,
         "imported_count": len(imported_ids),
+        "deleted_ids": deleted_ids,
+        "deleted_count": len(deleted_ids),
     })
 
 
@@ -2404,9 +2414,7 @@ def delete_event(event_id):
         return jsonify({"error": "not_found"}), 404
 
     save_events_index([event for event in events if event.get("id") != event_id])
-    path = event_file_path(event_id)
-    if os.path.exists(path):
-        os.remove(path)
+    delete_event_file(event_id)
 
     return jsonify({"status": "ok"})
 
