@@ -8,6 +8,7 @@
   "days": [
     {
       "date": "2026-05-14",
+      "expected_people": "",
       "id": "jeudi",
       "location": "",
       "name": "JEUDI 14 MAI",
@@ -155,6 +156,7 @@
     },
     {
       "date": "2026-05-15",
+      "expected_people": "",
       "id": "vendredi",
       "location": "",
       "name": "VENDREDI 15 MAI",
@@ -733,6 +735,7 @@
     },
     {
       "date": "2026-05-16",
+      "expected_people": "",
       "id": "samedi",
       "location": "",
       "name": "SAMEDI 16 MAI",
@@ -1485,6 +1488,7 @@
     },
     {
       "date": "2026-05-17",
+      "expected_people": "",
       "id": "dimanche",
       "location": "",
       "name": "DIMANCHE 17 MAI",

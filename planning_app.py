@@ -1633,6 +1633,7 @@ window.SCHEDULE_API_URL = "__SCHEDULE_API_URL__";
 window.DOCX_API_URL = "__DOCX_API_URL__";
 window.PDF_API_URL = "__PDF_API_URL__";
 window.RENDER_SCHEDULE_URL = "__RENDER_SCHEDULE_URL__";
+window.SYNC_EVENT_URL = "__SYNC_EVENT_URL__";
 window.SERVICE_TEAMS = __SERVICE_TEAMS__;
 </script>
 <script src="/app.js?v=16"></script>
@@ -2177,6 +2178,7 @@ def render_event_page(event_id, read_only):
         "__DOCX_API_URL__": f"/{public_slug}/api/generate-docx",
         "__PDF_API_URL__": f"/{public_slug}/api/generate-planning-pdf",
         "__RENDER_SCHEDULE_URL__": f"{RENDER_BASE_URL}/{public_slug}/api/schedule",
+        "__SYNC_EVENT_URL__": f"/api/sync/from-online/{event_id}",
         "__SERVICE_TEAMS__": json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False),
     }
     for key, value in replacements.items():
@@ -2345,6 +2347,30 @@ def sync_from_online_events():
         "imported_count": len(imported_ids),
         "deleted_ids": deleted_ids,
         "deleted_count": len(deleted_ids),
+    })
+
+
+@app.route("/api/sync/from-online/<event_id>", methods=["POST"])
+def sync_event_from_online(event_id):
+    event_id = resolve_event_id(event_id)
+    meta = get_event_meta(event_id)
+    if not meta:
+        abort(404)
+    event_slug = meta.get("slug") or event_id
+    url = f"{RENDER_BASE_URL}/{event_slug}/api/schedule"
+    try:
+        online_schedule = fetch_url_json(url)
+        saved_schedule = save_event_schedule(event_id, online_schedule)
+    except Exception as exc:
+        return jsonify({
+            "error": "sync_failed",
+            "message": f"Impossible de synchroniser {meta.get('name', event_id)} depuis {url} : {exc}",
+        }), 500
+    return jsonify({
+        "status": "ok",
+        "source": url,
+        "event_id": event_id,
+        "schedule": saved_schedule,
     })
 
 

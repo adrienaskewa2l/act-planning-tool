@@ -1,0 +1,138 @@
+{
+  "attendance": {
+    "dimanche": "",
+    "jour1": "500",
+    "jour2": "150",
+    "samedi": "",
+    "vendredi": ""
+  },
+  "conference_dates": "Vendredi 26 - Samedi 27 Juin",
+  "days": [
+    {
+      "date": "2026-06-26",
+      "expected_people": "500",
+      "id": "jour1",
+      "location": "Église St Joseph - Tassin",
+      "name": "VENDREDI 26 JUIN",
+      "sessions": [
+        {
+          "end_time": "",
+          "events": [
+            {
+              "color": "#aed6f1",
+              "details": "Installation du matériel son et balances",
+              "duration": 150,
+              "id": "e_ifh9w2b",
+              "teams": [
+                "Team Logistique",
+                "Team Louange"
+              ],
+              "time": "16:00",
+              "title": "Installation",
+              "type": "LOGISTIQUE"
+            }
+          ],
+          "id": "jour1_programme",
+          "name": "Programme",
+          "start_time": ""
+        }
+      ]
+    },
+    {
+      "date": "2026-06-27",
+      "expected_people": "150",
+      "id": "jour2",
+      "location": "Campus École Pierre",
+      "name": "SAMEDI 27 JUIN",
+      "sessions": [
+        {
+          "end_time": "",
+          "events": [],
+          "id": "jour2_programme",
+          "name": "Programme",
+          "start_time": ""
+        }
+      ]
+    }
+  ],
+  "dresscode": "",
+  "event": "Tim Hughes x SOS",
+  "installation_dates": "",
+  "lieu": "Église St Joseph - Tassin",
+  "service_teams": [
+    "Team Logistique",
+    "Team Hospitalité",
+    "Team Snacking",
+    "Team Coordo",
+    "Team Librairie",
+    "Team Son",
+    "Team Louange",
+    "Team Accueil",
+    "Team Chauffeurs",
+    "Team Médias Projection",
+    "Team Médias Capture",
+    "Team Ménage",
+    "Team Sécurité",
+    "Team Parking",
+    "Team Communication RS"
+  ],
+  "types": {
+    "ANNONCES": {
+      "color": "#A9DFBF",
+      "label": "Annonces"
+    },
+    "BOOST": {
+      "color": "#F1948A",
+      "label": "Boost"
+    },
+    "FUNDRAISING": {
+      "color": "#F9E79F",
+      "label": "Levée de fonds"
+    },
+    "INTERCESSION": {
+      "color": "#D6EAF8",
+      "label": "Intercession"
+    },
+    "LOGISTIQUE": {
+      "color": "#AED6F1",
+      "label": "Logistique"
+    },
+    "LOUANGE": {
+      "color": "#C39BD3",
+      "label": "Louange"
+    },
+    "PREDICATION": {
+      "color": "#82E0AA",
+      "label": "Prédication"
+    },
+    "PRIERE": {
+      "color": "#7FB3D3",
+      "label": "Prière"
+    },
+    "REPAS": {
+      "color": "#FAD7A0",
+      "label": "Repas"
+    },
+    "REPETITION": {
+      "color": "#D7BDE2",
+      "label": "Répétition"
+    },
+    "REUNION": {
+      "color": "#D5F5E3",
+      "label": "Réunion / Brief"
+    },
+    "STE_CENE": {
+      "color": "#BB8FCE",
+      "label": "Ste Cène"
+    },
+    "TECHNIQUE": {
+      "color": "#D5D8DC",
+      "label": "Technique"
+    },
+    "TED_PITCH": {
+      "color": "#A9DFBF",
+      "label": "Pitch / TED"
+    }
+  },
+  "version": "1.0"
+}

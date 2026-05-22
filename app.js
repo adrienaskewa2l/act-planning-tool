@@ -15,6 +15,7 @@ const SCHEDULE_API_URL = typeof window !== 'undefined' && window.SCHEDULE_API_UR
 const DOCX_API_URL = typeof window !== 'undefined' && window.DOCX_API_URL ? window.DOCX_API_URL : '/api/generate-docx';
 const PDF_API_URL = typeof window !== 'undefined' && window.PDF_API_URL ? window.PDF_API_URL : '/api/generate-planning-pdf';
 const RENDER_SCHEDULE_URL = typeof window !== 'undefined' && window.RENDER_SCHEDULE_URL ? window.RENDER_SCHEDULE_URL : SCHEDULE_API_URL;
+const SYNC_EVENT_URL = typeof window !== 'undefined' && window.SYNC_EVENT_URL ? window.SYNC_EVENT_URL : '';
 
 const DEFAULT_TYPES = {
   LOUANGE:      { label: 'Louange', color: '#C39BD3' },
@@ -936,17 +937,22 @@ async function syncFromOnline() {
 
   showToast('Synchronisation depuis la version en ligne...');
   try {
-    const r = await fetch(RENDER_SCHEDULE_URL, { cache: 'no-store' });
+    const r = await fetch(SYNC_EVENT_URL || RENDER_SCHEDULE_URL, {
+      method: SYNC_EVENT_URL ? 'POST' : 'GET',
+      cache: 'no-store'
+    });
     if (!r.ok) throw new Error(`Render a répondu ${r.status}`);
 
-    const onlineSchedule = await r.json();
+    const payload = await r.json();
+    const onlineSchedule = payload.schedule || payload;
     schedule = onlineSchedule;
     ensureScheduleShape();
     renderAll();
 
-    // La sauvegarde locale rend les données synchronisées disponibles pour l'export Word
-    // et les conserve si l'application est rechargée avant l'export.
-    await persistLocalSchedule();
+    if (!SYNC_EVENT_URL) {
+      // Compatibilité avec les anciennes pages qui synchronisent encore directement depuis Render.
+      await persistLocalSchedule();
+    }
     showToast('Planning synchronisé depuis la version en ligne');
   } catch (err) {
     console.error(err);
