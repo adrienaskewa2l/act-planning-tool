@@ -31,7 +31,7 @@ APP_SETTINGS_FILE = os.path.join(BASE_DIR, "app_settings.json")
 JS_FILE = os.path.join(BASE_DIR, "app.js")
 APP_TITLE = "Gestionnaire d'évènements - SOS Lyon"
 DEFAULT_EVENT_ID = "act-conference-2026"
-RENDER_BASE_URL = os.environ.get("RENDER_BASE_URL", "https://act-planning-tool.onrender.com").rstrip("/")
+RENDER_BASE_URL = os.environ.get("RENDER_BASE_URL", "https://sos-planning.onrender.com").rstrip("/")
 
 DEFAULT_SERVICE_TEAMS = [
     "Team Médias Capture",
@@ -642,6 +642,35 @@ def unique_event_id(base_id, existing_ids):
     return event_id
 
 
+def default_event_slug(event_id, name):
+    if event_id == DEFAULT_EVENT_ID:
+        return "act"
+    return slugify(name).split("-")[0]
+
+
+def unique_event_slug(base_slug, existing_slugs):
+    slug = base_slug or "event"
+    counter = 2
+    while slug in existing_slugs or slug in {"admin", "api", "app.js", "events"}:
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+    return slug
+
+
+def normalize_event_index(events):
+    normalized = []
+    used_slugs = set()
+    for event in events or []:
+        item = dict(event)
+        event_id = item.get("id", "")
+        name = item.get("name", "Événement")
+        base_slug = item.get("slug") or default_event_slug(event_id, name)
+        item["slug"] = unique_event_slug(slugify(base_slug), used_slugs)
+        used_slugs.add(item["slug"])
+        normalized.append(item)
+    return normalized
+
+
 def format_day_label(dt):
     return f"{FRENCH_WEEKDAYS[dt.weekday()]} {dt.day} {FRENCH_MONTHS[dt.month - 1]}"
 
@@ -704,11 +733,12 @@ def build_blank_schedule(name, start_date=None, day_count=1, location="", servic
     })
 
 
-def event_summary_from_schedule(event_id, schedule):
+def event_summary_from_schedule(event_id, schedule, slug=None):
     day_locations = unique_nonempty(day.get("location") for day in schedule.get("days", []))
     location = " / ".join(day_locations) if day_locations else schedule.get("lieu", "")
     return {
         "id": event_id,
+        "slug": slug or default_event_slug(event_id, schedule.get("event", "")),
         "name": schedule.get("event", "Événement"),
         "location": location,
         "date_label": schedule.get("conference_dates", "") or schedule.get("installation_dates", ""),
@@ -718,11 +748,12 @@ def event_summary_from_schedule(event_id, schedule):
 def load_events_index():
     ensure_event_storage()
     with open(EVENTS_INDEX_FILE, encoding="utf-8") as f:
-        events = json.load(f)
+        events = normalize_event_index(json.load(f))
     return sorted(events, key=lambda event: (event.get("date_label", ""), event.get("name", "")))
 
 
 def save_events_index(events):
+    events = normalize_event_index(events)
     os.makedirs(os.path.dirname(EVENTS_INDEX_FILE), exist_ok=True)
     with open(EVENTS_INDEX_FILE, "w", encoding="utf-8") as f:
         json.dump(events, f, ensure_ascii=False, indent=2)
@@ -733,7 +764,17 @@ def get_event_meta(event_id):
     return next((event for event in load_events_index() if event.get("id") == event_id), None)
 
 
+def get_event_meta_by_slug(slug):
+    return next((event for event in load_events_index() if event.get("slug") == slug), None)
+
+
+def resolve_event_id(value):
+    meta = get_event_meta(value) or get_event_meta_by_slug(value)
+    return meta.get("id") if meta else value
+
+
 def load_event_schedule(event_id):
+    event_id = resolve_event_id(event_id)
     path = event_file_path(event_id)
     if not os.path.exists(path):
         abort(404)
@@ -752,7 +793,8 @@ def save_event_schedule(event_id, data):
             json.dump(normalized, f, ensure_ascii=False, indent=2)
 
     events = load_events_index()
-    summary = event_summary_from_schedule(event_id, normalized)
+    existing_meta = get_event_meta(event_id)
+    summary = event_summary_from_schedule(event_id, normalized, slug=(existing_meta or {}).get("slug"))
     updated = False
     for idx, event in enumerate(events):
         if event.get("id") == event_id:
@@ -1872,19 +1914,21 @@ ensure_event_storage()
 # FLASK ROUTES
 # ─────────────────────────────────────────────────────────────────
 def render_event_page(event_id, read_only):
+    event_id = resolve_event_id(event_id)
     meta = get_event_meta(event_id)
     if not meta:
         abort(404)
     event_name = escape(meta["name"])
+    public_slug = meta.get("slug") or event_id
     html = HTML_TEMPLATE
     replacements = {
         "__PAGE_TITLE__": escape(f"{meta['name']} - {APP_TITLE}"),
         "__EVENT_NAME__": event_name,
         "__READ_ONLY__": "true" if read_only else "false",
-        "__SCHEDULE_API_URL__": f"/events/{event_id}/api/schedule",
-        "__DOCX_API_URL__": f"/events/{event_id}/api/generate-docx",
-        "__PDF_API_URL__": f"/events/{event_id}/api/generate-planning-pdf",
-        "__RENDER_SCHEDULE_URL__": f"{RENDER_BASE_URL}/events/{event_id}/api/schedule",
+        "__SCHEDULE_API_URL__": f"/{public_slug}/api/schedule",
+        "__DOCX_API_URL__": f"/{public_slug}/api/generate-docx",
+        "__PDF_API_URL__": f"/{public_slug}/api/generate-planning-pdf",
+        "__RENDER_SCHEDULE_URL__": f"{RENDER_BASE_URL}/{public_slug}/api/schedule",
         "__SERVICE_TEAMS__": json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False),
     }
     for key, value in replacements.items():
@@ -1896,6 +1940,7 @@ def render_home_page():
     cards = []
     for event in load_events_index():
         event_id = escape(event.get("id", ""))
+        event_slug = escape(event.get("slug", event.get("id", "")))
         event_name = escape(event.get("name", "Événement"))
         event_location = escape(event.get("location", ""))
         event_date = escape(event.get("date_label", ""))
@@ -1919,8 +1964,8 @@ def render_home_page():
             </div>
           </div>
           <div class="actions">
-            <button class="btn btn-link" onclick="window.location.href='/events/{event_id}'">Consultation</button>
-            <button class="btn btn-admin" onclick="window.location.href='/events/{event_id}/admin'">Gérer</button>
+            <button class="btn btn-link" onclick="window.location.href='/{event_slug}'">Consultation</button>
+            <button class="btn btn-admin" onclick="window.location.href='/{event_slug}/admin'">Gérer</button>
           </div>
         </article>
         """)
@@ -1935,7 +1980,25 @@ def index():
 
 @app.route("/admin")
 def admin():
-    return redirect(url_for("event_admin", event_id=DEFAULT_EVENT_ID))
+    return redirect("/act/admin")
+
+
+@app.route("/<event_slug>")
+def event_public_short(event_slug):
+    if event_slug in {"api", "events"}:
+        abort(404)
+    meta = get_event_meta_by_slug(event_slug)
+    if not meta:
+        abort(404)
+    return render_event_page(meta["id"], True)
+
+
+@app.route("/<event_slug>/admin")
+def event_admin_short(event_slug):
+    meta = get_event_meta_by_slug(event_slug)
+    if not meta:
+        abort(404)
+    return render_event_page(meta["id"], False)
 
 
 @app.route("/events/<event_id>")
@@ -1960,8 +2023,11 @@ def create_event():
         return jsonify({"error": "name_required"}), 400
 
     base_id = slugify(name)
-    existing_ids = {event.get("id") for event in load_events_index()}
+    indexed_events = load_events_index()
+    existing_ids = {event.get("id") for event in indexed_events}
+    existing_slugs = {event.get("slug") for event in indexed_events}
     event_id = unique_event_id(base_id, existing_ids)
+    event_slug = unique_event_slug(default_event_slug(event_id, name), existing_slugs)
 
     schedule = build_blank_schedule(
         name=name,
@@ -1973,6 +2039,12 @@ def create_event():
     )
     try:
         save_event_schedule(event_id, schedule)
+        events = load_events_index()
+        for event in events:
+            if event.get("id") == event_id:
+                event["slug"] = event_slug
+                break
+        save_events_index(events)
     except OSError as exc:
         return jsonify({
             "error": "write_failed",
@@ -1981,8 +2053,9 @@ def create_event():
     return jsonify({
         "status": "ok",
         "event_id": event_id,
-        "admin_url": f"/events/{event_id}/admin",
-        "public_url": f"/events/{event_id}",
+        "slug": event_slug,
+        "admin_url": f"/{event_slug}/admin",
+        "public_url": f"/{event_slug}",
     })
 
 
@@ -2000,40 +2073,54 @@ def save_settings_teams():
 
 @app.route("/api/events/<event_id>/rename", methods=["POST"])
 def rename_event(event_id):
+    event_id = resolve_event_id(event_id)
     payload = request.get_json() or {}
     name = (payload.get("name") or "").strip()
     if not name:
         return jsonify({"error": "name_required"}), 400
 
+    meta = get_event_meta(event_id) or {}
     schedule = load_event_schedule(event_id)
     schedule["event"] = name
     save_event_schedule(event_id, schedule)
     return jsonify({
         "status": "ok",
         "event_id": event_id,
-        "admin_url": f"/events/{event_id}/admin",
-        "public_url": f"/events/{event_id}",
+        "slug": meta.get("slug", event_id),
+        "admin_url": f"/{meta.get('slug', event_id)}/admin",
+        "public_url": f"/{meta.get('slug', event_id)}",
     })
 
 
 @app.route("/api/events/<event_id>/duplicate", methods=["POST"])
 def duplicate_event(event_id):
+    event_id = resolve_event_id(event_id)
     payload = request.get_json() or {}
     source = load_event_schedule(event_id)
     name = (payload.get("name") or "").strip() or f"Copie de {source.get('event', 'Événement')}"
-    new_id = unique_event_id(slugify(name), {event.get("id") for event in load_events_index()})
+    indexed_events = load_events_index()
+    new_id = unique_event_id(slugify(name), {event.get("id") for event in indexed_events})
+    new_slug = unique_event_slug(default_event_slug(new_id, name), {event.get("slug") for event in indexed_events})
     source["event"] = name
     save_event_schedule(new_id, source)
+    events = load_events_index()
+    for event in events:
+        if event.get("id") == new_id:
+            event["slug"] = new_slug
+            break
+    save_events_index(events)
     return jsonify({
         "status": "ok",
         "event_id": new_id,
-        "admin_url": f"/events/{new_id}/admin",
-        "public_url": f"/events/{new_id}",
+        "slug": new_slug,
+        "admin_url": f"/{new_slug}/admin",
+        "public_url": f"/{new_slug}",
     })
 
 
 @app.route("/api/events/<event_id>", methods=["DELETE"])
 def delete_event(event_id):
+    event_id = resolve_event_id(event_id)
     events = load_events_index()
     if not any(event.get("id") == event_id for event in events):
         return jsonify({"error": "not_found"}), 404
@@ -2051,10 +2138,28 @@ def get_schedule(event_id):
     return jsonify(load_event_schedule(event_id))
 
 
+@app.route("/<event_slug>/api/schedule", methods=["GET"])
+def get_schedule_short(event_slug):
+    meta = get_event_meta_by_slug(event_slug)
+    if not meta:
+        abort(404)
+    return jsonify(load_event_schedule(meta["id"]))
+
+
 @app.route("/events/<event_id>/api/schedule", methods=["POST"])
 def save_schedule(event_id):
     data = request.get_json()
-    save_event_schedule(event_id, data)
+    save_event_schedule(resolve_event_id(event_id), data)
+    return jsonify({"status": "ok"})
+
+
+@app.route("/<event_slug>/api/schedule", methods=["POST"])
+def save_schedule_short(event_slug):
+    meta = get_event_meta_by_slug(event_slug)
+    if not meta:
+        abort(404)
+    data = request.get_json()
+    save_event_schedule(meta["id"], data)
     return jsonify({"status": "ok"})
 
 
@@ -2072,6 +2177,12 @@ def generate_docx_route(event_id):
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
 
+
+@app.route("/<event_slug>/api/generate-docx", methods=["POST"])
+def generate_docx_short_route(event_slug):
+    return generate_docx_route(resolve_event_id(event_slug))
+
+
 @app.route("/events/<event_id>/api/generate-planning-pdf", methods=["POST"])
 def generate_planning_pdf_route(event_id):
     data = normalize_schedule(request.get_json())
@@ -2085,6 +2196,12 @@ def generate_planning_pdf_route(event_id):
         download_name=f"Planning_{event_name}.pdf",
         mimetype="application/pdf"
     )
+
+
+@app.route("/<event_slug>/api/generate-planning-pdf", methods=["POST"])
+def generate_planning_pdf_short_route(event_slug):
+    return generate_planning_pdf_route(resolve_event_id(event_slug))
+
 
 # ─────────────────────────────────────────────────────────────────
 # PLANNING PDF GENERATOR
