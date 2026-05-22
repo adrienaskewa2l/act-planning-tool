@@ -590,6 +590,7 @@ def normalize_schedule(data):
         day.setdefault("name", "")
         day.setdefault("date", "")
         day.setdefault("location", "")
+        day.setdefault("expected_people", "")
         day.setdefault("sessions", [])
         for session in day.get("sessions", []):
             session.setdefault("id", "")
@@ -685,7 +686,16 @@ def format_conference_dates(start_dt, day_count):
     return f"{format_day_label(start_dt).title()} - {format_day_label(end_dt).title()}"
 
 
-def build_blank_schedule(name, start_date=None, day_count=1, location="", service_teams=None, day_locations=None):
+def build_blank_schedule(
+    name,
+    start_date=None,
+    day_count=1,
+    location="",
+    service_teams=None,
+    day_locations=None,
+    attendance=None,
+    dresscode="",
+):
     day_count = max(1, min(int(day_count or 1), 10))
     if start_date:
         try:
@@ -696,16 +706,19 @@ def build_blank_schedule(name, start_date=None, day_count=1, location="", servic
         start_dt = datetime.now()
 
     day_locations = day_locations or []
+    attendance = attendance or {}
     days = []
     for idx in range(day_count):
         current = start_dt + timedelta(days=idx)
         day_id = f"jour{idx + 1}"
         day_location = str(day_locations[idx]).strip() if idx < len(day_locations) else ""
+        expected_people = str(attendance.get(day_id) or attendance.get(str(idx + 1)) or "").strip()
         days.append({
             "id": day_id,
             "name": format_day_label(current),
             "date": current.strftime("%Y-%m-%d"),
             "location": day_location,
+            "expected_people": expected_people,
             "sessions": [
                 {
                     "id": f"{day_id}_programme",
@@ -721,10 +734,10 @@ def build_blank_schedule(name, start_date=None, day_count=1, location="", servic
         "version": "1.0",
         "event": name,
         "lieu": location,
-        "dresscode": "",
+        "dresscode": dresscode or "",
         "installation_dates": "",
         "conference_dates": format_conference_dates(start_dt, day_count),
-        "attendance": {"vendredi": "", "samedi": "", "dimanche": ""},
+        "attendance": attendance,
         "types": {key: value.copy() for key, value in DEFAULT_SCHEDULE["types"].items()},
         "service_teams": unique_nonempty(
             service_teams if service_teams is not None else load_app_settings().get("service_teams") or []
@@ -1672,6 +1685,12 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .team-picker input { width: auto; }
   .day-locations { display: none; gap: 10px; margin-bottom: 12px; }
   .day-locations.show { display: grid; }
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+  .step-indicator { display: flex; gap: 6px; margin-bottom: 14px; }
+  .step-dot { height: 5px; flex: 1; border-radius: 99px; background: #d8e0e4; }
+  .step-dot.active { background: #0F4C3A; }
+  .create-modal-card { width: min(640px, 100%); }
   .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, .45); display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
   .modal-overlay.hidden { display: none; }
   .modal-card { width: min(560px, 100%); max-height: 88vh; overflow: auto; background: white; border-radius: 8px; border: 1px solid #dfe5e9; box-shadow: 0 22px 60px rgba(15, 23, 42, .24); padding: 18px; }
@@ -1705,8 +1724,26 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     <section class="layout">
       <aside class="panel">
         <h2>Créer un événement</h2>
+        <button class="btn btn-primary" type="button" onclick="openCreateModal()">Créer un événement</button>
+        <p class="helper">Chaque événement démarre avec un planning vide prêt à être rempli, tout en conservant les outils d'édition et d'export déjà existants.</p>
+      </aside>
+      <main class="cards">
+        __EVENT_CARDS__
+      </main>
+    </section>
+  </div>
+  <div class="modal-overlay hidden" id="create-modal">
+    <div class="modal-card create-modal-card">
+      <h2>Créer un événement</h2>
+      <div class="step-indicator">
+        <span class="step-dot active" data-step-dot="1"></span>
+        <span class="step-dot" data-step-dot="2"></span>
+        <span class="step-dot" data-step-dot="3"></span>
+      </div>
+
+      <div class="step-panel active" data-create-step="1">
         <div class="form-row">
-          <label>Nom</label>
+          <label>Nom de l'évènement</label>
           <input type="text" id="new-name" placeholder="Ex: Convention Jeunesse 2027">
         </div>
         <div class="form-row">
@@ -1714,7 +1751,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
           <input type="date" id="new-start-date">
         </div>
         <div class="form-row">
-          <label>Nombre de jours</label>
+          <label>Durée de l'évènement</label>
           <select id="new-day-count">
             <option value="1">1 jour</option>
             <option value="2">2 jours</option>
@@ -1723,11 +1760,10 @@ HOME_TEMPLATE = """<!DOCTYPE html>
             <option value="5">5 jours</option>
             <option value="6">6 jours</option>
             <option value="7">7 jours</option>
+            <option value="8">8 jours</option>
+            <option value="9">9 jours</option>
+            <option value="10">10 jours</option>
           </select>
-        </div>
-        <div class="form-row">
-          <label>Lieu</label>
-          <input type="text" id="new-location" placeholder="Ex: Espace 140, Rillieux-la-Pape">
         </div>
         <div class="form-row">
           <label class="checkbox-row">
@@ -1735,18 +1771,45 @@ HOME_TEMPLATE = """<!DOCTYPE html>
             Lieux différents en fonction des jours
           </label>
         </div>
-        <div class="day-locations" id="new-day-locations"></div>
+        <div class="day-locations show" id="new-day-locations"></div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeCreateModal()">Annuler</button>
+          <button class="btn btn-admin" onclick="goCreateStep(2)">Continuer</button>
+        </div>
+      </div>
+
+      <div class="step-panel" data-create-step="2">
+        <div class="form-row">
+          <label>Nombre de personnes attendues</label>
+        </div>
+        <div class="day-locations show" id="new-attendance-fields"></div>
+        <div class="form-row">
+          <label class="checkbox-row">
+            <input type="checkbox" id="new-dresscode-enabled" onchange="renderDressCodeField()">
+            Dress code Dream Team
+          </label>
+        </div>
+        <div class="form-row" id="new-dresscode-row" style="display:none">
+          <label>Dress code</label>
+          <input type="text" id="new-dresscode" placeholder="Ex: Bracelet bleu pour la Dream Team">
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeCreateModal()">Annuler</button>
+          <button class="btn btn-admin" onclick="goCreateStep(3)">Continuer</button>
+        </div>
+      </div>
+
+      <div class="step-panel" data-create-step="3">
         <div class="form-row">
           <label>Équipes nécessaires</label>
           <div class="team-picker" id="new-team-picker"></div>
         </div>
-        <button class="btn btn-primary" type="button" id="btn-create-event">Créer et ouvrir</button>
-        <p class="helper">Chaque événement démarre avec un planning vide prêt à être rempli, tout en conservant les outils d'édition et d'export déjà existants.</p>
-      </aside>
-      <main class="cards">
-        __EVENT_CARDS__
-      </main>
-    </section>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeCreateModal()">Annuler</button>
+          <button class="btn btn-admin" id="btn-create-event" type="button">Créer l'évènement</button>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="modal-overlay hidden" id="settings-modal">
     <div class="modal-card">
@@ -1762,6 +1825,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   <div class="toast" id="toast"></div>
   <script>
     let globalTeams = __SERVICE_TEAMS_JSON__;
+    let createStep = 1;
 
     function escHtml(str) {
       return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1777,6 +1841,46 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       `).join('');
     }
 
+    function openCreateModal() {
+      createStep = 1;
+      renderCreateStep();
+      renderDayLocationFields();
+      renderAttendanceFields();
+      renderDressCodeField();
+      renderCreateTeams();
+      document.getElementById('create-modal').classList.remove('hidden');
+      document.getElementById('new-name').focus();
+    }
+
+    function closeCreateModal() {
+      document.getElementById('create-modal').classList.add('hidden');
+    }
+
+    function renderCreateStep() {
+      document.querySelectorAll('[data-create-step]').forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.createStep === String(createStep));
+      });
+      document.querySelectorAll('[data-step-dot]').forEach(dot => {
+        dot.classList.toggle('active', Number(dot.dataset.stepDot) <= createStep);
+      });
+    }
+
+    function validateCreateStep(step) {
+      if (step === 1 && !document.getElementById('new-name').value.trim()) {
+        showToast('Donne un nom à l\\'événement');
+        return false;
+      }
+      return true;
+    }
+
+    function goCreateStep(step) {
+      if (step > createStep && !validateCreateStep(createStep)) return;
+      createStep = step;
+      if (createStep === 2) renderAttendanceFields();
+      if (createStep === 3) renderCreateTeams();
+      renderCreateStep();
+    }
+
     function selectedCreateTeams() {
       return Array.from(document.querySelectorAll('#new-team-picker input:checked'))
         .map(input => input.value)
@@ -1787,42 +1891,69 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       const container = document.getElementById('new-day-locations');
       const enabled = document.getElementById('new-different-locations').checked;
       const count = parseInt(document.getElementById('new-day-count').value, 10) || 1;
-      container.classList.toggle('show', enabled);
-      if (!enabled) {
-        container.innerHTML = '';
-        return;
-      }
       const existing = {};
       container.querySelectorAll('input[data-day-index]').forEach(input => {
         existing[input.dataset.dayIndex] = input.value;
       });
       container.innerHTML = Array.from({length: count}, (_, idx) => `
         <div class="form-row" style="margin:0">
-          <label>Lieu jour ${idx + 1}</label>
+          <label>${enabled ? `Lieu jour ${idx + 1}` : 'Lieu'}</label>
           <input type="text" data-day-index="${idx}" value="${escHtml(existing[idx] || '')}" placeholder="Lieu du jour ${idx + 1}">
         </div>
       `).join('');
     }
 
     function createDayLocationsPayload() {
-      if (!document.getElementById('new-different-locations').checked) return [];
-      return Array.from(document.querySelectorAll('#new-day-locations input[data-day-index]'))
+      const values = Array.from(document.querySelectorAll('#new-day-locations input[data-day-index]'))
         .map(input => input.value.trim());
+      if (document.getElementById('new-different-locations').checked) return values;
+      const first = values[0] || '';
+      const count = parseInt(document.getElementById('new-day-count').value, 10) || 1;
+      return Array.from({length: count}, () => first);
+    }
+
+    function renderAttendanceFields() {
+      const container = document.getElementById('new-attendance-fields');
+      const count = parseInt(document.getElementById('new-day-count').value, 10) || 1;
+      const existing = {};
+      container.querySelectorAll('input[data-attendance-index]').forEach(input => {
+        existing[input.dataset.attendanceIndex] = input.value;
+      });
+      container.innerHTML = Array.from({length: count}, (_, idx) => `
+        <div class="form-row" style="margin:0">
+          <label>Personnes attendues jour ${idx + 1}</label>
+          <input type="text" data-attendance-index="${idx}" value="${escHtml(existing[idx] || '')}" placeholder="Ex: 400">
+        </div>
+      `).join('');
+    }
+
+    function createAttendancePayload() {
+      const attendance = {};
+      document.querySelectorAll('#new-attendance-fields input[data-attendance-index]').forEach((input, idx) => {
+        attendance[`jour${idx + 1}`] = input.value.trim();
+      });
+      return attendance;
+    }
+
+    function renderDressCodeField() {
+      const enabled = document.getElementById('new-dresscode-enabled').checked;
+      document.getElementById('new-dresscode-row').style.display = enabled ? 'block' : 'none';
     }
 
     async function createEvent() {
+      if (!validateCreateStep(1)) return;
       const payload = {
         name: document.getElementById('new-name').value.trim(),
         start_date: document.getElementById('new-start-date').value,
         day_count: document.getElementById('new-day-count').value,
-        location: document.getElementById('new-location').value.trim(),
+        location: createDayLocationsPayload()[0] || '',
         service_teams: selectedCreateTeams(),
-        day_locations: createDayLocationsPayload()
+        day_locations: createDayLocationsPayload(),
+        attendance: createAttendancePayload(),
+        dresscode: document.getElementById('new-dresscode-enabled').checked
+          ? document.getElementById('new-dresscode').value.trim()
+          : ''
       };
-      if (!payload.name) {
-        showToast('Donne un nom à l\\'événement');
-        return;
-      }
       let r;
       try {
         r = await fetch('/api/events', {
@@ -2000,7 +2131,10 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     });
 
     document.getElementById('btn-create-event').addEventListener('click', createEvent);
-    document.getElementById('new-day-count').addEventListener('change', renderDayLocationFields);
+    document.getElementById('new-day-count').addEventListener('change', () => {
+      renderDayLocationFields();
+      renderAttendanceFields();
+    });
     renderCreateTeams();
 
     function showToast(message) {
@@ -2143,6 +2277,8 @@ def create_event():
         location=payload.get("location") or "",
         service_teams=payload.get("service_teams") or [],
         day_locations=payload.get("day_locations") or [],
+        attendance=payload.get("attendance") or {},
+        dresscode=payload.get("dresscode") or "",
     )
     try:
         save_event_schedule(event_id, schedule)
