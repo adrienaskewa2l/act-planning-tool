@@ -30,6 +30,51 @@
               "time": "16:00",
               "title": "Installation",
               "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#fad7a0",
+              "details": "Repas pour environ 15 personnes\nVérifier si salle du bas de St Joseph bien disponible",
+              "duration": 90,
+              "id": "e_jtpm8zj",
+              "teams": [
+                "Team Hospitalité"
+              ],
+              "time": "18:30",
+              "title": "Repas",
+              "type": "REPAS"
+            },
+            {
+              "color": "#c39bd3",
+              "details": "",
+              "duration": 150,
+              "id": "e_ojk63r1",
+              "teams": [
+                "Team Son",
+                "Team Louange",
+                "Team Médias Projection",
+                "Team Médias Capture",
+                "Team Sécurité",
+                "Team Parking",
+                "Team Communication RS"
+              ],
+              "time": "20:00",
+              "title": "Soirée louange : Résistance x Tim Hughes",
+              "type": "LOUANGE"
+            },
+            {
+              "color": "#d6eaf8",
+              "details": "",
+              "duration": 30,
+              "id": "e_b10e5po",
+              "teams": [
+                "Team Snacking",
+                "Team Librairie",
+                "Team Accueil",
+                "Team Parking"
+              ],
+              "time": "22:30",
+              "title": "Stands buvette et librairie/merch ouverts",
+              "type": "INTERCESSION"
             }
           ],
           "id": "jour1_programme",
@@ -47,7 +92,50 @@
       "sessions": [
         {
           "end_time": "",
-          "events": [],
+          "events": [
+            {
+              "color": "#d6eaf8",
+              "details": "Accueil participants par la team Accueil, scan des billets obligatoires + possibilité d'acheter des billets sur place",
+              "duration": 30,
+              "id": "e_5vw7edp",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "08:30",
+              "title": "Accueil participants",
+              "type": "INTERCESSION"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 180,
+              "id": "e_kce3d1p",
+              "teams": [],
+              "time": "09:00",
+              "title": "Journée formation",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#fad7a0",
+              "details": "",
+              "duration": 90,
+              "id": "e_vab7axb",
+              "teams": [],
+              "time": "12:00",
+              "title": "Repas",
+              "type": "REPAS"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 210,
+              "id": "e_998v679",
+              "teams": [],
+              "time": "13:30",
+              "title": "Journée formation",
+              "type": "ANNONCES"
+            }
+          ],
           "id": "jour2_programme",
           "name": "Programme",
           "start_time": ""
@@ -78,8 +166,8 @@
   ],
   "types": {
     "ANNONCES": {
-      "color": "#A9DFBF",
-      "label": "Annonces"
+      "color": "#a9dfbf",
+      "label": "Formation"
     },
     "BOOST": {
       "color": "#F1948A",
@@ -90,8 +178,8 @@
       "label": "Levée de fonds"
     },
     "INTERCESSION": {
-      "color": "#D6EAF8",
-      "label": "Intercession"
+      "color": "#d6eaf8",
+      "label": "Accueil"
     },
     "LOGISTIQUE": {
       "color": "#AED6F1",
