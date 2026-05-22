@@ -5,5 +5,12 @@
     "name": "ACT Conférence 2026",
     "location": "Espace 140, Rillieux la Pape",
     "date_label": "Vendredi 15 – Dimanche 17 mai 2026"
+  },
+  {
+    "id": "abc",
+    "slug": "abc",
+    "name": "ABC",
+    "location": "Lieu 1 / Lieu 2",
+    "date_label": "Vendredi 26 - Samedi 27 Juin"
   }
 ]
