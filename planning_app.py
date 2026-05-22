@@ -1896,15 +1896,16 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     function renderDayLocationFields() {
       const container = document.getElementById('new-day-locations');
       const enabled = document.getElementById('new-different-locations').checked;
-      const count = parseInt(document.getElementById('new-day-count').value, 10) || 1;
+      const dayCount = parseInt(document.getElementById('new-day-count').value, 10) || 1;
+      const fieldCount = enabled && dayCount > 1 ? dayCount : 1;
       const existing = {};
       container.querySelectorAll('input[data-day-index]').forEach(input => {
         existing[input.dataset.dayIndex] = input.value;
       });
-      container.innerHTML = Array.from({length: count}, (_, idx) => `
+      container.innerHTML = Array.from({length: fieldCount}, (_, idx) => `
         <div class="form-row" style="margin:0">
-          <label>${enabled ? `Lieu jour ${idx + 1}` : 'Lieu'}</label>
-          <input type="text" data-day-index="${idx}" value="${escHtml(existing[idx] || '')}" placeholder="Lieu du jour ${idx + 1}">
+          <label>${fieldCount > 1 ? `Lieu jour ${idx + 1}` : 'Lieu'}</label>
+          <input type="text" data-day-index="${idx}" value="${escHtml(existing[idx] || '')}" placeholder="${fieldCount > 1 ? `Lieu du jour ${idx + 1}` : 'Lieu'}">
         </div>
       `).join('');
     }
