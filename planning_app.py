@@ -6,7 +6,7 @@ Lancez:  python3 planning_app.py
 Puis ouvrez: http://localhost:5001
 """
 
-import os, json, io, re, shutil, unicodedata
+import os, json, io, re, shutil, unicodedata, urllib.request
 from datetime import datetime, timedelta
 from html import escape
 from flask import Flask, jsonify, request, send_file, Response, redirect, url_for, abort
@@ -807,6 +807,84 @@ def save_event_schedule(event_id, data):
     return normalized
 
 
+def write_event_schedule_for_import(event_id, data, slug=None):
+    normalized = normalize_schedule(data)
+    os.makedirs(EVENTS_DIR, exist_ok=True)
+    with open(event_file_path(event_id), "w", encoding="utf-8") as f:
+        json.dump(normalized, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
+    if event_id == DEFAULT_EVENT_ID:
+        with open(LEGACY_DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(normalized, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+
+    return event_summary_from_schedule(event_id, normalized, slug=slug)
+
+
+def merge_imported_events(imported_events):
+    by_id = {event.get("id"): event for event in load_events_index()}
+    for event in imported_events:
+        if event.get("id"):
+            by_id[event["id"]] = event
+    save_events_index(list(by_id.values()))
+
+
+def fetch_url_text(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "SOS-Planning-Sync/1.0"})
+    with urllib.request.urlopen(req, timeout=30) as response:
+        return response.read().decode("utf-8")
+
+
+def fetch_url_json(url):
+    return json.loads(fetch_url_text(url))
+
+
+def fetch_online_events_payload(base_url):
+    base_url = base_url.rstrip("/")
+    try:
+        return fetch_url_json(f"{base_url}/api/events/export")
+    except Exception:
+        home_html = fetch_url_text(f"{base_url}/")
+        event_ids = unique_nonempty(re.findall(r'data-event-id="([^"]+)"', home_html))
+        schedules = {}
+        events = []
+        for event_id in event_ids:
+            schedule = fetch_url_json(f"{base_url}/events/{event_id}/api/schedule")
+            schedules[event_id] = schedule
+            events.append(event_summary_from_schedule(event_id, schedule))
+        return {"events": events, "schedules": schedules}
+
+
+def import_events_payload(payload):
+    events = normalize_event_index(payload.get("events") or [])
+    schedules = payload.get("schedules") or {}
+    imported_events = []
+    imported_ids = []
+
+    for event in events:
+        event_id = event.get("id")
+        if not event_id or event_id not in schedules:
+            continue
+        imported_events.append(
+            write_event_schedule_for_import(
+                event_id,
+                schedules[event_id],
+                slug=event.get("slug"),
+            )
+        )
+        imported_ids.append(event_id)
+
+    if imported_events:
+        merge_imported_events(imported_events)
+
+    settings = payload.get("settings")
+    if settings and settings.get("service_teams"):
+        save_app_settings(settings)
+
+    return imported_ids
+
+
 def ensure_event_storage():
     os.makedirs(EVENTS_DIR, exist_ok=True)
 
@@ -1556,6 +1634,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .hero { margin-bottom: 26px; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
   .hero h1 { font-size: 30px; color: #0F4C3A; margin-bottom: 6px; }
   .hero p { font-size: 15px; color: #5b6772; line-height: 1.5; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
   .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
   .panel { background: white; border: 1px solid #e3e7ea; border-radius: 8px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05); padding: 18px; }
   .panel h2 { font-size: 18px; color: #0F4C3A; margin-bottom: 12px; }
@@ -1567,6 +1646,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .btn { border: none; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 700; padding: 10px 14px; }
   .btn-primary { background: #0F4C3A; color: white; width: 100%; }
   .btn-secondary { background: white; color: #0F4C3A; border: 1px solid #cfd9d5; }
+  .btn-sync-home { background: #F9E79F; color: #174032; border: 1px solid #f0d96d; }
   .btn-link { background: #eef4f2; color: #0F4C3A; }
   .btn-admin { background: #0F4C3A; color: white; }
   .btn-menu { width: 36px; height: 36px; padding: 0; background: #f3f5f7; color: #44515c; font-size: 20px; line-height: 1; }
@@ -1617,7 +1697,10 @@ HOME_TEMPLATE = """<!DOCTYPE html>
         <h1>Gestionnaire d'évènements - SOS Lyon</h1>
         <p>Crée, consulte et pilote plusieurs événements depuis un même outil. Chaque événement ouvre son propre planning interactif, ses exports et sa synchronisation.</p>
       </div>
-      <button class="btn btn-secondary" onclick="openSettings()">Paramètres</button>
+      <div class="hero-actions">
+        <button class="btn btn-sync-home" onclick="syncEventsFromOnline()">Synchroniser depuis la version en ligne</button>
+        <button class="btn btn-secondary" onclick="openSettings()">Paramètres</button>
+      </div>
     </section>
     <section class="layout">
       <aside class="panel">
@@ -1763,6 +1846,30 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       }
       const created = await r.json();
       window.location.href = created.admin_url;
+    }
+
+    async function syncEventsFromOnline() {
+      if (!confirm('Synchroniser les événements depuis la version en ligne ? Les événements en ligne seront importés ou mis à jour en local.')) return;
+      let r;
+      try {
+        r = await fetch('/api/sync/from-online', { method: 'POST' });
+      } catch (err) {
+        console.error(err);
+        showToast('Impossible de contacter le serveur local');
+        return;
+      }
+      if (!r.ok) {
+        let message = 'Erreur de synchronisation';
+        try {
+          const error = await r.json();
+          if (error && error.message) message = error.message;
+        } catch (err) {}
+        showToast(message);
+        return;
+      }
+      const result = await r.json();
+      showToast(`${result.imported_count || 0} événement(s) synchronisé(s)`);
+      window.setTimeout(() => window.location.reload(), 700);
     }
 
     async function renameEventFromHome(event, button) {
@@ -2056,6 +2163,41 @@ def create_event():
         "slug": event_slug,
         "admin_url": f"/{event_slug}/admin",
         "public_url": f"/{event_slug}",
+    })
+
+
+@app.route("/api/events/export", methods=["GET"])
+def export_events():
+    events = load_events_index()
+    schedules = {}
+    for event in events:
+        event_id = event.get("id")
+        if event_id:
+            schedules[event_id] = load_event_schedule(event_id)
+    return jsonify({
+        "events": events,
+        "schedules": schedules,
+        "settings": load_app_settings(),
+    })
+
+
+@app.route("/api/sync/from-online", methods=["POST"])
+def sync_from_online_events():
+    payload = request.get_json(silent=True) or {}
+    base_url = (payload.get("base_url") or RENDER_BASE_URL).rstrip("/")
+    try:
+        online_payload = fetch_online_events_payload(base_url)
+        imported_ids = import_events_payload(online_payload)
+    except Exception as exc:
+        return jsonify({
+            "error": "sync_failed",
+            "message": f"Impossible de synchroniser depuis {base_url} : {exc}",
+        }), 500
+    return jsonify({
+        "status": "ok",
+        "source": base_url,
+        "imported_ids": imported_ids,
+        "imported_count": len(imported_ids),
     })
 
 

@@ -9,6 +9,7 @@
     {
       "date": "2026-05-14",
       "id": "jeudi",
+      "location": "",
       "name": "JEUDI 14 MAI",
       "sessions": [
         {
@@ -155,6 +156,7 @@
     {
       "date": "2026-05-15",
       "id": "vendredi",
+      "location": "",
       "name": "VENDREDI 15 MAI",
       "sessions": [
         {
@@ -732,6 +734,7 @@
     {
       "date": "2026-05-16",
       "id": "samedi",
+      "location": "",
       "name": "SAMEDI 16 MAI",
       "sessions": [
         {
@@ -1483,6 +1486,7 @@
     {
       "date": "2026-05-17",
       "id": "dimanche",
+      "location": "",
       "name": "DIMANCHE 17 MAI",
       "sessions": [
         {
@@ -1801,6 +1805,7 @@
   "event": "ACT Conférence 2026",
   "installation_dates": "Jeudi 14 mai 2026",
   "lieu": "Espace 140, Rillieux la Pape",
+  "service_teams": [],
   "types": {
     "ANNONCES": {
       "color": "#caf0fe",
