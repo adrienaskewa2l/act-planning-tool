@@ -21,15 +21,28 @@
             {
               "color": "#aed6f1",
               "details": "Installation du matériel son et balances",
-              "duration": 150,
+              "duration": 120,
               "id": "e_ifh9w2b",
               "teams": [
                 "Team Logistique",
                 "Team Louange"
               ],
-              "time": "16:00",
+              "time": "14:00",
               "title": "Installation",
               "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 150,
+              "id": "e_7jk6jie",
+              "teams": [
+                "Team Son",
+                "Team Louange"
+              ],
+              "time": "16:00",
+              "title": "Balances et répétitions",
+              "type": "ANNONCES"
             },
             {
               "color": "#fad7a0",
@@ -44,9 +57,67 @@
               "type": "REPAS"
             },
             {
+              "color": "#fad7a0",
+              "details": "",
+              "duration": 30,
+              "id": "e_czsgw2r",
+              "teams": [
+                "Team Snacking"
+              ],
+              "time": "19:00",
+              "title": "Installation Snacking",
+              "type": "REPAS"
+            },
+            {
+              "color": "#fad7a0",
+              "details": "",
+              "duration": 15,
+              "id": "e_bw74kwf",
+              "teams": [
+                "Team Snacking"
+              ],
+              "time": "19:30",
+              "title": "Stand snacking ouvert",
+              "type": "REPAS"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 15,
+              "id": "e_khwrnbq",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "19:45",
+              "title": "Ouverture des portes",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 15,
+              "id": "e_e3ba81c",
+              "teams": [],
+              "time": "19:45",
+              "title": "Stand Ecole Biblique",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 15,
+              "id": "e_glj1w45",
+              "teams": [
+                "Team Librairie"
+              ],
+              "time": "19:45",
+              "title": "Stand librairie",
+              "type": "ANNONCES"
+            },
+            {
               "color": "#c39bd3",
               "details": "",
-              "duration": 150,
+              "duration": 120,
               "id": "e_ojk63r1",
               "teams": [
                 "Team Son",
@@ -72,8 +143,8 @@
                 "Team Accueil",
                 "Team Parking"
               ],
-              "time": "22:30",
-              "title": "Stands buvette et librairie/merch ouverts",
+              "time": "22:00",
+              "title": "Stands buvette et librairie/EB ouverts",
               "type": "INTERCESSION"
             }
           ],
