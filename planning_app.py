@@ -667,6 +667,7 @@ def normalize_event_index(events):
         name = item.get("name", "Événement")
         base_slug = item.get("slug") or default_event_slug(event_id, name)
         item["slug"] = unique_event_slug(slugify(base_slug), used_slugs)
+        item["archived"] = bool(item.get("archived", False))
         used_slugs.add(item["slug"])
         normalized.append(item)
     return normalized
@@ -1659,6 +1660,9 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .panel { background: white; border: 1px solid #e3e7ea; border-radius: 8px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05); padding: 18px; }
   .panel h2 { font-size: 18px; color: #0F4C3A; margin-bottom: 12px; }
   .panel p { font-size: 13px; color: #5f6b75; line-height: 1.45; }
+  .side-stack { display: grid; gap: 12px; }
+  .past-link { display: flex; justify-content: space-between; align-items: center; gap: 10px; text-decoration: none; color: #0F4C3A; font-weight: 800; }
+  .past-count { min-width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #eef4f2; color: #0F4C3A; font-size: 12px; }
   .form-row { margin-bottom: 12px; }
   .form-row label { display: block; font-size: 11px; font-weight: 700; color: #66727c; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px; }
   .form-row input, .form-row select { width: 100%; padding: 9px 10px; border: 1px solid #d2d9de; border-radius: 7px; font-size: 14px; }
@@ -1729,10 +1733,18 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       </div>
     </section>
     <section class="layout">
-      <aside class="panel">
-        <h2>Créer un événement</h2>
-        <button class="btn btn-primary" type="button" onclick="openCreateModal()">Créer un événement</button>
-        <p class="helper">Chaque événement démarre avec un planning vide prêt à être rempli, tout en conservant les outils d'édition et d'export déjà existants.</p>
+      <aside class="side-stack">
+        <div class="panel">
+          <h2>Créer un événement</h2>
+          <button class="btn btn-primary" type="button" onclick="openCreateModal()">Créer un événement</button>
+          <p class="helper">Chaque événement démarre avec un planning vide prêt à être rempli, tout en conservant les outils d'édition et d'export déjà existants.</p>
+        </div>
+        <div class="panel">
+          <a class="past-link" href="/past-events">
+            <span>Évènements passés</span>
+            <span class="past-count">__ARCHIVED_COUNT__</span>
+          </a>
+        </div>
       </aside>
       <main class="cards">
         __EVENT_CARDS__
@@ -2055,6 +2067,28 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       window.location.href = created.admin_url;
     }
 
+    async function archiveEventFromHome(event, button, archived) {
+      event.stopPropagation();
+      const eventId = button.dataset.eventId;
+      const eventName = button.dataset.eventName || 'cet événement';
+      button.closest('.card-menu').classList.remove('open');
+
+      const action = archived ? 'archiver' : 'désarchiver';
+      if (!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} "${eventName}" ?`)) return;
+
+      const r = await fetch(`/api/events/${encodeURIComponent(eventId)}/archive`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({archived})
+      });
+      if (!r.ok) {
+        showToast(`Impossible de ${action} l'événement`);
+        return;
+      }
+      showToast(archived ? 'Événement archivé' : 'Événement désarchivé');
+      window.location.reload();
+    }
+
     function openSettings() {
       renderSettingsTeams();
       document.getElementById('settings-modal').classList.remove('hidden');
@@ -2186,9 +2220,13 @@ def render_event_page(event_id, read_only):
     return Response(html, mimetype="text/html; charset=utf-8")
 
 
-def render_home_page():
+def render_event_cards(events, archived_view=False):
     cards = []
-    for event in load_events_index():
+    archive_label = "Désarchiver l'évènement" if archived_view else "Archiver l'évènement"
+    archive_value = "false" if archived_view else "true"
+    empty_label = "Aucun événement archivé pour l'instant." if archived_view else "Aucun événement pour l'instant."
+
+    for event in events:
         event_id = escape(event.get("id", ""))
         event_slug = escape(event.get("slug", event.get("id", "")))
         event_name = escape(event.get("name", "Événement"))
@@ -2209,6 +2247,7 @@ def render_home_page():
               <div class="menu-popover">
                 <button data-event-id="{event_id}" data-event-name="{event_name}" onclick="renameEventFromHome(event, this)">Renommer l'évènement</button>
                 <button data-event-id="{event_id}" data-event-name="{event_name}" onclick="duplicateEventFromHome(event, this)">Dupliquer l'évènement</button>
+                <button data-event-id="{event_id}" data-event-name="{event_name}" onclick="archiveEventFromHome(event, this, {archive_value})">{archive_label}</button>
                 <button class="menu-danger" data-event-id="{event_id}" data-event-name="{event_name}" onclick="deleteEventFromHome(event, this)">Supprimer l'évènement</button>
               </div>
             </div>
@@ -2219,7 +2258,33 @@ def render_home_page():
           </div>
         </article>
         """)
-    html = HOME_TEMPLATE.replace("__EVENT_CARDS__", "".join(cards) or "<div class='panel'><p>Aucun événement pour l'instant.</p></div>")
+    return "".join(cards) or f"<div class='panel'><p>{empty_label}</p></div>"
+
+
+def render_home_page():
+    events = load_events_index()
+    active_events = [event for event in events if not event.get("archived")]
+    archived_count = sum(1 for event in events if event.get("archived"))
+    html = HOME_TEMPLATE.replace("__EVENT_CARDS__", render_event_cards(active_events))
+    html = html.replace("__ARCHIVED_COUNT__", str(archived_count))
+    html = html.replace("__SERVICE_TEAMS_JSON__", json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False))
+    return Response(html, mimetype="text/html; charset=utf-8")
+
+
+def render_past_events_page():
+    events = load_events_index()
+    archived_events = [event for event in events if event.get("archived")]
+    html = HOME_TEMPLATE.replace("__EVENT_CARDS__", render_event_cards(archived_events, archived_view=True))
+    html = html.replace("__ARCHIVED_COUNT__", str(len(archived_events)))
+    html = html.replace("Gestionnaire d'évènements - SOS Lyon</h1>", "Évènements passés - SOS Lyon</h1>")
+    html = html.replace(
+        "Crée, consulte et pilote plusieurs événements depuis un même outil. Chaque événement ouvre son propre planning interactif, ses exports et sa synchronisation.",
+        "Consulte les événements archivés et renvoie-les vers l'accueil si besoin."
+    )
+    html = html.replace(
+        '<button class="btn btn-sync-home" onclick="syncEventsFromOnline()">Synchroniser depuis la version en ligne</button>',
+        "<button class=\"btn btn-secondary\" onclick=\"window.location.href='/'\">Retour à l'accueil</button>"
+    )
     html = html.replace("__SERVICE_TEAMS_JSON__", json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False))
     return Response(html, mimetype="text/html; charset=utf-8")
 
@@ -2228,6 +2293,11 @@ def render_home_page():
 def index():
     return render_home_page()
 
+
+@app.route("/past-events")
+def past_events():
+    return render_past_events_page()
+
 @app.route("/admin")
 def admin():
     return redirect("/act/admin")
@@ -2235,7 +2305,7 @@ def admin():
 
 @app.route("/<event_slug>")
 def event_public_short(event_slug):
-    if event_slug in {"api", "events"}:
+    if event_slug in {"api", "events", "past-events"}:
         abort(404)
     meta = get_event_meta_by_slug(event_slug)
     if not meta:
@@ -2430,6 +2500,28 @@ def duplicate_event(event_id):
         "slug": new_slug,
         "admin_url": f"/{new_slug}/admin",
         "public_url": f"/{new_slug}",
+    })
+
+
+@app.route("/api/events/<event_id>/archive", methods=["POST"])
+def archive_event(event_id):
+    event_id = resolve_event_id(event_id)
+    payload = request.get_json() or {}
+    archived = bool(payload.get("archived", True))
+    events = load_events_index()
+    updated = False
+    for event in events:
+        if event.get("id") == event_id:
+            event["archived"] = archived
+            updated = True
+            break
+    if not updated:
+        return jsonify({"error": "not_found"}), 404
+    save_events_index(events)
+    return jsonify({
+        "status": "ok",
+        "event_id": event_id,
+        "archived": archived,
     })
 
 
