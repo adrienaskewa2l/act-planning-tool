@@ -904,6 +904,8 @@ def save_event_schedule(event_id, data):
     events = load_events_index()
     existing_meta = get_event_meta(event_id)
     summary = event_summary_from_schedule(event_id, normalized, slug=(existing_meta or {}).get("slug"))
+    if existing_meta:
+        summary["archived"] = bool(existing_meta.get("archived", False))
     updated = False
     for idx, event in enumerate(events):
         if event.get("id") == event_id:
@@ -916,7 +918,8 @@ def save_event_schedule(event_id, data):
     return normalized
 
 
-def write_event_schedule_for_import(event_id, data, slug=None):
+def write_event_schedule_for_import(event_id, data, meta=None):
+    meta = meta or {}
     normalized = normalize_schedule(data)
     os.makedirs(EVENTS_DIR, exist_ok=True)
     with open(event_file_path(event_id), "w", encoding="utf-8") as f:
@@ -928,7 +931,9 @@ def write_event_schedule_for_import(event_id, data, slug=None):
             json.dump(normalized, f, ensure_ascii=False, indent=2)
             f.write("\n")
 
-    return event_summary_from_schedule(event_id, normalized, slug=slug)
+    summary = event_summary_from_schedule(event_id, normalized, slug=meta.get("slug"))
+    summary["archived"] = bool(meta.get("archived", False))
+    return summary
 
 
 def delete_event_file(event_id):
@@ -978,7 +983,7 @@ def import_events_payload(payload):
             write_event_schedule_for_import(
                 event_id,
                 schedules[event_id],
-                slug=event.get("slug"),
+                meta=event,
             )
         )
         imported_ids.append(event_id)
