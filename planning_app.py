@@ -590,6 +590,7 @@ def normalize_schedule(data):
             "event_date": str(reminder.get("event_date") or ""),
             "note": str(reminder.get("note") or ""),
             "created_at": str(reminder.get("created_at") or ""),
+            "read_at": str(reminder.get("read_at") or ""),
         })
     schedule["reminders"] = normalized_reminders
 
@@ -765,12 +766,14 @@ def build_blank_schedule(
 def event_summary_from_schedule(event_id, schedule, slug=None):
     day_locations = unique_nonempty(day.get("location") for day in schedule.get("days", []))
     location = " / ".join(day_locations) if day_locations else schedule.get("lieu", "")
+    first_day = next((day for day in schedule.get("days", []) if day.get("date")), {})
     return {
         "id": event_id,
         "slug": slug or default_event_slug(event_id, schedule.get("event", "")),
         "name": schedule.get("event", "Événement"),
         "location": location,
         "date_label": schedule.get("conference_dates", "") or schedule.get("installation_dates", ""),
+        "start_date": first_day.get("date", ""),
     }
 
 
@@ -804,8 +807,13 @@ def collect_due_reminders():
                 "remind_date": reminder.get("remind_date", ""),
                 "event_date": reminder.get("event_date", ""),
                 "note": reminder.get("note", ""),
+                "read_at": reminder.get("read_at", ""),
             })
     return sorted(reminders, key=lambda item: (item.get("remind_date", ""), item.get("event_name", "")))
+
+
+def unread_reminders(reminders):
+    return [reminder for reminder in reminders if not reminder.get("read_at")]
 
 
 def format_french_date_label(value):
@@ -1451,7 +1459,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <h1>Gestionnaire d'évènements - SOS Lyon<small>__EVENT_NAME__</small></h1>
   <button class="btn btn-add" onclick="window.location.href='/'">Accueil</button>
   <button data-admin-only class="btn btn-add" onclick="openMetaModal()">Infos</button>
-  <button data-admin-only class="btn btn-add" onclick="openReminderModal()">Ajouter rappel</button>
   <button data-admin-only class="btn btn-add" onclick="openAddSessionModal()">+ Session</button>
   <button data-admin-only class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
   <button data-admin-only class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
@@ -1575,40 +1582,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div id="view-body"></div>
     <div class="modal-actions">
       <button class="btn-modal btn-primary" onclick="closeViewModal()">Fermer</button>
-    </div>
-  </div>
-</div>
-
-<!-- REMINDER MODAL -->
-<div class="modal-overlay hidden" id="modal-reminder">
-  <div class="modal-card">
-    <h2>Ajouter un rappel</h2>
-    <div class="form-row">
-      <label>Délai d'anticipation</label>
-      <select id="r-preset" onchange="onReminderPresetChange()">
-        <option value="months:6">6 mois avant</option>
-        <option value="months:4">4 mois avant</option>
-        <option value="months:3">3 mois avant</option>
-        <option value="months:2">2 mois avant</option>
-        <option value="months:1">1 mois avant</option>
-        <option value="weeks:3">3 semaines avant</option>
-        <option value="weeks:2">2 semaines avant</option>
-        <option value="weeks:1">1 semaine avant</option>
-        <option value="custom">Date personnalisée</option>
-      </select>
-    </div>
-    <div class="form-row" id="r-custom-row" style="display:none">
-      <label>Date du rappel</label>
-      <input type="date" id="r-date" onchange="updateReminderPreview()">
-    </div>
-    <div class="form-row">
-      <label>Note</label>
-      <input type="text" id="r-note" placeholder="Ex: Relancer les responsables d'équipe">
-    </div>
-    <div class="helper-text" id="r-preview"></div>
-    <div class="modal-actions">
-      <button class="btn-modal btn-cancel" onclick="closeReminderModal()">Annuler</button>
-      <button class="btn-modal btn-primary" onclick="saveReminder()">Ajouter</button>
     </div>
   </div>
 </div>
@@ -1839,13 +1812,13 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     transform: translateX(100%); transition: transform .22s ease; z-index: 90; padding: 22px 18px; overflow: auto;
   }
   .notification-drawer.open { transform: translateX(0); }
-  .notification-tab {
-    position: fixed; right: 0; top: 180px; transform: translateX(0);
-    border: none; border-radius: 8px 0 0 8px; background: #0F4C3A; color: white;
-    padding: 11px 9px; cursor: pointer; z-index: 91; font-size: 13px; font-weight: 800;
-    writing-mode: vertical-rl; text-orientation: mixed;
+  .notification-bell {
+    position: fixed; right: 22px; top: 22px; width: 42px; height: 42px;
+    border: 1px solid #d3ddd9; border-radius: 999px; background: white; color: #0F4C3A;
+    cursor: pointer; z-index: 91; font-size: 19px; box-shadow: 0 10px 24px rgba(15, 23, 42, .10);
   }
-  .notification-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; margin-top: 6px; border-radius: 99px; background: #F9E79F; color: #174032; font-size: 11px; }
+  .notification-count { position: absolute; right: -4px; top: -5px; display: inline-flex; align-items: center; justify-content: center; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 99px; background: #b42318; color: white; font-size: 11px; font-weight: 800; }
+  .notification-count.empty { display: none; }
   .notification-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
   .notification-head h2 { font-size: 18px; color: #0F4C3A; }
   .notification-list { display: grid; gap: 10px; }
@@ -1853,6 +1826,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .notification-item h3 { font-size: 14px; color: #12212f; margin-bottom: 4px; }
   .notification-item p { font-size: 12px; color: #5f6b75; line-height: 1.45; margin-top: 3px; }
   .notification-item a { display: inline-block; margin-top: 8px; font-size: 12px; color: #0F4C3A; font-weight: 800; text-decoration: none; }
+  .reminder-event-name { color: #0F4C3A; font-weight: 800; margin-bottom: 10px; }
   .toast { position: fixed; right: 18px; bottom: 18px; background: #17212b; color: white; padding: 10px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .25s; }
   .toast.show { opacity: 1; }
   @media (max-width: 860px) {
@@ -1893,7 +1867,10 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       </main>
     </section>
   </div>
-  <button class="notification-tab" onclick="toggleNotifications()">Notifications <span class="notification-count">__NOTIFICATION_COUNT__</span></button>
+  <button class="notification-bell" onclick="toggleNotifications()" aria-label="Notifications">
+    &#128276;
+    <span class="notification-count __NOTIFICATION_EMPTY_CLASS__">__NOTIFICATION_COUNT__</span>
+  </button>
   <aside class="notification-drawer" id="notification-drawer">
     <div class="notification-head">
       <h2>Notifications</h2>
@@ -1903,6 +1880,41 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       __NOTIFICATION_ITEMS__
     </div>
   </aside>
+  <div class="modal-overlay hidden" id="reminder-modal">
+    <div class="modal-card">
+      <h2>Ajouter un rappel</h2>
+      <p class="reminder-event-name" id="reminder-event-name"></p>
+      <input type="hidden" id="reminder-event-id">
+      <input type="hidden" id="reminder-event-date">
+      <div class="form-row">
+        <label>Délai d'anticipation</label>
+        <select id="reminder-preset" onchange="onHomeReminderPresetChange()">
+          <option value="months:6">6 mois avant</option>
+          <option value="months:4">4 mois avant</option>
+          <option value="months:3">3 mois avant</option>
+          <option value="months:2">2 mois avant</option>
+          <option value="months:1">1 mois avant</option>
+          <option value="weeks:3">3 semaines avant</option>
+          <option value="weeks:2">2 semaines avant</option>
+          <option value="weeks:1">1 semaine avant</option>
+          <option value="custom">Date personnalisée</option>
+        </select>
+      </div>
+      <div class="form-row" id="reminder-custom-row" style="display:none">
+        <label>Date du rappel</label>
+        <input type="date" id="reminder-date" onchange="updateHomeReminderPreview()">
+      </div>
+      <div class="form-row">
+        <label>Note</label>
+        <input type="text" id="reminder-note" placeholder="Ex: Relancer les responsables d'équipe">
+      </div>
+      <p class="helper" id="reminder-preview"></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeHomeReminderModal()">Annuler</button>
+        <button class="btn btn-admin" onclick="saveHomeReminder()">Ajouter</button>
+      </div>
+    </div>
+  </div>
   <div class="modal-overlay hidden" id="create-modal">
     <div class="modal-card create-modal-card">
       <h2>Créer un événement</h2>
@@ -2003,7 +2015,136 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     }
 
     function toggleNotifications() {
-      document.getElementById('notification-drawer').classList.toggle('open');
+      const drawer = document.getElementById('notification-drawer');
+      drawer.classList.toggle('open');
+      if (drawer.classList.contains('open')) markNotificationsRead();
+    }
+
+    async function markNotificationsRead() {
+      const badge = document.querySelector('.notification-count');
+      if (badge) {
+        badge.textContent = '0';
+        badge.classList.add('empty');
+      }
+      try {
+        await fetch('/api/reminders/read', { method: 'POST' });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function reminderParseDate(value) {
+      const parts = String(value || '').split('-').map(Number);
+      if (parts.length !== 3 || parts.some(part => Number.isNaN(part))) return null;
+      return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+    }
+
+    function reminderToIso(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    function reminderAddDays(value, days) {
+      const date = reminderParseDate(value);
+      if (!date) return '';
+      date.setUTCDate(date.getUTCDate() + days);
+      return reminderToIso(date);
+    }
+
+    function reminderAddMonths(value, months) {
+      const date = reminderParseDate(value);
+      if (!date) return '';
+      const originalDay = date.getUTCDate();
+      date.setUTCMonth(date.getUTCMonth() + months);
+      if (date.getUTCDate() !== originalDay) date.setUTCDate(0);
+      return reminderToIso(date);
+    }
+
+    function reminderFormatDate(value) {
+      const date = reminderParseDate(value);
+      if (!date) return value || '';
+      return date.toLocaleDateString('fr-FR', { timeZone: 'UTC' });
+    }
+
+    function computeHomeReminderDate() {
+      const preset = document.getElementById('reminder-preset').value;
+      if (preset === 'custom') return document.getElementById('reminder-date').value;
+      const eventDate = document.getElementById('reminder-event-date').value;
+      if (!eventDate) return '';
+      const [unit, amountRaw] = preset.split(':');
+      const amount = parseInt(amountRaw, 10);
+      if (unit === 'months') return reminderAddMonths(eventDate, -amount);
+      if (unit === 'weeks') return reminderAddDays(eventDate, -amount * 7);
+      return '';
+    }
+
+    function updateHomeReminderPreview() {
+      const preview = document.getElementById('reminder-preview');
+      const eventDate = document.getElementById('reminder-event-date').value;
+      const reminderDate = computeHomeReminderDate();
+      if (!eventDate) {
+        preview.textContent = "Cet évènement n'a pas encore de date de début.";
+        return;
+      }
+      preview.textContent = reminderDate
+        ? `Notification le ${reminderFormatDate(reminderDate)} pour l'évènement du ${reminderFormatDate(eventDate)}.`
+        : 'Choisis une date de rappel.';
+    }
+
+    function onHomeReminderPresetChange() {
+      const custom = document.getElementById('reminder-preset').value === 'custom';
+      document.getElementById('reminder-custom-row').style.display = custom ? 'block' : 'none';
+      updateHomeReminderPreview();
+    }
+
+    function openHomeReminderModal(button) {
+      document.getElementById('reminder-event-id').value = button.dataset.eventId || '';
+      document.getElementById('reminder-event-date').value = button.dataset.eventDate || '';
+      document.getElementById('reminder-event-name').textContent = button.dataset.eventName || '';
+      document.getElementById('reminder-preset').value = 'months:6';
+      document.getElementById('reminder-note').value = '';
+      document.getElementById('reminder-date').value = '';
+      onHomeReminderPresetChange();
+      document.getElementById('reminder-modal').classList.remove('hidden');
+    }
+
+    function closeHomeReminderModal() {
+      document.getElementById('reminder-modal').classList.add('hidden');
+    }
+
+    async function saveHomeReminder() {
+      const eventId = document.getElementById('reminder-event-id').value;
+      const eventDate = document.getElementById('reminder-event-date').value;
+      const reminderDate = computeHomeReminderDate();
+      if (!eventId) {
+        showToast("Impossible d'identifier l'évènement");
+        return;
+      }
+      if (!eventDate) {
+        showToast("Cet évènement n'a pas encore de date de début");
+        return;
+      }
+      if (!reminderDate) {
+        showToast('Choisis une date de rappel');
+        return;
+      }
+      const preset = document.getElementById('reminder-preset');
+      const r = await fetch(`/api/events/${encodeURIComponent(eventId)}/reminders`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          label: preset.options[preset.selectedIndex].text,
+          remind_date: reminderDate,
+          event_date: eventDate,
+          note: document.getElementById('reminder-note').value.trim()
+        })
+      });
+      if (!r.ok) {
+        showToast("Impossible d'ajouter le rappel");
+        return;
+      }
+      closeHomeReminderModal();
+      showToast('Rappel ajouté');
+      window.setTimeout(() => window.location.reload(), 650);
     }
 
     function renderCreateTeams() {
@@ -2327,6 +2468,9 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     document.addEventListener('click', () => {
       document.querySelectorAll('.card-menu.open').forEach(menu => menu.classList.remove('open'));
     });
+    document.getElementById('reminder-modal').addEventListener('click', event => {
+      if (event.target === document.getElementById('reminder-modal')) closeHomeReminderModal();
+    });
 
     document.getElementById('btn-create-event').addEventListener('click', createEvent);
     document.getElementById('new-day-count').addEventListener('change', () => {
@@ -2388,6 +2532,14 @@ def render_event_cards(events, archived_view=False):
         event_name = escape(event.get("name", "Événement"))
         event_location = escape(event.get("location", ""))
         event_date = escape(event.get("date_label", ""))
+        start_date = event.get("start_date", "")
+        if not start_date and event.get("id"):
+            try:
+                event_schedule = load_event_schedule(event.get("id"))
+                start_date = next((day.get("date", "") for day in event_schedule.get("days", []) if day.get("date")), "")
+            except Exception:
+                start_date = ""
+        event_start_date = escape(start_date)
         cards.append(f"""
         <article class="card">
           <div class="card-head">
@@ -2409,8 +2561,9 @@ def render_event_cards(events, archived_view=False):
             </div>
           </div>
           <div class="actions">
-            <button class="btn btn-link" onclick="window.location.href='/{event_slug}'">Consultation</button>
+            <button class="btn btn-link" onclick="window.location.href='/{event_slug}'">Consulter</button>
             <button class="btn btn-admin" onclick="window.location.href='/{event_slug}/admin'">Gérer</button>
+            <button class="btn btn-secondary" data-event-id="{event_id}" data-event-name="{event_name}" data-event-date="{event_start_date}" onclick="openHomeReminderModal(this)">Ajouter rappel</button>
           </div>
         </article>
         """)
@@ -2422,9 +2575,11 @@ def render_home_page():
     active_events = [event for event in events if not event.get("archived")]
     archived_count = sum(1 for event in events if event.get("archived"))
     reminders = collect_due_reminders()
+    unread_count = len(unread_reminders(reminders))
     html = HOME_TEMPLATE.replace("__EVENT_CARDS__", render_event_cards(active_events))
     html = html.replace("__ARCHIVED_COUNT__", str(archived_count))
-    html = html.replace("__NOTIFICATION_COUNT__", str(len(reminders)))
+    html = html.replace("__NOTIFICATION_COUNT__", str(unread_count))
+    html = html.replace("__NOTIFICATION_EMPTY_CLASS__", "empty" if not unread_count else "")
     html = html.replace("__NOTIFICATION_ITEMS__", render_notification_items(reminders))
     html = html.replace("__SERVICE_TEAMS_JSON__", json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False))
     return Response(html, mimetype="text/html; charset=utf-8")
@@ -2434,9 +2589,11 @@ def render_past_events_page():
     events = load_events_index()
     archived_events = [event for event in events if event.get("archived")]
     reminders = collect_due_reminders()
+    unread_count = len(unread_reminders(reminders))
     html = HOME_TEMPLATE.replace("__EVENT_CARDS__", render_event_cards(archived_events, archived_view=True))
     html = html.replace("__ARCHIVED_COUNT__", str(len(archived_events)))
-    html = html.replace("__NOTIFICATION_COUNT__", str(len(reminders)))
+    html = html.replace("__NOTIFICATION_COUNT__", str(unread_count))
+    html = html.replace("__NOTIFICATION_EMPTY_CLASS__", "empty" if not unread_count else "")
     html = html.replace("__NOTIFICATION_ITEMS__", render_notification_items(reminders))
     html = html.replace("Gestionnaire d'évènements - SOS Lyon</h1>", "Évènements passés - SOS Lyon</h1>")
     html = html.replace(
@@ -2618,6 +2775,34 @@ def save_settings_teams():
     return jsonify(settings)
 
 
+@app.route("/api/reminders/read", methods=["POST"])
+def mark_reminders_read():
+    today = datetime.now().date()
+    read_at = datetime.now().isoformat()
+    updated_events = []
+    read_count = 0
+    for event in load_events_index():
+        event_id = event.get("id")
+        if not event_id or event.get("archived"):
+            continue
+        schedule = load_event_schedule(event_id)
+        changed = False
+        for reminder in schedule.get("reminders") or []:
+            remind_date = parse_iso_date(reminder.get("remind_date"))
+            if remind_date and remind_date <= today and not reminder.get("read_at"):
+                reminder["read_at"] = read_at
+                changed = True
+                read_count += 1
+        if changed:
+            save_event_schedule(event_id, schedule)
+            updated_events.append(event_id)
+    return jsonify({
+        "status": "ok",
+        "read_count": read_count,
+        "updated_events": updated_events,
+    })
+
+
 @app.route("/api/events/<event_id>/rename", methods=["POST"])
 def rename_event(event_id):
     event_id = resolve_event_id(event_id)
@@ -2684,6 +2869,39 @@ def archive_event(event_id):
         "status": "ok",
         "event_id": event_id,
         "archived": archived,
+    })
+
+
+@app.route("/api/events/<event_id>/reminders", methods=["POST"])
+def add_event_reminder(event_id):
+    event_id = resolve_event_id(event_id)
+    if not get_event_meta(event_id):
+        return jsonify({"error": "not_found"}), 404
+
+    payload = request.get_json() or {}
+    remind_date = (payload.get("remind_date") or "").strip()
+    event_date = (payload.get("event_date") or "").strip()
+    if not parse_iso_date(remind_date):
+        return jsonify({"error": "invalid_remind_date"}), 400
+    if event_date and not parse_iso_date(event_date):
+        return jsonify({"error": "invalid_event_date"}), 400
+
+    schedule = load_event_schedule(event_id)
+    schedule.setdefault("reminders", [])
+    schedule["reminders"].append({
+        "id": f"rem_{int(datetime.now().timestamp() * 1000)}",
+        "label": (payload.get("label") or "Rappel").strip(),
+        "remind_date": remind_date,
+        "event_date": event_date,
+        "note": (payload.get("note") or "").strip(),
+        "created_at": datetime.now().isoformat(),
+        "read_at": "",
+    })
+    saved = save_event_schedule(event_id, schedule)
+    return jsonify({
+        "status": "ok",
+        "event_id": event_id,
+        "reminders": saved.get("reminders", []),
     })
 
 
