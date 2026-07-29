@@ -1,0 +1,98 @@
+{
+  "version": "1.0",
+  "event": "Journée Dream Team",
+  "lieu": "Presbytère Tassin",
+  "dresscode": "",
+  "installation_dates": "",
+  "conference_dates": "Samedi 19 Septembre",
+  "attendance": {
+    "jour1": "190",
+    "vendredi": "",
+    "samedi": "",
+    "dimanche": ""
+  },
+  "types": {
+    "LOUANGE": {
+      "label": "Louange",
+      "color": "#C39BD3"
+    },
+    "PREDICATION": {
+      "label": "Prédication",
+      "color": "#82E0AA"
+    },
+    "REPAS": {
+      "label": "Repas",
+      "color": "#FAD7A0"
+    },
+    "LOGISTIQUE": {
+      "label": "Logistique",
+      "color": "#AED6F1"
+    },
+    "REPETITION": {
+      "label": "Répétition",
+      "color": "#D7BDE2"
+    },
+    "REUNION": {
+      "label": "Réunion / Brief",
+      "color": "#D5F5E3"
+    },
+    "BOOST": {
+      "label": "Boost",
+      "color": "#F1948A"
+    },
+    "STE_CENE": {
+      "label": "Ste Cène",
+      "color": "#BB8FCE"
+    },
+    "PRIERE": {
+      "label": "Prière",
+      "color": "#7FB3D3"
+    },
+    "INTERCESSION": {
+      "label": "Intercession",
+      "color": "#D6EAF8"
+    },
+    "FUNDRAISING": {
+      "label": "Levée de fonds",
+      "color": "#F9E79F"
+    },
+    "TED_PITCH": {
+      "label": "Pitch / TED",
+      "color": "#A9DFBF"
+    },
+    "ANNONCES": {
+      "label": "Annonces",
+      "color": "#A9DFBF"
+    },
+    "TECHNIQUE": {
+      "label": "Technique",
+      "color": "#D5D8DC"
+    }
+  },
+  "service_teams": [
+    "Team Bébés",
+    "Team Son",
+    "Team Médias Projection",
+    "Team Médias Capture",
+    "Team Ménage"
+  ],
+  "reminders": [],
+  "days": [
+    {
+      "id": "jour1",
+      "name": "SAMEDI 19 SEPTEMBRE",
+      "date": "2026-09-19",
+      "location": "Presbytère Tassin",
+      "expected_people": "190",
+      "sessions": [
+        {
+          "id": "jour1_programme",
+          "name": "Programme",
+          "start_time": "",
+          "end_time": "",
+          "events": []
+        }
+      ]
+    }
+  ]
+}

@@ -1809,6 +1809,7 @@
   "event": "ACT Conférence 2026",
   "installation_dates": "Jeudi 14 mai 2026",
   "lieu": "Espace 140, Rillieux la Pape",
+  "reminders": [],
   "service_teams": [],
   "types": {
     "ANNONCES": {
