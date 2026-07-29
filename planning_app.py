@@ -577,7 +577,21 @@ def normalize_schedule(data):
     schedule.setdefault("attendance", {})
     schedule.setdefault("types", {})
     schedule.setdefault("service_teams", [])
+    schedule.setdefault("reminders", [])
     schedule["service_teams"] = unique_nonempty(schedule.get("service_teams") or [])
+    normalized_reminders = []
+    for reminder in schedule.get("reminders") or []:
+        if not isinstance(reminder, dict):
+            continue
+        normalized_reminders.append({
+            "id": str(reminder.get("id") or ""),
+            "label": str(reminder.get("label") or "Rappel"),
+            "remind_date": str(reminder.get("remind_date") or ""),
+            "event_date": str(reminder.get("event_date") or ""),
+            "note": str(reminder.get("note") or ""),
+            "created_at": str(reminder.get("created_at") or ""),
+        })
+    schedule["reminders"] = normalized_reminders
 
     for key, value in DEFAULT_SCHEDULE["attendance"].items():
         schedule["attendance"].setdefault(key, value)
@@ -743,6 +757,7 @@ def build_blank_schedule(
         "service_teams": unique_nonempty(
             service_teams if service_teams is not None else load_app_settings().get("service_teams") or []
         ),
+        "reminders": [],
         "days": days
     })
 
@@ -757,6 +772,78 @@ def event_summary_from_schedule(event_id, schedule, slug=None):
         "location": location,
         "date_label": schedule.get("conference_dates", "") or schedule.get("installation_dates", ""),
     }
+
+
+def parse_iso_date(value):
+    try:
+        return datetime.strptime(str(value or ""), "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def collect_due_reminders():
+    today = datetime.now().date()
+    reminders = []
+    for event in load_events_index():
+        event_id = event.get("id")
+        if not event_id or event.get("archived"):
+            continue
+        try:
+            schedule = load_event_schedule(event_id)
+        except Exception:
+            continue
+        for reminder in schedule.get("reminders") or []:
+            remind_date = parse_iso_date(reminder.get("remind_date"))
+            if not remind_date or remind_date > today:
+                continue
+            reminders.append({
+                "event_id": event_id,
+                "slug": event.get("slug", event_id),
+                "event_name": event.get("name", schedule.get("event", "Événement")),
+                "label": reminder.get("label") or "Rappel",
+                "remind_date": reminder.get("remind_date", ""),
+                "event_date": reminder.get("event_date", ""),
+                "note": reminder.get("note", ""),
+            })
+    return sorted(reminders, key=lambda item: (item.get("remind_date", ""), item.get("event_name", "")))
+
+
+def format_french_date_label(value):
+    parsed = parse_iso_date(value)
+    if not parsed:
+        return value or ""
+    return parsed.strftime("%d/%m/%Y")
+
+
+def render_notification_items(reminders):
+    if not reminders:
+        return """
+        <article class="notification-item">
+          <h3>Aucune notification</h3>
+          <p>Aucun rappel arrivé à échéance pour le moment.</p>
+        </article>
+        """
+
+    items = []
+    for reminder in reminders:
+        event_name = escape(reminder.get("event_name", "Événement"))
+        label = escape(reminder.get("label", "Rappel"))
+        remind_date = escape(format_french_date_label(reminder.get("remind_date", "")))
+        event_date = escape(format_french_date_label(reminder.get("event_date", "")))
+        note = escape(reminder.get("note", ""))
+        slug = escape(reminder.get("slug", reminder.get("event_id", "")))
+        event_date_text = f" pour l'évènement du {event_date}" if event_date else ""
+        note_html = f"<p>{note}</p>" if note else ""
+        items.append(f"""
+        <article class="notification-item">
+          <h3>{label}</h3>
+          <p><strong>{event_name}</strong></p>
+          <p>Rappel prévu le {remind_date}{event_date_text}.</p>
+          {note_html}
+          <a href="/{slug}/admin">Ouvrir l'évènement</a>
+        </article>
+        """)
+    return "".join(items)
 
 
 def load_events_index():
@@ -1364,6 +1451,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <h1>Gestionnaire d'évènements - SOS Lyon<small>__EVENT_NAME__</small></h1>
   <button class="btn btn-add" onclick="window.location.href='/'">Accueil</button>
   <button data-admin-only class="btn btn-add" onclick="openMetaModal()">Infos</button>
+  <button data-admin-only class="btn btn-add" onclick="openReminderModal()">Ajouter rappel</button>
   <button data-admin-only class="btn btn-add" onclick="openAddSessionModal()">+ Session</button>
   <button data-admin-only class="btn btn-sync" onclick="syncFromOnline()">Synchroniser depuis la version en ligne</button>
   <button data-admin-only class="btn btn-save" onclick="saveSchedule()">&#128190; Sauvegarder</button>
@@ -1487,6 +1575,40 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div id="view-body"></div>
     <div class="modal-actions">
       <button class="btn-modal btn-primary" onclick="closeViewModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- REMINDER MODAL -->
+<div class="modal-overlay hidden" id="modal-reminder">
+  <div class="modal-card">
+    <h2>Ajouter un rappel</h2>
+    <div class="form-row">
+      <label>Délai d'anticipation</label>
+      <select id="r-preset" onchange="onReminderPresetChange()">
+        <option value="months:6">6 mois avant</option>
+        <option value="months:4">4 mois avant</option>
+        <option value="months:3">3 mois avant</option>
+        <option value="months:2">2 mois avant</option>
+        <option value="months:1">1 mois avant</option>
+        <option value="weeks:3">3 semaines avant</option>
+        <option value="weeks:2">2 semaines avant</option>
+        <option value="weeks:1">1 semaine avant</option>
+        <option value="custom">Date personnalisée</option>
+      </select>
+    </div>
+    <div class="form-row" id="r-custom-row" style="display:none">
+      <label>Date du rappel</label>
+      <input type="date" id="r-date" onchange="updateReminderPreview()">
+    </div>
+    <div class="form-row">
+      <label>Note</label>
+      <input type="text" id="r-note" placeholder="Ex: Relancer les responsables d'équipe">
+    </div>
+    <div class="helper-text" id="r-preview"></div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeReminderModal()">Annuler</button>
+      <button class="btn-modal btn-primary" onclick="saveReminder()">Ajouter</button>
     </div>
   </div>
 </div>
@@ -1637,7 +1759,7 @@ window.RENDER_SCHEDULE_URL = "__RENDER_SCHEDULE_URL__";
 window.SYNC_EVENT_URL = "__SYNC_EVENT_URL__";
 window.SERVICE_TEAMS = __SERVICE_TEAMS__;
 </script>
-<script src="/app.js?v=16"></script>
+<script src="/app.js?v=17"></script>
 </body>
 </html>
 """
@@ -1711,6 +1833,26 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .team-row input { width: 100%; padding: 9px 10px; border: 1px solid #d2d9de; border-radius: 7px; font-size: 14px; }
   .btn-icon { width: 36px; height: 36px; padding: 0; background: #fff1f0; color: #b42318; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  .notification-drawer {
+    position: fixed; top: 0; right: 0; width: min(360px, calc(100vw - 48px)); height: 100vh;
+    background: white; border-left: 1px solid #dfe5e9; box-shadow: -18px 0 40px rgba(15, 23, 42, .14);
+    transform: translateX(100%); transition: transform .22s ease; z-index: 90; padding: 22px 18px; overflow: auto;
+  }
+  .notification-drawer.open { transform: translateX(0); }
+  .notification-tab {
+    position: fixed; right: 0; top: 180px; transform: translateX(0);
+    border: none; border-radius: 8px 0 0 8px; background: #0F4C3A; color: white;
+    padding: 11px 9px; cursor: pointer; z-index: 91; font-size: 13px; font-weight: 800;
+    writing-mode: vertical-rl; text-orientation: mixed;
+  }
+  .notification-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; margin-top: 6px; border-radius: 99px; background: #F9E79F; color: #174032; font-size: 11px; }
+  .notification-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .notification-head h2 { font-size: 18px; color: #0F4C3A; }
+  .notification-list { display: grid; gap: 10px; }
+  .notification-item { border: 1px solid #e3e7ea; border-radius: 8px; padding: 12px; background: #fbfcfd; }
+  .notification-item h3 { font-size: 14px; color: #12212f; margin-bottom: 4px; }
+  .notification-item p { font-size: 12px; color: #5f6b75; line-height: 1.45; margin-top: 3px; }
+  .notification-item a { display: inline-block; margin-top: 8px; font-size: 12px; color: #0F4C3A; font-weight: 800; text-decoration: none; }
   .toast { position: fixed; right: 18px; bottom: 18px; background: #17212b; color: white; padding: 10px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .25s; }
   .toast.show { opacity: 1; }
   @media (max-width: 860px) {
@@ -1751,6 +1893,16 @@ HOME_TEMPLATE = """<!DOCTYPE html>
       </main>
     </section>
   </div>
+  <button class="notification-tab" onclick="toggleNotifications()">Notifications <span class="notification-count">__NOTIFICATION_COUNT__</span></button>
+  <aside class="notification-drawer" id="notification-drawer">
+    <div class="notification-head">
+      <h2>Notifications</h2>
+      <button class="btn btn-secondary" onclick="toggleNotifications()">Fermer</button>
+    </div>
+    <div class="notification-list">
+      __NOTIFICATION_ITEMS__
+    </div>
+  </aside>
   <div class="modal-overlay hidden" id="create-modal">
     <div class="modal-card create-modal-card">
       <h2>Créer un événement</h2>
@@ -1848,6 +2000,10 @@ HOME_TEMPLATE = """<!DOCTYPE html>
 
     function escHtml(str) {
       return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function toggleNotifications() {
+      document.getElementById('notification-drawer').classList.toggle('open');
     }
 
     function renderCreateTeams() {
@@ -2265,8 +2421,11 @@ def render_home_page():
     events = load_events_index()
     active_events = [event for event in events if not event.get("archived")]
     archived_count = sum(1 for event in events if event.get("archived"))
+    reminders = collect_due_reminders()
     html = HOME_TEMPLATE.replace("__EVENT_CARDS__", render_event_cards(active_events))
     html = html.replace("__ARCHIVED_COUNT__", str(archived_count))
+    html = html.replace("__NOTIFICATION_COUNT__", str(len(reminders)))
+    html = html.replace("__NOTIFICATION_ITEMS__", render_notification_items(reminders))
     html = html.replace("__SERVICE_TEAMS_JSON__", json.dumps(load_app_settings().get("service_teams", []), ensure_ascii=False))
     return Response(html, mimetype="text/html; charset=utf-8")
 
@@ -2274,8 +2433,11 @@ def render_home_page():
 def render_past_events_page():
     events = load_events_index()
     archived_events = [event for event in events if event.get("archived")]
+    reminders = collect_due_reminders()
     html = HOME_TEMPLATE.replace("__EVENT_CARDS__", render_event_cards(archived_events, archived_view=True))
     html = html.replace("__ARCHIVED_COUNT__", str(len(archived_events)))
+    html = html.replace("__NOTIFICATION_COUNT__", str(len(reminders)))
+    html = html.replace("__NOTIFICATION_ITEMS__", render_notification_items(reminders))
     html = html.replace("Gestionnaire d'évènements - SOS Lyon</h1>", "Évènements passés - SOS Lyon</h1>")
     html = html.replace(
         "Crée, consulte et pilote plusieurs événements depuis un même outil. Chaque événement ouvre son propre planning interactif, ses exports et sa synchronisation.",
