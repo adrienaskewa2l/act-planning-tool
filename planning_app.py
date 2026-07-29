@@ -1815,7 +1815,25 @@ HOME_TEMPLATE = """<!DOCTYPE html>
   .notification-bell {
     position: fixed; right: 22px; top: 22px; width: 42px; height: 42px;
     border: 1px solid #d3ddd9; border-radius: 999px; background: white; color: #0F4C3A;
-    cursor: pointer; z-index: 91; font-size: 19px; box-shadow: 0 10px 24px rgba(15, 23, 42, .10);
+    cursor: pointer; z-index: 91; box-shadow: 0 10px 24px rgba(15, 23, 42, .10);
+  }
+  .notification-bell.hidden { display: none; }
+  .bell-symbol {
+    position: absolute; left: 50%; top: 50%; width: 15px; height: 16px;
+    transform: translate(-50%, -54%); border: 2px solid currentColor; border-bottom: none;
+    border-radius: 10px 10px 4px 4px;
+  }
+  .bell-symbol::before {
+    content: ""; position: absolute; left: 50%; top: -5px; width: 5px; height: 5px;
+    transform: translateX(-50%); border-radius: 999px; background: currentColor;
+  }
+  .bell-symbol::after {
+    content: ""; position: absolute; left: 50%; bottom: -7px; width: 17px; height: 7px;
+    transform: translateX(-50%); border-top: 2px solid currentColor; border-radius: 0 0 999px 999px;
+  }
+  .bell-clapper {
+    position: absolute; left: 50%; bottom: -10px; width: 4px; height: 4px;
+    transform: translateX(-50%); border-radius: 999px; background: currentColor;
   }
   .notification-count { position: absolute; right: -4px; top: -5px; display: inline-flex; align-items: center; justify-content: center; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 99px; background: #b42318; color: white; font-size: 11px; font-weight: 800; }
   .notification-count.empty { display: none; }
@@ -1868,7 +1886,7 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     </section>
   </div>
   <button class="notification-bell" onclick="toggleNotifications()" aria-label="Notifications">
-    &#128276;
+    <span class="bell-symbol"><span class="bell-clapper"></span></span>
     <span class="notification-count __NOTIFICATION_EMPTY_CLASS__">__NOTIFICATION_COUNT__</span>
   </button>
   <aside class="notification-drawer" id="notification-drawer">
@@ -2017,7 +2035,10 @@ HOME_TEMPLATE = """<!DOCTYPE html>
     function toggleNotifications() {
       const drawer = document.getElementById('notification-drawer');
       drawer.classList.toggle('open');
-      if (drawer.classList.contains('open')) markNotificationsRead();
+      const isOpen = drawer.classList.contains('open');
+      const bell = document.querySelector('.notification-bell');
+      if (bell) bell.classList.toggle('hidden', isOpen);
+      if (isOpen) markNotificationsRead();
     }
 
     async function markNotificationsRead() {
