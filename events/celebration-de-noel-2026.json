@@ -50,7 +50,7 @@
               "teams": [
                 "Team Accueil"
               ],
-              "time": "16:00",
+              "time": "15:00",
               "title": "Arrivée de l'équipe d'accueil et des derniers membres de la DT",
               "type": "FUNDRAISING"
             }
@@ -82,7 +82,8 @@
               "id": "e_m11z2n8",
               "teams": [
                 "Team Louange",
-                "Team MC/Infos"
+                "Team MC/Infos",
+                "Team Gospel"
               ],
               "time": "14:00",
               "title": "Filage chorale",
@@ -97,6 +98,23 @@
               "time": "15:00",
               "title": "Répétition spectacle Kids",
               "type": "REPETITION"
+            },
+            {
+              "color": "#d5d8dc",
+              "details": "Chaque équipe installe son espace de service : bébés, accueil, vélo cargo, médias...",
+              "duration": 60,
+              "id": "e_rf0krpo",
+              "teams": [
+                "Team Bébés",
+                "Team Communication",
+                "Team Médias",
+                "Team Accueil",
+                "Team Sécurité",
+                "Team Parking"
+              ],
+              "time": "15:15",
+              "title": "Préparation des secteurs par les équipes",
+              "type": "TECHNIQUE"
             },
             {
               "color": "#d7bde2",
@@ -170,7 +188,8 @@
               "teams": [
                 "Team Son",
                 "Team Louange",
-                "Team Médias Projection"
+                "Team Médias Projection",
+                "Team Gospel"
               ],
               "time": "17:05",
               "title": "Set de louange",
@@ -245,7 +264,9 @@
               "details": "1. Voici Noël \n2. In Excellais Deo / Glory Alleluia",
               "duration": 10,
               "id": "e_zvm2hur",
-              "teams": [],
+              "teams": [
+                "Team Gospel"
+              ],
               "time": "18:20",
               "title": "Set de louange 2",
               "type": "TED_PITCH"
@@ -282,7 +303,8 @@
               "teams": [
                 "Team Son",
                 "Team Louange",
-                "Team Médias Projection"
+                "Team Médias Projection",
+                "Team Gospel"
               ],
               "time": "19:05",
               "title": "Set de louange",
@@ -357,7 +379,9 @@
               "details": "1. Voici Noël \n2. In Excellais Deo / Glory Alleluia",
               "duration": 10,
               "id": "e_5y2nwm6",
-              "teams": [],
+              "teams": [
+                "Team Gospel"
+              ],
               "time": "20:20",
               "title": "Set de louange 2",
               "type": "TED_PITCH"
@@ -421,7 +445,8 @@
     "Team Médias Capture",
     "Team Ménage",
     "Team Sécurité",
-    "Team Parking"
+    "Team Parking",
+    "Team Gospel"
   ],
   "types": {
     "ANNONCES": {
