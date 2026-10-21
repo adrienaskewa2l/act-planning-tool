@@ -343,6 +343,24 @@
               "time": "18:30",
               "title": "Mot de fin du MC",
               "type": "ANNONCES"
+            }
+          ],
+          "id": "jour1_programme",
+          "name": "Célébration 1",
+          "start_time": "17:00"
+        },
+        {
+          "end_time": "20:45",
+          "events": [
+            {
+              "color": "#f9e79f",
+              "details": "",
+              "duration": 20,
+              "id": "e_dyf4tuu",
+              "teams": [],
+              "time": "18:40",
+              "title": "Ouverture des portes",
+              "type": "FUNDRAISING"
             },
             {
               "color": "#a9dfbf",
@@ -458,24 +476,6 @@
               "time": "20:30",
               "title": "Mot de fin du MC",
               "type": "ANNONCES"
-            }
-          ],
-          "id": "jour1_programme",
-          "name": "Célébration 1",
-          "start_time": "17:00"
-        },
-        {
-          "end_time": "20:45",
-          "events": [
-            {
-              "color": "#f9e79f",
-              "details": "",
-              "duration": 20,
-              "id": "e_dyf4tuu",
-              "teams": [],
-              "time": "18:40",
-              "title": "Ouverture des portes",
-              "type": "FUNDRAISING"
             }
           ],
           "id": "sess_e_ypr7zmw",
