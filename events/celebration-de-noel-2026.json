@@ -53,6 +53,18 @@
               "time": "15:00",
               "title": "Arrivée de l'équipe d'accueil et des derniers membres de la DT",
               "type": "FUNDRAISING"
+            },
+            {
+              "color": "#f9e79f",
+              "details": "",
+              "duration": 30,
+              "id": "e_bfotny7",
+              "teams": [
+                "Team Parking"
+              ],
+              "time": "15:00",
+              "title": "Parking : organisation véhicules équipiers",
+              "type": "FUNDRAISING"
             }
           ],
           "id": "sess_e_zxntr5d",
@@ -92,6 +104,53 @@
             {
               "color": "#d7bde2",
               "details": "",
+              "duration": 15,
+              "id": "e_qj7nr7y",
+              "teams": [
+                "Team Hospitalité",
+                "Team Coordo",
+                "Team Bébés",
+                "Team Son",
+                "Team Communication",
+                "Team Médias",
+                "Team Accueil",
+                "Team Médias Projection",
+                "Team Médias Capture",
+                "Team Ménage",
+                "Team Sécurité",
+                "Team Parking",
+                "Team Gospel"
+              ],
+              "time": "14:30",
+              "title": "Arrivée Responsables de secteur",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#fad7a0",
+              "details": "Revue du programme, des équipes et des timings",
+              "duration": 15,
+              "id": "e_vvpqgfn",
+              "teams": [
+                "Team Hospitalité",
+                "Team Coordo",
+                "Team Bébés",
+                "Team Son",
+                "Team Communication",
+                "Team Médias",
+                "Team Accueil",
+                "Team Médias Projection",
+                "Team Médias Capture",
+                "Team Ménage",
+                "Team Sécurité",
+                "Team Parking"
+              ],
+              "time": "14:45",
+              "title": "Briefing Coordo/Responsables de secteur",
+              "type": "REPAS"
+            },
+            {
+              "color": "#d7bde2",
+              "details": "",
               "duration": 30,
               "id": "e_j0r6m46",
               "teams": [],
@@ -101,14 +160,16 @@
             },
             {
               "color": "#d5d8dc",
-              "details": "Chaque équipe installe son espace de service : bébés, accueil, vélo cargo, médias...",
+              "details": "Chaque équipe installe son espace de service : bébés, accueil, vélo cargo, médias, hospitalité avec snacking pour les équipiers...\nL'équipe ménage prépare les espaces",
               "duration": 60,
               "id": "e_rf0krpo",
               "teams": [
+                "Team Hospitalité",
                 "Team Bébés",
                 "Team Communication",
                 "Team Médias",
                 "Team Accueil",
+                "Team Ménage",
                 "Team Sécurité",
                 "Team Parking"
               ],
@@ -138,7 +199,7 @@
             },
             {
               "color": "#f1948a",
-              "details": "",
+              "details": "Sarah ou Matt",
               "duration": 15,
               "id": "e_ew5r84a",
               "teams": [
@@ -214,7 +275,7 @@
                 "Team Son"
               ],
               "time": "17:50",
-              "title": "Interlude musical",
+              "title": "Rap : Victo et Louise",
               "type": "REUNION"
             },
             {
@@ -224,7 +285,7 @@
               "id": "e_eztaqj8",
               "teams": [],
               "time": "17:52",
-              "title": "Danse",
+              "title": "Danse Margaux",
               "type": "REUNION"
             },
             {
@@ -236,7 +297,7 @@
                 "Team Son"
               ],
               "time": "17:55",
-              "title": "Racontez-moi le vrai Noël",
+              "title": "Chant : Racontez-moi le vrai Noël",
               "type": "REUNION"
             },
             {
@@ -329,7 +390,7 @@
                 "Team Son"
               ],
               "time": "19:50",
-              "title": "Interlude musical",
+              "title": "Rap : Victo et Louise",
               "type": "REUNION"
             },
             {
@@ -339,7 +400,7 @@
               "id": "e_b4g43bb",
               "teams": [],
               "time": "19:52",
-              "title": "Danse",
+              "title": "Danse Margaux",
               "type": "REUNION"
             },
             {
@@ -351,7 +412,7 @@
                 "Team Son"
               ],
               "time": "19:55",
-              "title": "Racontez-moi le vrai Noël",
+              "title": "Chant : Racontez-moi le vrai Noël",
               "type": "REUNION"
             },
             {
@@ -420,6 +481,32 @@
           "id": "sess_e_ypr7zmw",
           "name": "Célébration 2",
           "start_time": "19:00"
+        },
+        {
+          "end_time": "22:00",
+          "events": [
+            {
+              "color": "#aed6f1",
+              "details": "Rangement et désinstallation de tous les secteurs avec du matériel",
+              "duration": 60,
+              "id": "e_fbmeyq2",
+              "teams": [
+                "Team Logistique",
+                "Team Hospitalité",
+                "Team Bébés",
+                "Team Médias Projection",
+                "Team Médias Capture",
+                "Team Ménage",
+                "Team Parking"
+              ],
+              "time": "20:45",
+              "title": "Désinstallation et rangement",
+              "type": "LOGISTIQUE"
+            }
+          ],
+          "id": "sess_e_kxwlsbb",
+          "name": "Désinstallation",
+          "start_time": "20:45"
         }
       ]
     }
@@ -482,8 +569,8 @@
       "label": "Prière"
     },
     "REPAS": {
-      "color": "#FAD7A0",
-      "label": "Repas"
+      "color": "#fad7a0",
+      "label": "Briefing"
     },
     "REPETITION": {
       "color": "#D7BDE2",
