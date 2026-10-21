@@ -1,5 +1,14 @@
 [
   {
+    "id": "celebration-de-noel-2026",
+    "slug": "celebration",
+    "name": "Célébration de Noël 2026",
+    "location": "",
+    "date_label": "Dimanche 20 Decembre",
+    "start_date": "2026-12-20",
+    "archived": false
+  },
+  {
     "id": "journee-dream-team",
     "slug": "journee",
     "name": "Journée Dream Team",

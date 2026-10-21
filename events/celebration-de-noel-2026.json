@@ -1,0 +1,232 @@
+{
+  "attendance": {
+    "dimanche": "",
+    "jour1": "1000",
+    "samedi": "",
+    "vendredi": ""
+  },
+  "conference_dates": "Dimanche 20 Decembre",
+  "days": [
+    {
+      "date": "2026-12-20",
+      "expected_people": "1000",
+      "id": "jour1",
+      "location": "",
+      "name": "DIMANCHE 20 DECEMBRE",
+      "sessions": [
+        {
+          "end_time": "13:30",
+          "events": [],
+          "id": "sess_e_zxntr5d",
+          "name": "Installation",
+          "start_time": "12:30"
+        },
+        {
+          "end_time": "18:45",
+          "events": [
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 5,
+              "id": "e_s1xhtku",
+              "teams": [
+                "Team MC/Infos"
+              ],
+              "time": "17:00",
+              "title": "Mot d'accueil du MC",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#ffaa00",
+              "details": "Set du choeur gospel : \n\n1. Joy to the World\n2. Ô Peuple fidèle\n3. Jesus what a wonderful child\n4. Minuit chrétien \n5. Douce nuit\n6. Hallelujah ",
+              "duration": 30,
+              "id": "e_j07fxsu",
+              "teams": [
+                "Team Son",
+                "Team Louange",
+                "Team Médias Projection"
+              ],
+              "time": "17:05",
+              "title": "Set de louange",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#53d5fd",
+              "details": "Spectacle Enfants",
+              "duration": 15,
+              "id": "e_mhbjeuo",
+              "teams": [],
+              "time": "17:35",
+              "title": "Spectacle Enfants",
+              "type": "STE_CENE"
+            },
+            {
+              "color": "#d5f5e3",
+              "details": "Victo et Louise",
+              "duration": 2,
+              "id": "e_11bkdea",
+              "teams": [
+                "Team Son"
+              ],
+              "time": "17:50",
+              "title": "Interlude musical",
+              "type": "REUNION"
+            },
+            {
+              "color": "#d5f5e3",
+              "details": "Margaux",
+              "duration": 3,
+              "id": "e_b4g43bb",
+              "teams": [],
+              "time": "17:52",
+              "title": "Danse",
+              "type": "REUNION"
+            },
+            {
+              "color": "#d5f5e3",
+              "details": "Solo Rondro + musiciens",
+              "duration": 5,
+              "id": "e_fjk15iy",
+              "teams": [
+                "Team Son"
+              ],
+              "time": "17:55",
+              "title": "Racontez-moi le vrai Noël",
+              "type": "REUNION"
+            },
+            {
+              "color": "#e32400",
+              "details": "Matt",
+              "duration": 15,
+              "id": "e_e17ngk4",
+              "teams": [],
+              "time": "18:00",
+              "title": "Message",
+              "type": "PREDICATION"
+            },
+            {
+              "color": "#7fb3d3",
+              "details": "",
+              "duration": 5,
+              "id": "e_7dldz47",
+              "teams": [],
+              "time": "18:15",
+              "title": "Prière",
+              "type": "PRIERE"
+            },
+            {
+              "color": "#ffaa00",
+              "details": "1. Voici Noël \n2. In Excellais Deo / Glory Alleluia",
+              "duration": 10,
+              "id": "e_zvm2hur",
+              "teams": [],
+              "time": "18:20",
+              "title": "Set de louange 2",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 5,
+              "id": "e_q2w2ay5",
+              "teams": [
+                "Team MC/Infos"
+              ],
+              "time": "18:30",
+              "title": "Mot de fin du MC",
+              "type": "ANNONCES"
+            }
+          ],
+          "id": "jour1_programme",
+          "name": "Célébration 1",
+          "start_time": "17:00"
+        },
+        {
+          "end_time": "20:45",
+          "events": [],
+          "id": "sess_e_ypr7zmw",
+          "name": "Célébration 2",
+          "start_time": "19:00"
+        }
+      ]
+    }
+  ],
+  "dresscode": "Tenue noire pour l'accueil",
+  "event": "Célébration de Noël 2026",
+  "installation_dates": "",
+  "lieu": "",
+  "reminders": [],
+  "service_teams": [
+    "Team Logistique",
+    "Team Hospitalité",
+    "Team Coordo",
+    "Team Bébés",
+    "Team Son",
+    "Team Communication",
+    "Team Médias",
+    "Team Louange",
+    "Team Boost",
+    "Team Accueil",
+    "Team Médias Projection",
+    "Team MC/Infos"
+  ],
+  "types": {
+    "ANNONCES": {
+      "color": "#A9DFBF",
+      "label": "Annonces"
+    },
+    "BOOST": {
+      "color": "#F1948A",
+      "label": "Boost"
+    },
+    "FUNDRAISING": {
+      "color": "#F9E79F",
+      "label": "Levée de fonds"
+    },
+    "INTERCESSION": {
+      "color": "#D6EAF8",
+      "label": "Intercession"
+    },
+    "LOGISTIQUE": {
+      "color": "#AED6F1",
+      "label": "Logistique"
+    },
+    "LOUANGE": {
+      "color": "#C39BD3",
+      "label": "Louange"
+    },
+    "PREDICATION": {
+      "color": "#e32400",
+      "label": "Prédication"
+    },
+    "PRIERE": {
+      "color": "#7FB3D3",
+      "label": "Prière"
+    },
+    "REPAS": {
+      "color": "#FAD7A0",
+      "label": "Repas"
+    },
+    "REPETITION": {
+      "color": "#D7BDE2",
+      "label": "Répétition"
+    },
+    "REUNION": {
+      "color": "#d5f5e3",
+      "label": "Interlude artistique"
+    },
+    "STE_CENE": {
+      "color": "#53d5fd",
+      "label": "Spectacle Enfants"
+    },
+    "TECHNIQUE": {
+      "color": "#D5D8DC",
+      "label": "Technique"
+    },
+    "TED_PITCH": {
+      "color": "#ffaa00",
+      "label": "Gospel"
+    }
+  },
+  "version": "1.0"
+}
