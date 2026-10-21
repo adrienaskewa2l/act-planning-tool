@@ -64,7 +64,7 @@ const DEFAULT_SERVICE_TEAMS = [
 ];
 
 function serviceTeams() {
-  if (schedule && Array.isArray(schedule.service_teams) && schedule.service_teams.length) {
+  if (schedule && Array.isArray(schedule.service_teams)) {
     return schedule.service_teams;
   }
   if (typeof window !== 'undefined' && Array.isArray(window.SERVICE_TEAMS) && window.SERVICE_TEAMS.length) {
@@ -533,11 +533,10 @@ function buildColorPresets() {
   });
 }
 
-function buildTeamSelect(selectedTeams) {
-  const sel = document.getElementById('f-teams');
+function buildTeamCheckboxes(containerId, baseTeams, selectedTeams) {
+  const sel = document.getElementById(containerId);
   const selected = new Set(selectedTeams || []);
-  const baseTeams = serviceTeams();
-  const options = [...baseTeams];
+  const options = [...new Set(baseTeams)];
 
   selected.forEach(team => {
     if (team && !baseTeams.includes(team)) options.push(team);
@@ -545,16 +544,22 @@ function buildTeamSelect(selectedTeams) {
 
   sel.innerHTML = '';
   options.forEach(team => {
-    const opt = document.createElement('option');
+    const label = document.createElement('label');
+    const opt = document.createElement('input');
+    opt.type = 'checkbox';
     opt.value = team;
-    opt.textContent = team;
-    opt.selected = selected.has(team);
-    sel.appendChild(opt);
+    opt.checked = selected.has(team);
+    label.append(opt, document.createTextNode(team));
+    sel.appendChild(label);
   });
 }
 
+function buildTeamSelect(selectedTeams) {
+  buildTeamCheckboxes('f-teams', serviceTeams(), selectedTeams);
+}
+
 function selectedTeamsFromForm() {
-  return Array.from(document.getElementById('f-teams').selectedOptions)
+  return Array.from(document.querySelectorAll('#f-teams input:checked'))
     .map(opt => opt.value)
     .filter(Boolean);
 }
@@ -575,6 +580,7 @@ function openEditModal(ev, dayId, sessionId) {
   buildSessionSelect(dayId, sessionId);
   buildColorPresets();
   document.getElementById('btn-delete').style.display = 'inline-flex';
+  document.getElementById('btn-duplicate').style.display = 'inline-flex';
   document.getElementById('modal').classList.remove('hidden');
 }
 
@@ -596,6 +602,7 @@ function openAddModal(dayId, sessionId, time) {
   buildSessionSelect(dayId, sessionId || (day && day.sessions[0] && day.sessions[0].id));
   buildColorPresets();
   document.getElementById('btn-delete').style.display = 'none';
+  document.getElementById('btn-duplicate').style.display = 'none';
   document.getElementById('modal').classList.remove('hidden');
 }
 
@@ -705,6 +712,20 @@ function saveEvent() {
   closeModal();
   renderDays();
   showToast('Événement enregistré');
+}
+
+function duplicateEventBlock() {
+  if (READ_ONLY || !_editEv) return;
+  const day = schedule.days.find(d => d.id === _editDay);
+  const session = day && day.sessions.find(s => s.id === _editSession);
+  if (!session) return;
+  const copy = JSON.parse(JSON.stringify(_editEv));
+  copy.id = genId();
+  session.events.push(copy);
+  session.events.sort((a, b) => a.time.localeCompare(b.time));
+  renderDays();
+  openEditModal(copy, day.id, session.id);
+  showToast('Bloc dupliqué');
 }
 
 function deleteEvent() {
@@ -884,6 +905,7 @@ function closeSessionModal() {
 
 function openMetaModal() {
   ensureScheduleShape();
+  buildTeamCheckboxes('m-teams', window.SERVICE_TEAMS || DEFAULT_SERVICE_TEAMS, serviceTeams());
   document.getElementById('m-event').value = schedule.event || '';
   document.getElementById('m-lieu').value = schedule.lieu || '';
   document.getElementById('m-installation').value = schedule.installation_dates || '';
@@ -901,6 +923,7 @@ function closeMetaModal() {
 
 function saveMeta() {
   ensureScheduleShape();
+  schedule.service_teams = Array.from(document.querySelectorAll('#m-teams input:checked'), input => input.value);
   schedule.event = document.getElementById('m-event').value.trim();
   schedule.lieu = document.getElementById('m-lieu').value.trim();
   schedule.installation_dates = document.getElementById('m-installation').value.trim();

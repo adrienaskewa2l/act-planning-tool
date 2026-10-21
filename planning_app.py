@@ -1561,8 +1561,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     <div class="form-row">
       <label>Équipes responsables</label>
-      <select id="f-teams" multiple size="8"></select>
-      <div class="helper-text">Sélection multiple autorisée : Cmd/Ctrl + clic selon votre navigateur.</div>
+      <div id="f-teams" class="team-checkboxes"></div>
     </div>
 
     <div class="form-row">
@@ -1574,6 +1573,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <button class="btn-modal btn-danger" id="btn-delete" onclick="deleteEvent()" style="display:none;margin-right:auto">
         &#128465; Supprimer
       </button>
+      <button class="btn-modal btn-cancel" id="btn-duplicate" onclick="duplicateEventBlock()" style="display:none">Dupliquer</button>
       <button class="btn-modal btn-cancel" onclick="closeModal()">Annuler</button>
       <button class="btn-modal btn-primary" onclick="saveEvent()">&#10003; Enregistrer</button>
     </div>
@@ -1704,6 +1704,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <input type="text" id="m-dresscode" placeholder="Bracelet bleu pour la Dream Team">
     </div>
     <div class="form-row">
+      <label>Équipes nécessaires à l'évènement</label>
+      <div id="m-teams" class="team-checkboxes"></div>
+    </div>
+    <div class="form-row">
       <label>Nombre de personnes attendues</label>
       <div class="meta-grid">
         <div class="form-row" style="margin:0">
@@ -1737,7 +1741,13 @@ window.RENDER_SCHEDULE_URL = "__RENDER_SCHEDULE_URL__";
 window.SYNC_EVENT_URL = "__SYNC_EVENT_URL__";
 window.SERVICE_TEAMS = __SERVICE_TEAMS__;
 </script>
-<script src="/app.js?v=17"></script>
+<style>
+.team-checkboxes { display: grid; gap: 8px; max-height: 220px; overflow: auto; border: 1px solid #d2d9de; border-radius: 7px; padding: 10px; }
+.team-checkboxes label { display: flex; align-items: center; gap: 8px; margin: 0; text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; }
+.team-checkboxes input[type="checkbox"] { width: 16px; height: 16px; flex: 0 0 16px; accent-color: #0F4C3A; }
+.modal-actions { flex-wrap: wrap; }
+</style>
+<script src="/app.js?v=18"></script>
 </body>
 </html>
 """
