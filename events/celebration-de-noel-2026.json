@@ -16,14 +16,140 @@
       "sessions": [
         {
           "end_time": "13:30",
-          "events": [],
+          "events": [
+            {
+              "color": "#aed6f1",
+              "details": "",
+              "duration": 60,
+              "id": "e_51jotwd",
+              "teams": [
+                "Team Logistique"
+              ],
+              "time": "12:30",
+              "title": "Installation",
+              "type": "LOGISTIQUE"
+            },
+            {
+              "color": "#d5d8dc",
+              "details": "",
+              "duration": 30,
+              "id": "e_zcysp8h",
+              "teams": [
+                "Team Son",
+                "Team Louange"
+              ],
+              "time": "13:00",
+              "title": "Arrivée des musiciens",
+              "type": "TECHNIQUE"
+            },
+            {
+              "color": "#f9e79f",
+              "details": "",
+              "duration": 15,
+              "id": "e_7qjk0eo",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "16:00",
+              "title": "Arrivée de l'équipe d'accueil et des derniers membres de la DT",
+              "type": "FUNDRAISING"
+            }
+          ],
           "id": "sess_e_zxntr5d",
           "name": "Installation",
           "start_time": "12:30"
         },
         {
+          "end_time": "16:30",
+          "events": [
+            {
+              "color": "#d7bde2",
+              "details": "",
+              "duration": 30,
+              "id": "e_i7cd1sj",
+              "teams": [
+                "Team Son",
+                "Team Louange"
+              ],
+              "time": "13:30",
+              "title": "Balances",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#d7bde2",
+              "details": "Filage des chants et répétition MC en introduction",
+              "duration": 60,
+              "id": "e_m11z2n8",
+              "teams": [
+                "Team Louange",
+                "Team MC/Infos"
+              ],
+              "time": "14:00",
+              "title": "Filage chorale",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#d7bde2",
+              "details": "",
+              "duration": 30,
+              "id": "e_j0r6m46",
+              "teams": [],
+              "time": "15:00",
+              "title": "Répétition spectacle Kids",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#d7bde2",
+              "details": "Margaux",
+              "duration": 15,
+              "id": "e_4plb5of",
+              "teams": [],
+              "time": "15:30",
+              "title": "Répétition danse Margaux",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#d7bde2",
+              "details": "",
+              "duration": 15,
+              "id": "e_wgprsqb",
+              "teams": [],
+              "time": "15:45",
+              "title": "Répétition Victo et Louise",
+              "type": "REPETITION"
+            },
+            {
+              "color": "#f1948a",
+              "details": "",
+              "duration": 15,
+              "id": "e_ew5r84a",
+              "teams": [
+                "Team Boost"
+              ],
+              "time": "16:15",
+              "title": "BOOST",
+              "type": "BOOST"
+            }
+          ],
+          "id": "sess_e_r7pxlni",
+          "name": "Répétitions",
+          "start_time": "13:30"
+        },
+        {
           "end_time": "18:45",
           "events": [
+            {
+              "color": "#f9e79f",
+              "details": "Entrée et placement des invités",
+              "duration": 20,
+              "id": "e_a8n9hdu",
+              "teams": [
+                "Team Accueil"
+              ],
+              "time": "16:40",
+              "title": "Ouverture des portes",
+              "type": "FUNDRAISING"
+            },
             {
               "color": "#a9dfbf",
               "details": "",
@@ -76,7 +202,7 @@
               "color": "#d5f5e3",
               "details": "Margaux",
               "duration": 3,
-              "id": "e_b4g43bb",
+              "id": "e_eztaqj8",
               "teams": [],
               "time": "17:52",
               "title": "Danse",
@@ -171,6 +297,82 @@
               "time": "19:35",
               "title": "Spectacle Enfants",
               "type": "STE_CENE"
+            },
+            {
+              "color": "#d5f5e3",
+              "details": "Victo et Louise",
+              "duration": 2,
+              "id": "e_uig32lf",
+              "teams": [
+                "Team Son"
+              ],
+              "time": "19:50",
+              "title": "Interlude musical",
+              "type": "REUNION"
+            },
+            {
+              "color": "#d5f5e3",
+              "details": "Margaux",
+              "duration": 3,
+              "id": "e_b4g43bb",
+              "teams": [],
+              "time": "19:52",
+              "title": "Danse",
+              "type": "REUNION"
+            },
+            {
+              "color": "#d5f5e3",
+              "details": "Solo Rondro + musiciens",
+              "duration": 5,
+              "id": "e_bsqsnya",
+              "teams": [
+                "Team Son"
+              ],
+              "time": "19:55",
+              "title": "Racontez-moi le vrai Noël",
+              "type": "REUNION"
+            },
+            {
+              "color": "#e32400",
+              "details": "Matt",
+              "duration": 15,
+              "id": "e_9r49c0j",
+              "teams": [],
+              "time": "20:00",
+              "title": "Message",
+              "type": "PREDICATION"
+            },
+            {
+              "color": "#7fb3d3",
+              "details": "",
+              "duration": 5,
+              "id": "e_z6dxxbe",
+              "teams": [],
+              "time": "20:15",
+              "title": "Prière",
+              "type": "PRIERE"
+            },
+            {
+              "color": "#ffaa00",
+              "details": "1. Voici Noël \n2. In Excellais Deo / Glory Alleluia",
+              "duration": 10,
+              "id": "e_5y2nwm6",
+              "teams": [],
+              "time": "20:20",
+              "title": "Set de louange 2",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 5,
+              "id": "e_8gdda5h",
+              "teams": [
+                "Team MC/Infos"
+              ],
+              "time": "20:30",
+              "title": "Mot de fin du MC",
+              "type": "ANNONCES"
             }
           ],
           "id": "jour1_programme",
@@ -179,7 +381,18 @@
         },
         {
           "end_time": "20:45",
-          "events": [],
+          "events": [
+            {
+              "color": "#f9e79f",
+              "details": "",
+              "duration": 20,
+              "id": "e_dyf4tuu",
+              "teams": [],
+              "time": "18:40",
+              "title": "Ouverture des portes",
+              "type": "FUNDRAISING"
+            }
+          ],
           "id": "sess_e_ypr7zmw",
           "name": "Célébration 2",
           "start_time": "19:00"
@@ -204,7 +417,11 @@
     "Team Boost",
     "Team Accueil",
     "Team Médias Projection",
-    "Team MC/Infos"
+    "Team MC/Infos",
+    "Team Médias Capture",
+    "Team Ménage",
+    "Team Sécurité",
+    "Team Parking"
   ],
   "types": {
     "ANNONCES": {
@@ -216,8 +433,8 @@
       "label": "Boost"
     },
     "FUNDRAISING": {
-      "color": "#F9E79F",
-      "label": "Levée de fonds"
+      "color": "#f9e79f",
+      "label": "Accueil et transitions"
     },
     "INTERCESSION": {
       "color": "#D6EAF8",
