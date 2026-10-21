@@ -906,14 +906,30 @@ function closeSessionModal() {
 function openMetaModal() {
   ensureScheduleShape();
   buildTeamCheckboxes('m-teams', window.SERVICE_TEAMS || DEFAULT_SERVICE_TEAMS, serviceTeams());
+  addMetaTeamRemoveButtons();
+  document.getElementById('m-new-team').value = '';
   document.getElementById('m-event').value = schedule.event || '';
   document.getElementById('m-lieu').value = schedule.lieu || '';
   document.getElementById('m-installation').value = schedule.installation_dates || '';
   document.getElementById('m-conference').value = schedule.conference_dates || '';
   document.getElementById('m-dresscode').value = schedule.dresscode || '';
-  document.getElementById('m-att-vendredi').value = schedule.attendance.vendredi || '';
-  document.getElementById('m-att-samedi').value = schedule.attendance.samedi || '';
-  document.getElementById('m-att-dimanche').value = schedule.attendance.dimanche || '';
+  const attendance = document.getElementById('m-attendance');
+  attendance.replaceChildren();
+  (schedule.days || []).forEach((day, index) => {
+    const row = document.createElement('div');
+    row.className = 'form-row';
+    const label = document.createElement('label');
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(day.date || '') ? day.date.split('-').reverse().join('/') : 'date non renseignée';
+    label.textContent = `Nombre de personnes attendues le ${date}`;
+    label.htmlFor = `m-att-${index}`;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = label.htmlFor;
+    input.dataset.dayIndex = index;
+    input.value = schedule.attendance[day.id] ?? day.expected_people ?? '';
+    row.append(label, input);
+    attendance.appendChild(row);
+  });
   document.getElementById('modal-meta').classList.remove('hidden');
 }
 
@@ -921,7 +937,35 @@ function closeMetaModal() {
   document.getElementById('modal-meta').classList.add('hidden');
 }
 
-function saveMeta() {
+function addMetaTeamRemoveButtons() {
+  document.querySelectorAll('#m-teams label').forEach(label => {
+    if (label.querySelector('button')) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = '×';
+    button.title = 'Retirer cette équipe';
+    button.setAttribute('aria-label', `Retirer ${label.querySelector('input').value}`);
+    button.style.cssText = 'margin-left:auto;border:0;background:transparent;color:#b42318;cursor:pointer;font-size:20px';
+    button.onclick = event => { event.preventDefault(); label.remove(); };
+    label.appendChild(button);
+  });
+}
+
+function addMetaTeam() {
+  const input = document.getElementById('m-new-team');
+  const name = input.value.trim();
+  if (!name) return;
+  const choices = Array.from(document.querySelectorAll('#m-teams input'));
+  const existing = choices.find(choice => choice.value.toLowerCase() === name.toLowerCase());
+  if (existing) existing.checked = true;
+  else {
+    buildTeamCheckboxes('m-teams', [...choices.map(choice => choice.value), name], [...choices.filter(choice => choice.checked).map(choice => choice.value), name]);
+    addMetaTeamRemoveButtons();
+  }
+  input.value = '';
+}
+
+async function saveMeta() {
   ensureScheduleShape();
   schedule.service_teams = Array.from(document.querySelectorAll('#m-teams input:checked'), input => input.value);
   schedule.event = document.getElementById('m-event').value.trim();
@@ -929,9 +973,17 @@ function saveMeta() {
   schedule.installation_dates = document.getElementById('m-installation').value.trim();
   schedule.conference_dates = document.getElementById('m-conference').value.trim();
   schedule.dresscode = document.getElementById('m-dresscode').value.trim();
-  schedule.attendance.vendredi = document.getElementById('m-att-vendredi').value.trim();
-  schedule.attendance.samedi = document.getElementById('m-att-samedi').value.trim();
-  schedule.attendance.dimanche = document.getElementById('m-att-dimanche').value.trim();
+  document.querySelectorAll('#m-attendance input').forEach(input => {
+    const day = schedule.days[Number(input.dataset.dayIndex)];
+    day.expected_people = input.value.trim();
+    schedule.attendance[day.id] = day.expected_people;
+  });
+  try {
+    await persistLocalSchedule();
+  } catch (err) {
+    showToast('Impossible de sauvegarder les informations. Réessayez.');
+    return;
+  }
   closeMetaModal();
   showToast('Infos générales enregistrées');
 }

@@ -1706,23 +1706,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="form-row">
       <label>Équipes nécessaires à l'évènement</label>
       <div id="m-teams" class="team-checkboxes"></div>
+      <input type="text" id="m-new-team" placeholder="Nouvelle équipe" aria-label="Nouvelle équipe" style="margin-top:8px">
+      <button type="button" class="btn-modal btn-cancel" onclick="addMetaTeam()">Ajouter une équipe</button>
     </div>
     <div class="form-row">
-      <label>Nombre de personnes attendues</label>
-      <div class="meta-grid">
-        <div class="form-row" style="margin:0">
-          <label>Vendredi</label>
-          <input type="text" id="m-att-vendredi" placeholder="Ex: 400">
-        </div>
-        <div class="form-row" style="margin:0">
-          <label>Samedi</label>
-          <input type="text" id="m-att-samedi" placeholder="Ex: 550">
-        </div>
-      </div>
-      <div class="form-row" style="margin-top:12px">
-        <label>Dimanche</label>
-        <input type="text" id="m-att-dimanche" placeholder="Ex: 450">
-      </div>
+      <div id="m-attendance"></div>
       <div class="helper-text">Ces informations sont reprises en tête de la Running Sheet exportée.</div>
     </div>
     <div class="modal-actions">
@@ -1747,7 +1735,7 @@ window.SERVICE_TEAMS = __SERVICE_TEAMS__;
 .team-checkboxes input[type="checkbox"] { width: 16px; height: 16px; flex: 0 0 16px; accent-color: #0F4C3A; }
 .modal-actions { flex-wrap: wrap; }
 </style>
-<script src="/app.js?v=18"></script>
+<script src="/app.js?v=19"></script>
 </body>
 </html>
 """
