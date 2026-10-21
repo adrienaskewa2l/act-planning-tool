@@ -135,6 +135,42 @@
               "time": "18:30",
               "title": "Mot de fin du MC",
               "type": "ANNONCES"
+            },
+            {
+              "color": "#a9dfbf",
+              "details": "",
+              "duration": 5,
+              "id": "e_3urnrps",
+              "teams": [
+                "Team MC/Infos"
+              ],
+              "time": "19:00",
+              "title": "Mot d'accueil du MC",
+              "type": "ANNONCES"
+            },
+            {
+              "color": "#ffaa00",
+              "details": "Set du choeur gospel : \n\n1. Joy to the World\n2. Ô Peuple fidèle\n3. Jesus what a wonderful child\n4. Minuit chrétien \n5. Douce nuit\n6. Hallelujah ",
+              "duration": 30,
+              "id": "e_7gimxx0",
+              "teams": [
+                "Team Son",
+                "Team Louange",
+                "Team Médias Projection"
+              ],
+              "time": "19:05",
+              "title": "Set de louange",
+              "type": "TED_PITCH"
+            },
+            {
+              "color": "#53d5fd",
+              "details": "Spectacle Enfants",
+              "duration": 15,
+              "id": "e_iamsxid",
+              "teams": [],
+              "time": "19:35",
+              "title": "Spectacle Enfants",
+              "type": "STE_CENE"
             }
           ],
           "id": "jour1_programme",
